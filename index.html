@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ABYSS FORGE v6.0 - 레인보우 오픈월드 & 보스레이드 RPG</title>
+  <title>ABYSS FORGE v7.0 - 5차 전직 & AI 멀티월드 RPG</title>
   <style>
     :root {
       --bg-dark: #090b10;
@@ -125,7 +125,7 @@
     }
 
     #side-panel {
-      width: 495px;
+      width: 505px;
       background: var(--panel-bg);
       border-left: 1px solid var(--border-col);
       display: flex;
@@ -179,7 +179,7 @@
       #main-area { flex-direction: row; }
       #side-panel {
         width: 48vw;
-        max-width: 460px;
+        max-width: 465px;
         height: 100%;
         position: relative;
       }
@@ -259,7 +259,6 @@
       box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
     }
 
-    /* 보스 레이드 카드 */
     .raid-card {
       background: linear-gradient(90deg, #16192b, #231528);
       border: 1px solid #581c87;
@@ -279,6 +278,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
     }
     .equip-grid, .inv-grid {
       display: grid;
@@ -303,7 +304,6 @@
     .item-slot:hover { transform: scale(1.04); z-index: 2; }
     .item-slot.selected { outline: 2px solid #00f0ff; outline-offset: 1px; }
 
-    /* 빨주노초파남보 7단계 무지개 슬롯 테두리 */
     .item-slot.rarity-R1_RED    { border-color: var(--rb-1-red); }
     .item-slot.rarity-R2_ORANGE { border-color: var(--rb-2-orange); }
     .item-slot.rarity-R3_YELLOW { border-color: var(--rb-3-yellow); }
@@ -460,29 +460,6 @@
       text-shadow: 0 1px 4px #000;
     }
 
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 7, 12, 0.86);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 90;
-      padding: 16px;
-    }
-    .modal-box {
-      background: #121724;
-      border: 2px solid var(--gold);
-      border-radius: 10px;
-      padding: 18px;
-      max-width: 720px;
-      max-height: 88dvh;
-      overflow-y: auto;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
-    }
-
     #tooltip-container {
       position: fixed;
       pointer-events: none;
@@ -493,7 +470,7 @@
     }
     #tooltip-container.pinned { pointer-events: auto; }
     .tooltip-card {
-      width: 305px;
+      width: 310px;
       max-height: 80dvh;
       overflow-y: auto;
       background: rgba(10, 13, 21, 0.98);
@@ -526,7 +503,6 @@
       border-radius: 3px;
       margin-right: 4px;
     }
-    /* 옵션 티어도 무지개 색상(T5 빨강 -> T4 주황 -> T3 노랑/초록 -> T2 파랑 -> T1 보라) */
     .t-T1 { background: rgba(204,93,232,0.25); color: #e599f7; border: 1px solid #cc5de8; }
     .t-T2 { background: rgba(92,124,250,0.25); color: #91a7ff; border: 1px solid #5c7cfa; }
     .t-T3 { background: rgba(51,154,240,0.22); color: #74c0fc; border: 1px solid #339af0; }
@@ -571,23 +547,35 @@
       background: rgba(0,0,0,0.6);
       border: 1px solid currentColor;
     }
-    .bot-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-      margin-top: 10px;
+    .job-step-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      margin-top: 6px;
     }
-    .bot-table th, .bot-table td {
+    .job-step-pill {
+      padding: 5px 3px;
+      border-radius: 5px;
+      background: #0d111a;
       border: 1px solid #2d3548;
-      padding: 5px 6px;
       text-align: center;
+      font-size: 10px;
+      color: #64748b;
     }
-    .bot-table th {
-      background: #1b2236;
-      color: var(--gold);
+    .job-step-pill.unlocked {
+      border-color: #ffd700;
+      color: #fde047;
+      background: rgba(92, 69, 18, 0.35);
+      font-weight: bold;
+    }
+    .job-step-pill.current {
+      border: 2px solid #05d5fa;
+      color: #ffffff;
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      box-shadow: 0 0 10px rgba(5, 213, 250, 0.45);
     }
     #log-box {
-      height: 90px;
+      height: 88px;
       overflow-y: auto;
       background: #090c12;
       border-top: 1px solid var(--border-col);
@@ -617,11 +605,13 @@
       <span class="stat-pill">
         👤직업:
         <select id="sel-char-class" style="padding:1px 4px; font-weight:bold; color:#38bdf8;">
-          <option value="BERSERKER">⚔️ 버서커(전사)</option>
-          <option value="ARCHMAGE">🔮 아크메이지(마법사)</option>
-          <option value="SHADOW">🗡️ 섀도우(도적)</option>
+          <option value="BERSERKER">⚔️ 버서커</option>
+          <option value="ARCHMAGE">🔮 아크메이지</option>
+          <option value="SHADOW">🗡️ 섀도우</option>
         </select>
+        <b id="ui-job-tier-badge" style="color:#ffd700;">[1차]</b>
       </span>
+      <span class="stat-pill" title="내 레벨에 따른 최대 장비 100% 제어 레벨">⚖️제어ilvl <b id="ui-sync-ilvl" style="color:#38bdf8;">8</b></span>
       <span class="stat-pill">👹 보스 <b id="ui-boss-gauge" style="color:#fbbf24;">0/12</b></span>
       <span class="stat-pill">⭐ Lv.<b id="ui-lv">1</b> (<span id="ui-exp">0%</span>)</span>
       <span class="stat-pill">⚔️ 전투력 <b id="ui-power">0</b> <span id="ui-berserk-badge" style="color:#ff3860; display:none;">[광전사!]</span></span>
@@ -636,13 +626,15 @@
       <label style="font-size:11px; cursor:pointer; display:flex; align-items:center; gap:2px; color:#86efac;" title="전투력이 더 높은 장비를 획득하면 즉시 자동 장착합니다">
         <input type="checkbox" id="chk-auto-equip" checked /> ⬆️상위자동장착
       </label>
-      <label style="font-size:11px; cursor:pointer; display:flex; align-items:center; gap:2px; color:#93c5fd;" title="장착 장비보다 약하거나 설정 등급 이하인 장비를 즉시 자동 해체합니다">
-        <input type="checkbox" id="chk-auto-salvage" checked /> 🔨자동해체
+      <label style="font-size:11px; cursor:pointer; display:flex; align-items:center; gap:2px; color:#93c5fd;" title="장착 장비보다 약한 모든 장비(잠금/태초 제외)를 등급 불문 즉시 자동 해체합니다">
+        <input type="checkbox" id="chk-auto-salvage" checked /> 🔨하위전부자동해체
+      </label>
+      <label style="font-size:11px; cursor:pointer; display:flex; align-items:center; gap:2px; color:#fde047;" title="필드에 다른 AI 유저들이 함께 돌아다니며 사냥하고 채팅합니다">
+        <input type="checkbox" id="chk-ai-players" checked /> 👥AI유저동반
       </label>
       <label style="font-size:11px; cursor:pointer; display:flex; align-items:center; gap:2px;">
         <input type="checkbox" id="chk-auto-advance-zone" /> 보스처치시 다음지역
       </label>
-      <button class="btn" id="btn-sim-1m">🎲 100만회</button>
       <button class="btn" id="btn-save">💾 저장</button>
       <button class="btn btn-danger" id="btn-reset">🗑️ 초기화</button>
     </div>
@@ -716,27 +708,27 @@
     <div id="side-panel">
       <div id="drawer-handle">
         <div class="drawer-pill"></div>
-        <span>▲ 월드맵 / 레이드 / 인벤 / 재련 / 펫·직업 드로어</span>
+        <span>▲ 월드맵 / 레이드 / 인벤 / 재련 / 5차전직·용병 드로어</span>
         <div class="drawer-pill"></div>
       </div>
 
       <div class="tabs">
         <div class="tab-btn active" data-tab="tab-world">🗺️ 월드(32)</div>
         <div class="tab-btn" data-tab="tab-raid">🐉 레이드</div>
-        <div class="tab-btn" data-tab="tab-inv">🎒 인벤/펫</div>
+        <div class="tab-btn" data-tab="tab-inv">🎒 인벤/일괄</div>
+        <div class="tab-btn" data-tab="tab-party">🤝 용병/펫</div>
         <div class="tab-btn" data-tab="tab-forge">🔨 재련</div>
-        <div class="tab-btn" data-tab="tab-filter-codex">🔍 도감</div>
-        <div class="tab-btn" data-tab="tab-skill">🌿 직업/성소</div>
+        <div class="tab-btn" data-tab="tab-skill">👑 5차전직/성소</div>
       </div>
 
-      <!-- 탭 0: 오픈월드 대륙 지도 (8대륙 32개 사냥터) -->
+      <!-- 탭 0: 오픈월드 대륙 지도 -->
       <div class="tab-content active" id="tab-world">
         <div class="forge-box" style="margin-bottom:8px;">
           <div style="font-size:12px; font-weight:bold; color:#4ade80; margin-bottom:3px;">
-            🌍 아비스 오픈월드 대륙 (8대륙 32개 사냥터 + 5단계 월드 난이도)
+            🌍 아비스 오픈월드 대륙 (AI 모험가 동반 사냥 & 레벨 동기화)
           </div>
           <div style="font-size:10px; color:#cbd5e1; line-height:1.45;">
-            • 난이도가 쉽다면 상단 바에서 <b>🔥난이도(악몽/고행/나락/불지옥)</b>를 올리거나, 아래의 <b>7대륙(피의 차원문)·8대륙(신들의 황혼)</b> 상위 던전으로 진입하세요!
+            • <b>장비 레벨 제어율</b>: 내 레벨(`Lv×2 + 6`)보다 높은 `ilvl` 장비는 레벨에 맞게 위력이 조율되며, 권장 레벨이 높은 사냥터에서는 레벨 격차 페널티가 적용됩니다.
           </div>
         </div>
         <div id="world-map-list"></div>
@@ -746,19 +738,19 @@
       <div class="tab-content" id="tab-raid">
         <div class="forge-box">
           <div style="font-size:13px; font-weight:800; color:#c084fc; margin-bottom:4px;">
-            🐉 태초의 거신 보스 레이드 (Boss Raid Arena)
+            🐉 태초의 거신 보스 레이드 (용병단 & AI 유저 합동 토벌)
           </div>
           <div style="font-size:11px; color:#cbd5e1; line-height:1.45;">
-            • 입장 시 전용 레이드 결투장으로 이동하며 <b>90초 내에 보스를 토벌</b>해야 합니다.<br/>
-            • 토벌 성공 시 <b>6단계(남색) ~ 7단계(보라) 최상위 무지개 장비 다수</b>와 <b>보석·에디큐브·영혼파편</b>을 확정 획득합니다!
+            • 입장 시 고용한 <b>용병단 및 AI 유저들과 함께</b> 레이드 보스를 협공합니다!<br/>
+            • 토벌 성공 시 <b>6단계(남색) ~ 7단계(보라) 무지개 장비 5개</b>와 <b>보석·에디큐브·영혼파편</b>을 확정 획득합니다!
           </div>
         </div>
         <div id="raid-boss-list"></div>
       </div>
 
-      <!-- 탭 2: 장비 & 인벤토리 & 펫 & 무지개 등급 안내 -->
+      <!-- 탭 2: 장비 & 인벤토리 (전체 일괄 해체 / 전체 일괄 장착 탑재) -->
       <div class="tab-content" id="tab-inv">
-        <div style="font-size:10px; color:#cbd5e1; margin-bottom:2px;">🌈 <b>빨·주·노·초·파·남·보</b> 7단계 무지개 장비 등급표 (오른쪽일수록 상위 등급)</div>
+        <div style="font-size:10px; color:#cbd5e1; margin-bottom:2px;">🌈 <b>빨·주·노·초·파·남·보</b> 7단계 무지개 장비 등급표</div>
         <div class="rainbow-legend-bar">
           <span class="rb-chip" style="color:var(--rb-1-red);">1.빨강</span>
           <span class="rb-chip" style="color:var(--rb-2-orange);">2.주황</span>
@@ -769,22 +761,9 @@
           <span class="rb-chip" style="color:var(--rb-7-violet);">7.보라(신화)</span>
         </div>
 
-        <!-- 자동습득 펫 관리 박스 -->
-        <div class="forge-box" style="padding:7px 10px; margin-bottom:8px; border-color:#38bdf8;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <b style="font-size:11px; color:#38bdf8;">🐉 자동습득 신화 펫 [루비곤 Lv.<span id="ui-pet-lv">1</span>]</b>
-              <div style="font-size:10px; color:#94a3b8;" id="ui-pet-desc">필드 아이템 자석 자동습득 | 이동속도 350 | 골드/드랍 보너스 +5%</div>
-            </div>
-            <div style="display:flex; gap:4px; align-items:center;">
-              <label style="font-size:10px; cursor:pointer;"><input type="checkbox" id="chk-pet-active" checked /> 소환</label>
-              <button class="btn btn-gold" id="btn-pet-upgrade">펫 강화 (1,000G)</button>
-            </div>
-          </div>
-        </div>
-
         <div class="section-title">
-          <span>착용 장비 (탭/클릭: 툴팁 고정 / 우클릭: 장착·해제)</span>
+          <span>착용 장비 (제어 가능 최대 ilvl: <b id="ui-inv-sync-ilvl" style="color:#38bdf8;">8</b>)</span>
+          <button class="btn btn-green" id="btn-equip-all-best">⬆️ 인벤토리 상위장비 전체 일괄장착</button>
         </div>
         <div class="equip-grid" id="equip-grid"></div>
 
@@ -795,9 +774,9 @@
 
         <div class="section-title">
           <span>인벤토리 (<span id="inv-count">0</span>/36)</span>
-          <div style="display:flex; gap:4px;">
+          <div style="display:flex; gap:4px; flex-wrap:wrap;">
             <button class="btn" id="btn-sort">정렬</button>
-            <button class="btn btn-danger" id="btn-salvage-low">4단계(초록)이하 일괄해체</button>
+            <button class="btn btn-danger" id="btn-salvage-all" title="잠금(🔒) 및 태초신화를 제외한 인벤토리의 모든 아이템을 등급 불문 한 번에 해체합니다">🗑️ 잠금제외 인벤토리 전체 일괄해체</button>
           </div>
         </div>
         <div class="inv-grid" id="inv-grid"></div>
@@ -815,14 +794,48 @@
 
         <div class="forge-box">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <span style="font-size:11px; font-weight:bold;">캐릭터 상세 스탯</span>
-            <span style="font-size:10px; color:#94a3b8;">시드: <b id="ui-seed-label">-</b></span>
+            <span style="font-size:11px; font-weight:bold;">캐릭터 상세 스탯 & 도감 요약</span>
+            <span style="font-size:10px; color:#ffd700;">태초획득: <b id="codex-mythic-cnt">0</b> / 완벽: <b id="codex-perfect-cnt">0</b></span>
           </div>
           <div id="char-stat-list" style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:11px; color:#cbd5e1;"></div>
         </div>
       </div>
 
-      <!-- 탭 3: 심화 재련 -->
+      <!-- 탭 3: 용병단 & 자동습득 펫 & AI 유저 설정 (일괄 강화 탑재) -->
+      <div class="tab-content" id="tab-party">
+        <div class="forge-box" style="border-color:#38bdf8;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <b style="font-size:12px; color:#38bdf8;">🐉 자동습득 신화 펫 [루비곤 Lv.<span id="ui-pet-lv">1</span>]</b>
+            <label style="font-size:11px; cursor:pointer;"><input type="checkbox" id="chk-pet-active" checked /> 소환 활성화</label>
+          </div>
+          <div style="font-size:10px; color:#cbd5e1; margin-bottom:8px;" id="ui-pet-desc"></div>
+          <div style="display:flex; gap:5px;">
+            <button class="btn btn-gold" id="btn-pet-up-1" style="flex:1;">+1 강화</button>
+            <button class="btn btn-gold" id="btn-pet-up-10" style="flex:1;">+10 일괄강화</button>
+            <button class="btn btn-green" id="btn-pet-up-max" style="flex:1;">⚡ 골드 MAX 강화</button>
+          </div>
+        </div>
+
+        <div class="forge-box" style="border-color:#fbbf24;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <b style="font-size:12px; color:#fbbf24;">🤝 아비스 고용 용병단 (3인 파티 협동 사냥)</b>
+            <button class="btn btn-green" id="btn-merc-all-max">⚡ 전 용병 골드 균등 MAX 일괄강화</button>
+          </div>
+          <div style="font-size:10px; color:#94a3b8; margin-bottom:8px;">
+            용병을 고용하면 필드와 보스 레이드에서 함께 몬스터를 타격하고 캐릭터를 치유/버프합니다.
+          </div>
+          <div id="mercenary-list"></div>
+        </div>
+
+        <div class="forge-box" style="border-color:#c084fc;">
+          <div style="font-size:12px; font-weight:bold; color:#c084fc; margin-bottom:4px;">👥 오픈월드 AI 유저 멀티플레이 시스템</div>
+          <div style="font-size:11px; color:#cbd5e1; line-height:1.45;">
+            현재 사냥터에서 <b>4명의 AI 모험가</b>가 함께 사냥하며 보스를 협공하고 실시간 말풍선 대화를 나눕니다. (상단 바 `👥AI유저동반` 체크박스로 ON/OFF 가능)
+          </div>
+        </div>
+      </div>
+
+      <!-- 탭 4: 심화 재련 (연속 스타포스 탑재) -->
       <div class="tab-content" id="tab-forge">
         <div id="forge-empty" style="color:#94a3b8; font-size:12px;">인벤토리나 착용 장비에서 재련할 아이템을 먼저 선택해주세요.</div>
         <div id="forge-content" style="display:none;">
@@ -832,8 +845,10 @@
               <span id="forge-star-badge" style="color:#ffd700; font-weight:bold; font-size:12px;"></span>
             </div>
             <div style="font-size:11px; color:#94a3b8; margin-top:4px;" id="forge-star-rates"></div>
-            <div style="margin-top:7px; display:flex; gap:6px;">
-              <button class="btn btn-gold" id="btn-starforce" style="flex:1;">⭐ 스타포스 강화 시도</button>
+            <div style="margin-top:7px; display:flex; gap:5px; flex-wrap:wrap;">
+              <button class="btn btn-gold" id="btn-starforce" style="flex:1;">⭐ +1회 강화</button>
+              <button class="btn btn-gold" id="btn-starforce-10" style="flex:1;">⚡ +10성까지 연속강화</button>
+              <button class="btn btn-green" id="btn-starforce-15" style="flex:1;">🔥 +15성까지 연속강화</button>
             </div>
           </div>
 
@@ -842,7 +857,7 @@
             <div class="pity-bar-wrap">
               <div style="display:flex; justify-content:space-between;">
                 <span>🌟 완벽(Perfect) 천장</span>
-                <span id="pity-perfect-text">0 / 150 (T1·T2 보너스 +0.0%)</span>
+                <span id="pity-perfect-text">0 / 150</span>
               </div>
               <div class="bar-bg"><div class="bar-fill" id="pity-perfect-bar" style="background:#ffd700; width:0%;"></div></div>
             </div>
@@ -882,17 +897,13 @@
           </div>
 
           <div class="forge-box">
-            <div style="font-size:11px; font-weight:bold; color:#f472b6; margin-bottom:6px;">
-              💎 장비 보석 소켓
-            </div>
+            <div style="font-size:11px; font-weight:bold; color:#f472b6; margin-bottom:6px;">💎 장비 보석 소켓</div>
             <div id="forge-gem-inventory" style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:6px; font-size:10px;"></div>
             <div id="forge-socket-list"></div>
           </div>
 
           <div class="forge-box">
-            <div style="font-size:12px; font-weight:bold; color:#38bdf8; margin-bottom:6px;">
-              🤖 목표 옵션 자동 리롤
-            </div>
+            <div style="font-size:12px; font-weight:bold; color:#38bdf8; margin-bottom:6px;">🤖 목표 옵션 자동 리롤</div>
             <div style="display:grid; grid-template-columns:1fr auto; gap:5px; margin-bottom:5px; align-items:center;">
               <select id="auto-opt-1"></select>
               <select id="auto-tier-1">
@@ -910,18 +921,9 @@
               </select>
             </div>
             <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:5px; margin-bottom:6px; font-size:10px; color:#cbd5e1;">
-              <div>
-                최소 보유 골드
-                <input type="number" id="auto-min-gold" value="0" min="0" step="500" style="width:100%; margin-top:2px;" />
-              </div>
-              <div>
-                최소 보유 재련석
-                <input type="number" id="auto-min-stones" value="0" min="0" step="5" style="width:100%; margin-top:2px;" />
-              </div>
-              <div>
-                최대 시도 상한
-                <input type="number" id="auto-max-attempts" value="500" min="1" max="50000" step="50" style="width:100%; margin-top:2px;" />
-              </div>
+              <div>최소 골드<input type="number" id="auto-min-gold" value="0" min="0" step="500" style="width:100%; margin-top:2px;" /></div>
+              <div>최소 재련석<input type="number" id="auto-min-stones" value="0" min="0" step="5" style="width:100%; margin-top:2px;" /></div>
+              <div>최대 시도<input type="number" id="auto-max-attempts" value="500" min="1" max="50000" step="50" style="width:100%; margin-top:2px;" /></div>
             </div>
             <label style="font-size:11px; display:flex; align-items:center; gap:5px; margin-bottom:7px; cursor:pointer;">
               <input type="checkbox" id="chk-auto-stop-perfect" checked /> 완벽(Perfect) 또는 태초신화(Mythic) 등장 시 즉시 정지
@@ -930,65 +932,34 @@
               <button class="btn btn-gold" id="btn-auto-reroll-start" style="flex:1;">▶️ 자동 리롤 시작</button>
               <button class="btn btn-danger" id="btn-auto-reroll-stop" disabled>⏹️ 정지</button>
             </div>
-            <div id="auto-reroll-stats" style="font-size:11px; color:#cbd5e1; margin-top:6px;">
-              시도: 0회 | 소모 골드: 0 G | 소모 재련석: 0개
-            </div>
+            <div id="auto-reroll-stats" style="font-size:11px; color:#cbd5e1; margin-top:6px;">시도: 0회 | 소모 골드: 0 G</div>
           </div>
         </div>
       </div>
 
-      <!-- 탭 4: 자동해체 설정 & 도감 -->
-      <div class="tab-content" id="tab-filter-codex">
-        <div class="forge-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <b style="font-size:12px; color:#4ade80;">🔨 자동해체 & 세부 필터 규칙</b>
-          </div>
-          <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px; font-size:11px;">
-            <span>자동해체 기준 등급:</span>
-            <select id="filter-min-rarity">
-              <option value="R3_YELLOW">2단계(주황) 이하 즉시해체</option>
-              <option value="R4_GREEN" selected>3단계(노랑) 이하 즉시해체</option>
-              <option value="R5_BLUE">4단계(초록) 이하 즉시해체</option>
-              <option value="R6_INDIGO">5단계(파랑) 이하 즉시해체</option>
-              <option value="R7_VIOLET">6단계(남색) 이하 즉시해체</option>
-            </select>
-          </div>
-          <div style="display:flex; gap:4px; margin-bottom:6px;">
-            <select id="filter-add-opt" style="flex:1;"></select>
-            <select id="filter-add-tier">
-              <option value="T1">T1 이상</option>
-              <option value="T2" selected>T2 이상</option>
-              <option value="T3">T3 이상</option>
-            </select>
-            <button class="btn btn-gold" id="btn-add-filter-rule">+ 조건추가</button>
-          </div>
-          <div id="filter-rule-list" style="font-size:11px;"></div>
-        </div>
-
-        <div class="forge-box">
-          <div style="font-size:12px; font-weight:bold; color:#ffd700; margin-bottom:4px;">
-            📖 명예의 전당 도감 (태초신화 <span id="codex-mythic-cnt">0</span>회 / 완벽 <span id="codex-perfect-cnt">0</span>회 루팅)
-          </div>
-          <div class="inv-grid" id="codex-gallery-grid" style="margin-bottom:8px;"></div>
-          <div style="font-size:11px; font-weight:bold; color:#38bdf8; margin-bottom:4px;">드랍 획득 옵션별 역대 최고 롤 기록</div>
-          <div id="codex-best-options" style="max-height:170px; overflow-y:auto; font-size:11px;"></div>
-        </div>
-      </div>
-
-      <!-- 탭 5: 직업 선택 & 스킬 트리 & 영구 성소 -->
+      <!-- 탭 5: 1~5차 전직 시스템 & 일괄 성소 & 일괄 스킬 트리 -->
       <div class="tab-content" id="tab-skill">
-        <div class="forge-box">
-          <div style="font-size:12px; font-weight:bold; color:#38bdf8; margin-bottom:6px;">👤 클래스(직업) 실시간 전직</div>
-          <div id="class-select-cards" style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;"></div>
+        <div class="forge-box" style="border-color:#ffd700;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <b style="font-size:12px; color:#ffd700;">👑 클래스 선택 & 1차 ~ 5차 전직 각성</b>
+            <button class="btn btn-gold" id="btn-job-advance">⚡ 다음 차수 전직 각성</button>
+          </div>
+          <div id="class-select-cards" style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:6px;"></div>
+          <div id="job-advancement-info" style="font-size:11px; color:#e2e8f0; margin-bottom:4px;"></div>
+          <div class="job-step-bar" id="job-step-bar"></div>
         </div>
 
-        <div class="forge-box">
-          <div style="font-size:12px; font-weight:bold; color:#e0aaff; margin-bottom:4px;">🏛️ 영구 성소 업그레이드 (👻 영혼 파편 전용)</div>
+        <div class="forge-box" style="border-color:#9d4edd;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <b style="font-size:12px; color:#e0aaff;">🏛️ 영구 성소 (👻 영혼 파편)</b>
+            <button class="btn btn-soul" id="btn-sanctuary-all-max">⚡ 영혼파편 전체 균등 MAX 일괄강화</button>
+          </div>
           <div id="sanctuary-list"></div>
         </div>
 
-        <div style="font-size:12px; margin:8px 0;">
-          남은 스킬 포인트(SP): <b id="ui-sp" style="color:#ffd700;">0</b> (레벨업 시 +1 획득)
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0;">
+          <span style="font-size:12px;">남은 스킬 포인트(SP): <b id="ui-sp" style="color:#ffd700;">0</b></span>
+          <button class="btn btn-green" id="btn-skill-all-max">⚡ 남은 SP 전체 균등 MAX 일괄투자</button>
         </div>
         <div id="skill-tree-list"></div>
       </div>
@@ -1006,7 +977,7 @@
 <script>
 /**
  * ============================================================================
- * [모듈 0] SeededRNG (mulberry32 기반 난수 생성기)
+ * [모듈 0] SeededRNG
  * ============================================================================
  */
 class SeededRNG {
@@ -1036,9 +1007,11 @@ const GlobalRNG = new SeededRNG(20261118);
 
 /**
  * ============================================================================
- * [모듈 1] 3종 직업(CLASSES), 5단계 월드 난이도(WORLD_TIERS), 8대륙 32사냥터, 5대 보스레이드
+ * [모듈 1] 3종 직업 × 1~5차 전직(JOB_TIERS), 용병 3종(MERCENARY_DEFS), AI 유저 풀
  * ============================================================================
  */
+const JOB_TIER_REQ_LVS = [1, 25, 60, 110, 180];
+
 const CHAR_CLASSES = {
   BERSERKER: {
     id: 'BERSERKER',
@@ -1048,11 +1021,18 @@ const CHAR_CLASSES = {
     desc: '근접 대검 특화 | 공격력 +20%, 최대체력 +30%, 흡혈 +5%',
     atkRange: 95,
     bonuses: { pctAtk: 20, pctHp: 30, lifeSteal: 5 },
+    advancements: [
+      { tier: 1, reqLv: 1,   title: '1차: 버서커',         finalDmgMult: 1.00, bonusCritRate: 0,  bonusCdr: 0,  auraDesc: '기초 광전사 투기' },
+      { tier: 2, reqLv: 25,  title: '2차: 블러드로드',     finalDmgMult: 1.35, bonusCritRate: 5,  bonusCdr: 5,  auraDesc: '최종 피해 x1.35, 치명타 확률 +5%' },
+      { tier: 3, reqLv: 60,  title: '3차: 데스나이트',     finalDmgMult: 1.85, bonusCritRate: 10, bonusCdr: 10, auraDesc: '최종 피해 x1.85, 스킬 범위 +20%' },
+      { tier: 4, reqLv: 110, title: '4차: 월드브레이커',   finalDmgMult: 2.65, bonusCritRate: 15, bonusCdr: 15, auraDesc: '최종 피해 x2.65, 방어력 관통 +20%' },
+      { tier: 5, reqLv: 180, title: '5차: 투신(鬪神) 아레스', finalDmgMult: 4.20, bonusCritRate: 25, bonusCdr: 22, auraDesc: '최종 피해 x4.20, 투신의 붉은 날개 및 궁극기 각성' }
+    ],
     skills: [
       { id: 0, key: 'Q', icon: '🌪️', name: '대지 분쇄',   mp: 10, cd: 3.0, desc: '주변 적을 강타해 광역 물리 피해를 입힙니다.', branchA: { name: '피의 갈증', desc: '범위 +35%, 피해량 8% 즉시 흡혈' }, branchB: { name: '분노 폭발', desc: '치명타 피해 +60% 추가' } },
       { id: 1, key: 'W', icon: '🩸', name: '혈풍 참격',   mp: 14, cd: 4.2, desc: '전방의 적들에게 연속 검기를 날립니다.', branchA: { name: '과다 출혈', desc: '타겟 +3 증가 및 둔화' }, branchB: { name: '처형자의 검', desc: '피해량 +70% 증폭' } },
       { id: 2, key: 'E', icon: '☄️', name: '단두대 강타', mp: 20, cd: 6.0, desc: '목표 지점으로 도약해 대지를 가릅니다.', branchA: { name: '지진 여파', desc: '반경 +50% 및 화염 지대 생성' }, branchB: { name: '거인 학살', desc: '보스/엘리트 피해 +80%' } },
-      { id: 3, key: 'R', icon: '🔥', name: '불멸의 광기', mp: 25, cd: 11.5, desc: '7초간 광전사 상태 돌입 및 체력 회복.', branchA: { name: '강철 육체', desc: '체력 45% 회복 및 방어력 +45' }, branchB: { name: '피의 학살자', desc: '치명타 확률 +25%, 공속 +60%' } }
+      { id: 3, key: 'R', icon: '🔥', name: '투신의 강림', mp: 25, cd: 11.5, desc: '7초간 광전사 각성 및 전방위 충격파 발산.', branchA: { name: '강철 육체', desc: '체력 45% 회복 및 방어력 +45' }, branchB: { name: '피의 학살자', desc: '치명타 확률 +25%, 공속 +60%' } }
     ]
   },
   ARCHMAGE: {
@@ -1061,13 +1041,20 @@ const CHAR_CLASSES = {
     icon: '🔮',
     color: '#38bdf8',
     desc: '원거리 마법 구체 | 속성피해 +35%, 쿨감 +15%, 마나 +50',
-    atkRange: 225,
+    atkRange: 230,
     bonuses: { elemDmg: 35, cdr: 15, flatMp: 50 },
+    advancements: [
+      { tier: 1, reqLv: 1,   title: '1차: 아크메이지',       finalDmgMult: 1.00, bonusCritRate: 0,  bonusCdr: 0,  auraDesc: '기초 비전 마력' },
+      { tier: 2, reqLv: 25,  title: '2차: 엘레멘탈마스터',   finalDmgMult: 1.35, bonusCritRate: 5,  bonusCdr: 5,  auraDesc: '최종 피해 x1.35, 쿨타임 감소 +5%' },
+      { tier: 3, reqLv: 60,  title: '3차: 아스트랄세이지',   finalDmgMult: 1.85, bonusCritRate: 10, bonusCdr: 10, auraDesc: '최종 피해 x1.85, 기본공격 마력탄 2연사' },
+      { tier: 4, reqLv: 110, title: '4차: 크로노맨서',       finalDmgMult: 2.65, bonusCritRate: 15, bonusCdr: 15, auraDesc: '최종 피해 x2.65, 스킬 범위 +25%' },
+      { tier: 5, reqLv: 180, title: '5차: 마신(魔神) 에테르나', finalDmgMult: 4.20, bonusCritRate: 25, bonusCdr: 22, auraDesc: '최종 피해 x4.20, 아스트랄 날개 및 성운 폭격 각성' }
+    ],
     skills: [
       { id: 0, key: 'Q', icon: '❄️', name: '프로스트 노바', mp: 10, cd: 3.0, desc: '주변 적을 얼려 광역 냉기 피해를 줍니다.', branchA: { name: '마력 흡수', desc: '범위 +35%, 피해량 8% 체력 회복' }, branchB: { name: '절대영도', desc: '치명타 피해 +60% 추가' } },
       { id: 1, key: 'W', icon: '⚡', name: '체인 라이트닝', mp: 14, cd: 4.0, desc: '고압 전류를 방출해 다수의 적을 감전시킵니다.', branchA: { name: '초전도체', desc: '타겟 +3 증가 및 감전 둔화' }, branchB: { name: '뇌신 강림', desc: '피해량 +70% 증폭' } },
       { id: 2, key: 'E', icon: '☄️', name: '메테오 스톰',   mp: 20, cd: 6.0, desc: '하늘에서 초거대 운석을 소환합니다.', branchA: { name: '성운 폭발', desc: '반경 +50% 및 지속 화염장판' }, branchB: { name: '비전 집중', desc: '보스/엘리트 피해 +80%' } },
-      { id: 3, key: 'R', icon: '🌌', name: '아케인 폭주',   mp: 25, cd: 11.5, desc: '7초간 마력 해방 및 보호막/체력 회복.', branchA: { name: '마나 실드', desc: '체력 45% 회복 및 방어력 +45' }, branchB: { name: '비전 가속', desc: '치명타 확률 +25%, 공속 +60%' } }
+      { id: 3, key: 'R', icon: '🌌', name: '창세의 빅뱅',   mp: 25, cd: 11.5, desc: '7초간 마신 각성 및 전장 전체 아케인 폭격.', branchA: { name: '마나 실드', desc: '체력 45% 회복 및 방어력 +45' }, branchB: { name: '비전 가속', desc: '치명타 확률 +25%, 공속 +60%' } }
     ]
   },
   SHADOW: {
@@ -1076,20 +1063,54 @@ const CHAR_CLASSES = {
     icon: '🗡️',
     color: '#c084fc',
     desc: '초고속 암살자 | 공속 +35%, 이속 +25%, 치명피해 +45%, 회피 +15%',
-    atkRange: 145,
+    atkRange: 150,
     bonuses: { atkSpd: 35, moveSpd: 25, critDmg: 45, evasion: 15 },
+    advancements: [
+      { tier: 1, reqLv: 1,   title: '1차: 섀도우블레이드', finalDmgMult: 1.00, bonusCritRate: 0,  bonusCdr: 0,  auraDesc: '기초 암살술' },
+      { tier: 2, reqLv: 25,  title: '2차: 나이트스토커',   finalDmgMult: 1.35, bonusCritRate: 6,  bonusCdr: 5,  auraDesc: '최종 피해 x1.35, 치명타 확률 +6%' },
+      { tier: 3, reqLv: 60,  title: '3차: 팬텀어쌔신',     finalDmgMult: 1.85, bonusCritRate: 12, bonusCdr: 10, auraDesc: '최종 피해 x1.85, 수리검 2연발 투척' },
+      { tier: 4, reqLv: 110, title: '4차: 보이드리퍼',     finalDmgMult: 2.65, bonusCritRate: 18, bonusCdr: 15, auraDesc: '최종 피해 x2.65, 방어력 관통 +20%' },
+      { tier: 5, reqLv: 180, title: '5차: 암신(暗神) 녹턴', finalDmgMult: 4.20, bonusCritRate: 28, bonusCdr: 22, auraDesc: '최종 피해 x4.20, 심연의 그림자 날개 및 차원 절개 각성' }
+    ],
     skills: [
       { id: 0, key: 'Q', icon: '🌙', name: '그림자 난무',   mp: 10, cd: 2.8, desc: '주변 적을 순식간에 베어 넘깁니다.', branchA: { name: '어둠의 계약', desc: '범위 +35%, 피해량 8% 즉시 흡혈' }, branchB: { name: '급소 찌르기', desc: '치명타 피해 +60% 추가' } },
       { id: 1, key: 'W', icon: '✴️', name: '뇌전 수리검',   mp: 14, cd: 4.0, desc: '유도형 마력 수리검을 다수 투척합니다.', branchA: { name: '그림자 속박', desc: '타겟 +3 증가 및 둔화' }, branchB: { name: '맹독 수리검', desc: '피해량 +70% 증폭' } },
       { id: 2, key: 'E', icon: '💥', name: '환영 폭살진',   mp: 20, cd: 5.8, desc: '목표 지점에 그림자 분신을 폭발시킵니다.', branchA: { name: '심연 장막', desc: '반경 +50% 및 암흑 지대 생성' }, branchB: { name: '암살자의 일격', desc: '보스/엘리트 피해 +80%' } },
-      { id: 3, key: 'R', icon: '👁️', name: '암살자의 무아', mp: 25, cd: 11.5, desc: '7초간 극한의 암살 감각을 일깨웁니다.', branchA: { name: '은신 재생', desc: '체력 45% 회복 및 방어력 +45' }, branchB: { name: '무한 절개', desc: '치명타 확률 +25%, 공속 +60%' } }
+      { id: 3, key: 'R', icon: '👁️', name: '무영의 절개',   mp: 25, cd: 11.5, desc: '7초간 암신 각성 및 주변 적 연속 암살 베기.', branchA: { name: '은신 재생', desc: '체력 45% 회복 및 방어력 +45' }, branchB: { name: '무한 절개', desc: '치명타 확률 +25%, 공속 +60%' } }
     ]
   }
 };
 
 /**
- * [요청 5: 난이도 상향 - 5단계 월드 티어]
+ * [요청 4: 고용 용병단 3인 정의]
  */
+const MERCENARY_DEFS = [
+  { id: 'PALADIN', name: '성기사 레오나', icon: '🛡️', color: '#fbbf24', role: '근접 탱커 & 방어 버프', baseCost: 800,  atkRatio: 0.45, cd: 0.9, desc: '전방의 적을 강타하며 캐릭터 방어력을 (용병Lv×4)만큼 높입니다.' },
+  { id: 'RANGER',  name: '신궁 실바나',   icon: '🏹', color: '#4ade80', role: '원거리 고속 관통 사격', baseCost: 1100, atkRatio: 0.65, cd: 0.65,desc: '원거리에서 관통 화살을 연사하며 치명타 피해를 +(용병Lv×3)% 높입니다.' },
+  { id: 'PRIEST',  name: '대신관 세라핀', icon: '✨', color: '#f472b6', role: '신성 타격 & 파티 치유', baseCost: 1400, atkRatio: 0.40, cd: 1.4, desc: '성스러운 빛으로 적을 타격하며 매 공격 시 캐릭터 체력을 3% 회복합니다.' }
+];
+
+/**
+ * [요청 4: 오픈월드 AI 유저 프로필 & 실시간 채팅 대사 풀]
+ */
+const AI_PLAYER_PROFILES = [
+  { name: '빛의검사',     cls: 'BERSERKER', color: '#f87171', title: '5차 투신' },
+  { name: '지존아크메이지', cls: 'ARCHMAGE',  color: '#38bdf8', title: '5차 마신' },
+  { name: '섀도우장인',   cls: 'SHADOW',    color: '#c084fc', title: '5차 암신' },
+  { name: '태초파밍러',   cls: 'BERSERKER', color: '#fbbf24', title: '길드마스터' }
+];
+
+const AI_CHAT_LINES = [
+  '오 방금 7단계 보라템 떴다 ㄷㄷ',
+  '님들 보스 소환 게이지 다 차가요!',
+  '5차 전직 각성 이펙트 진짜 멋지네 ㅋㅋ',
+  '상위 자동장착+자동해체 켜두니 인벤 안 차고 개편함',
+  '레이드 보스 같이 녹여요!!',
+  '와 올 T1 태초신화 언제 먹어보냐...',
+  '레벨업하니까 장비 제어율 100% 돼서 딜 떡상함!',
+  '불지옥 난이도 보상은 확실히 달달하네'
+];
+
 const WORLD_TIERS = [
   { id: 0, name: '일반',     statMult: 1.0,   dropBonus: 0,    goldBonus: 0,    ilvlBonus: 0   },
   { id: 1, name: '악몽',     statMult: 3.5,   dropBonus: 80,   goldBonus: 100,  ilvlBonus: 15  },
@@ -1098,9 +1119,6 @@ const WORLD_TIERS = [
   { id: 4, name: '불지옥',   statMult: 180.0, dropBonus: 1100, goldBonus: 1500, ilvlBonus: 150 }
 ];
 
-/**
- * [요청 6: 전용 보스 레이드 5단계]
- */
 const RAID_BOSSES = [
   { id: 0, name: '파멸의 화룡 이그니스',   title: '레이드 1단계', recLv: 25,  ilvl: 35,  hp: 45000,      atk: 260,   def: 65,  color: '#ef4444', rewardShards: 25,  rewardAddCubes: 4,  minRarity: 'R5_BLUE'   },
   { id: 1, name: '심해의 마룡 레비아탄',   title: '레이드 2단계', recLv: 55,  ilvl: 75,  hp: 320000,     atk: 820,   def: 140, color: '#3b82f6', rewardShards: 60,  rewardAddCubes: 8,  minRarity: 'R5_BLUE'   },
@@ -1109,9 +1127,6 @@ const RAID_BOSSES = [
   { id: 4, name: '창세의 태초신 카오스',   title: '레이드 5단계', recLv: 220, ilvl: 330, hp: 160000000,  atk: 29000, def: 680, color: '#ff2a6d', rewardShards: 800, rewardAddCubes: 65, minRarity: 'R7_VIOLET' }
 ];
 
-/**
- * [요청 5: 상위 던전 대륙 추가 - 8대륙 32개 사냥터]
- */
 const BIOMES = {
   PLAINS:  { id: 'PLAINS',  name: '🌿 1대륙: 엘븐가드 평원',    color: '#4ade80', tileA: '#132419', tileB: '#16291d', borderCol: '#1e3a28', obstacleType: 'TREE',           bossName: '평원의 수호거인 골드혼' },
   FOREST:  { id: 'FOREST',  name: '🌲 2대륙: 망각의 고대 숲',    color: '#2dd4bf', tileA: '#0f2222', tileB: '#132828', borderCol: '#1c3d3d', obstacleType: 'ANCIENT_PILLAR', bossName: '타락한 세계수의 화신' },
@@ -1148,22 +1163,16 @@ const WORLD_ZONES = [
   { id: 21, code: '6-2', biome: 'ABYSS',   name: '타락한 성소 회랑',    ilvl: 106, recLv: 122 },
   { id: 22, code: '6-3', biome: 'ABYSS',   name: '별이 죽어가는 차원',  ilvl: 118, recLv: 135 },
   { id: 23, code: '6-4', biome: 'ABYSS',   name: '태초의 심연 왕좌',    ilvl: 132, recLv: 150 },
-  // 신규 7대륙: 핏빛 나락 차원문 (고난이도 상위 사냥터)
   { id: 24, code: '7-1', biome: 'HELL',    name: '강철의 피투성이 연옥', ilvl: 150, recLv: 165 },
   { id: 25, code: '7-2', biome: 'HELL',    name: '절규하는 영혼의 강',   ilvl: 170, recLv: 180 },
   { id: 26, code: '7-3', biome: 'HELL',    name: '대악마의 처형장',      ilvl: 190, recLv: 200 },
   { id: 27, code: '7-4', biome: 'HELL',    name: '혈마신 아스모데우스전',ilvl: 215, recLv: 220 },
-  // 신규 8대륙: 신들의 황혼 성역 (엔드게임 초월 사냥터)
   { id: 28, code: '8-1', biome: 'DIVINE',  name: '무너진 발할라 계단',   ilvl: 240, recLv: 245 },
   { id: 29, code: '8-2', biome: 'DIVINE',  name: '성운의 심판소',        ilvl: 265, recLv: 270 },
   { id: 30, code: '8-3', biome: 'DIVINE',  name: '초신성 붕괴 핵',       ilvl: 290, recLv: 295 },
   { id: 31, code: '8-4', biome: 'DIVINE',  name: '창세신의 종언 왕좌',   ilvl: 320, recLv: 325 }
 ];
 
-/**
- * [요청 7: 빨·주·노·초·파·남·보 7단계 무지개 장비 등급 체계]
- * - 1단계(빨강)부터 7단계(보라)까지 무지개 순서대로 상위 아이템을 구분합니다.
- */
 const DROP_CONSTANTS = {
   BASE_MONSTER_DROP_RATE: 0.42,
   ELITE_DROP_RATE: 0.90,
@@ -1171,13 +1180,13 @@ const DROP_CONSTANTS = {
   BOSS_SUMMON_KILL_REQ: 12,
 
   RARITY_WEIGHTS: {
-    R1_RED:    0.34, // 1단계 빨강 (1줄)
-    R2_ORANGE: 0.27, // 2단계 주황 (2줄)
-    R3_YELLOW: 0.18, // 3단계 노랑 (3줄)
-    R4_GREEN:  0.11, // 4단계 초록 (4줄)
-    R5_BLUE:   0.06, // 5단계 파랑 (5줄)
-    R6_INDIGO: 0.03, // 6단계 남색 (5줄 + 고배율 + T3~T1 보정)
-    R7_VIOLET: 0.01  // 7단계 보라 (5줄 + 초월배율 + 고유효과 2개 + T2~T1 보정)
+    R1_RED:    0.34,
+    R2_ORANGE: 0.27,
+    R3_YELLOW: 0.18,
+    R4_GREEN:  0.11,
+    R5_BLUE:   0.06,
+    R6_INDIGO: 0.03,
+    R7_VIOLET: 0.01
   },
 
   BASE_TIER_PROBS: {
@@ -1210,7 +1219,6 @@ const RARITY_INFO = {
   R7_VIOLET: { id: 'R7_VIOLET', name: '7단계[보라]', prefix: '초월신화', lines: 5, addLines: 3, sockets: 3, rank: 7, baseMult: 4.80, color: '#cc5de8', salvageStones: 95 }
 };
 
-// 구버전 세이브 호환 매핑
 const LEGACY_RARITY_MAP = {
   NORMAL: 'R1_RED',
   MAGIC: 'R2_ORANGE',
@@ -1358,10 +1366,10 @@ const STARFORCE_TABLE = [
 ];
 
 const MONSTER_TYPES = [
-  { id: 'GOBLIN', name: '고블린 약탈자', color: '#4ade80', radius: 13, hp: 65,  atk: 11, def: 8,  speed: 105, range: 28, exp: 18 },
-  { id: 'ARCHER', name: '해골 궁수',     color: '#e2e8f0', radius: 13, hp: 50,  atk: 13, def: 6,  speed: 75,  range: 190,exp: 20, ranged: true },
-  { id: 'SLIME',  name: '심연 슬라임',   color: '#38bdf8', radius: 16, hp: 105, atk: 10, def: 16, speed: 65,  range: 30, exp: 22 },
-  { id: 'MAGE',   name: '암흑 마도사',   color: '#c084fc', radius: 14, hp: 58,  atk: 16, def: 7,  speed: 80,  range: 210,exp: 26, ranged: true }
+  { id: 'GOBLIN', name: '고블린 약탈자', color: '#4ade80', radius: 13, hp: 65,  atk: 11, def: 8,  speed: 105, range: 28, exp: 20 },
+  { id: 'ARCHER', name: '해골 궁수',     color: '#e2e8f0', radius: 13, hp: 50,  atk: 13, def: 6,  speed: 75,  range: 190,exp: 22, ranged: true },
+  { id: 'SLIME',  name: '심연 슬라임',   color: '#38bdf8', radius: 16, hp: 105, atk: 10, def: 16, speed: 65,  range: 30, exp: 25 },
+  { id: 'MAGE',   name: '암흑 마도사',   color: '#c084fc', radius: 14, hp: 58,  atk: 16, def: 7,  speed: 80,  range: 210,exp: 28, ranged: true }
 ];
 
 /**
@@ -1441,7 +1449,7 @@ const SFX = new SoundEngine();
 
 /**
  * ============================================================================
- * [모듈 3] ItemGenerator & ForgeSystem (빨주노초파남보 7단계 무지개 등급 지원)
+ * [모듈 3] ItemGenerator & ForgeSystem (장비 레벨 제어율 Level Sync 및 연속 스타포스 탑재)
  * ============================================================================
  */
 class ItemGenerator {
@@ -1450,6 +1458,23 @@ class ItemGenerator {
       return crypto.randomUUID();
     }
     return 'itm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+  }
+
+  /**
+   * [요청 2 핵심: 캐릭터 레벨에 따른 장비 레벨 제어율(Level Sync) 계산]
+   * - 캐릭터의 최대 100% 제어 가능 ilvl = playerLevel * 2 + 6
+   * - 아이템의 ilvl이 이를 초과하면 성능 발휘율이 (maxSyncIlvl / item.ilvl)^1.15 로 감소 (최소 15%)
+   */
+  static getMaxControllableIlvl(playerLevel = 1) {
+    return Math.round(playerLevel * 2 + 6);
+  }
+
+  static getLevelSyncRatio(item, playerLevel = 1) {
+    if (!item) return 1.0;
+    const itemIlvl = item.ilvl || item.floor || 1;
+    const maxSync = this.getMaxControllableIlvl(playerLevel);
+    if (itemIlvl <= maxSync) return 1.0;
+    return Math.max(0.15, Math.pow(maxSync / itemIlvl, 1.15));
   }
 
   static getDisplayName(item) {
@@ -1606,7 +1631,6 @@ class ItemGenerator {
     const floorScale = (1 + (ilvl - 1) * 0.15) * (rarity.baseMult || 1.0);
     const baseVal = Math.round(slotDef.baseStat.base * floorScale);
 
-    // 5단계(파랑)~6단계(남색)는 고유효과 1개, 7단계(보라)는 고유효과 2개!
     let uniqueEffectId = null;
     let secondUniqueEffectId = null;
     if (rarity.rank >= 5) {
@@ -1647,10 +1671,12 @@ class ItemGenerator {
     return item;
   }
 
-  static scoreItemPower(item) {
+  static scoreItemPower(item, playerLevel = null) {
     if (!item) return 0;
     const rInfo = RARITY_INFO[item.rarity] || RARITY_INFO.R1_RED;
     const starMult = 1 + item.star * 0.08;
+    const syncRatio = playerLevel ? this.getLevelSyncRatio(item, playerLevel) : 1.0;
+
     let score = item.baseStat.value * starMult * 1.6 + rInfo.rank * 65;
     item.options.forEach(o => {
       const tierWeight = (6 - TIER_RANK[o.tier]) * 24;
@@ -1662,7 +1688,7 @@ class ItemGenerator {
     if (item.setId) score += 55;
     if (item.uniqueEffectId) score += 90;
     if (item.secondUniqueEffectId) score += 110;
-    return Math.round(score);
+    return Math.round(score * syncRatio);
   }
 }
 
@@ -1858,54 +1884,63 @@ class ForgeSystem {
     const row = STARFORCE_TABLE[item.star];
     const ilvl = item.ilvl || item.floor || 1;
     const cost = Math.round(row.cost * (1 + (ilvl - 1) * 0.2));
-    if (state.gold < cost) return { ok: false, msg: `강화 골드가 부족합니다. (${cost} G 필요)` };
+    if (state.gold < cost) return { ok: false, msg: `강화 골드가 부족합니다. (${cost.toLocaleString()} G 필요)` };
 
     state.gold -= cost;
     const r = rng.next();
     if (r < row.success) {
       item.star += 1;
       if (playSound) SFX.enhanceSuccess();
-      return { ok: true, msg: `⭐ 강화 성공! [+${item.star}성] 달성!` };
+      return { ok: true, msg: `⭐ 강화 성공! [+${item.star}성] 달성!`, cost };
     } else if (r < row.success + row.boom) {
       item.star = Math.max(0, item.star - 5);
       if (playSound) SFX.enhanceFail();
-      return { ok: false, msg: `💥 장비가 강화 충격을 이기지 못해 [+${item.star}성]으로 대폭 하락했습니다!` };
+      return { ok: false, msg: `💥 충격으로 [+${item.star}성]으로 하락했습니다!`, cost };
     } else if (r < row.success + row.boom + row.drop) {
       item.star = Math.max(0, item.star - 1);
       if (playSound) SFX.enhanceFail();
-      return { ok: false, msg: `📉 강화 실패! 단계가 하락하여 [+${item.star}성]이 되었습니다.` };
+      return { ok: false, msg: `📉 강화 실패! [+${item.star}성]으로 하락했습니다.`, cost };
     } else {
       if (playSound) SFX.enhanceFail();
-      return { ok: false, msg: `💨 강화 실패! 다행히 [+${item.star}성] 단계가 유지되었습니다.` };
+      return { ok: false, msg: `💨 강화 실패! [+${item.star}성] 단계가 유지되었습니다.`, cost };
     }
+  }
+
+  /**
+   * [요청 5: 스타포스 목표 단계(+10성 / +15성) 원클릭 일괄 연속 강화]
+   */
+  static enhanceStarforceBulk(item, targetStar, state, rng = GlobalRNG) {
+    if (item.star >= targetStar) {
+      return { ok: false, msg: `이미 +${targetStar}성 이상입니다.` };
+    }
+    let tries = 0;
+    let totalGold = 0;
+    while (item.star < targetStar && tries < 300) {
+      const row = STARFORCE_TABLE[item.star];
+      const ilvl = item.ilvl || item.floor || 1;
+      const cost = Math.round(row.cost * (1 + (ilvl - 1) * 0.2));
+      if (state.gold < cost) {
+        break;
+      }
+      const res = this.enhanceStarforce(item, state, false, rng);
+      totalGold += cost;
+      tries++;
+    }
+    if (item.star >= targetStar) SFX.enhanceSuccess();
+    else SFX.enhanceFail();
+
+    return {
+      ok: item.star >= targetStar,
+      msg: `⚡ 연속 강화 종료 (총 ${tries}회 시도, ${totalGold.toLocaleString()}G 소모) ➔ 현재 [+${item.star}성]`
+    };
   }
 }
 
 /**
  * ============================================================================
- * [모듈 4] FilterRuleEngine & CodexManager
+ * [모듈 4] CodexManager & OpenWorldGenerator & SaveManager
  * ============================================================================
  */
-class FilterRuleEngine {
-  static shouldKeepItem(item, filterConfig) {
-    if (!filterConfig || !filterConfig.enabled) return true;
-    // 7단계(보라), 태초신화, 완벽 아이템은 항상 보호
-    if (item.isMythic || item.isPerfect || item.rarity === 'R7_VIOLET') return true;
-
-    const minR = RARITY_INFO[filterConfig.minRarity] || RARITY_INFO.R4_GREEN;
-    const itemR = RARITY_INFO[item.rarity] || RARITY_INFO.R1_RED;
-    if (itemR.rank < minR.rank) return false;
-
-    const rules = filterConfig.rules || [];
-    if (rules.length === 0) return true;
-
-    return rules.every(rule => {
-      const reqRank = TIER_RANK[rule.minTier] || 5;
-      return item.options.some(o => o.id === rule.optId && TIER_RANK[o.tier] <= reqRank);
-    });
-  }
-}
-
 class CodexManager {
   static recordLootedItem(item, codex) {
     if (!item || !codex) return;
@@ -1941,11 +1976,6 @@ class CodexManager {
   }
 }
 
-/**
- * ============================================================================
- * [모듈 5] OpenWorldGenerator
- * ============================================================================
- */
 class OpenWorldGenerator {
   static generate(zoneId = 0, rng = GlobalRNG) {
     const zoneDef = WORLD_ZONES[zoneId] || WORLD_ZONES[0];
@@ -1989,15 +2019,10 @@ class OpenWorldGenerator {
   }
 }
 
-/**
- * ============================================================================
- * [모듈 6] SaveManager (v6.0 직업, 펫, 자동장착/해체, 무지개 등급 마이그레이션)
- * ============================================================================
- */
-const SAVE_KEY = 'ABYSS_FORGE_SAVE_V6_RAINBOW';
-const LEGACY_KEYS = ['ABYSS_FORGE_SAVE_V5_OPENWORLD', 'ABYSS_FORGE_SAVE_V4_B', 'ABYSS_FORGE_SAVE_V4_0'];
+const SAVE_KEY = 'ABYSS_FORGE_SAVE_V7_MULTI';
+const LEGACY_KEYS = ['ABYSS_FORGE_SAVE_V6_RAINBOW', 'ABYSS_FORGE_SAVE_V5_OPENWORLD', 'ABYSS_FORGE_SAVE_V4_B'];
 const BACKUP_CORRUPTED_KEY = 'ABYSS_FORGE_CORRUPTED_BACKUP';
-const CURRENT_VERSION = '6.0.0-RainbowRaid';
+const CURRENT_VERSION = '7.0.0-Job5MercAI';
 
 class SaveManager {
   static createDefaultState(seed = Date.now()) {
@@ -2005,21 +2030,28 @@ class SaveManager {
       version: CURRENT_VERSION,
       seed: seed >>> 0,
       charClass: 'BERSERKER',
+      jobTier: 1,
       worldTier: 0,
       zoneId: 0,
       bossKillGauge: 0,
       autoEquip: true,
+      aiPlayersEnabled: true,
       level: 1,
       exp: 0,
       sp: 1,
-      gold: 1200,
-      stones: 25,
+      gold: 1500,
+      stones: 30,
       cubes: 8,
       addCubes: 5,
       soulShards: 0,
       pet: {
         enabled: true,
         level: 1
+      },
+      mercenaries: {
+        PALADIN: { hired: true,  level: 1 },
+        RANGER:  { hired: false, level: 0 },
+        PRIEST:  { hired: false, level: 0 }
       },
       pity: {
         perfect: 0,
@@ -2049,7 +2081,7 @@ class SaveManager {
       },
       filterConfig: {
         enabled: true,
-        minRarity: 'R4_GREEN',
+        minRarity: 'R7_VIOLET',
         rules: []
       },
       codex: {
@@ -2112,18 +2144,24 @@ class SaveManager {
     if (!data.sanctuary || typeof data.sanctuary.atkLv !== 'number') return null;
 
     if (!CHAR_CLASSES[data.charClass]) data.charClass = 'BERSERKER';
+    if (typeof data.jobTier !== 'number' || data.jobTier < 1 || data.jobTier > 5) data.jobTier = 1;
     if (typeof data.worldTier !== 'number' || !WORLD_TIERS[data.worldTier]) data.worldTier = 0;
     if (typeof data.zoneId !== 'number' || data.zoneId < 0 || data.zoneId >= WORLD_ZONES.length) data.zoneId = 0;
     if (typeof data.bossKillGauge !== 'number') data.bossKillGauge = 0;
     if (typeof data.autoEquip !== 'boolean') data.autoEquip = true;
+    if (typeof data.aiPlayersEnabled !== 'boolean') data.aiPlayersEnabled = true;
     if (!data.pet || typeof data.pet.level !== 'number') data.pet = { enabled: true, level: 1 };
+    if (!data.mercenaries || typeof data.mercenaries !== 'object') {
+      data.mercenaries = def.mercenaries;
+    } else {
+      MERCENARY_DEFS.forEach(m => {
+        if (!data.mercenaries[m.id]) data.mercenaries[m.id] = { hired: false, level: 0 };
+      });
+    }
 
     if (!data.filterConfig || typeof data.filterConfig !== 'object') {
       data.filterConfig = def.filterConfig;
-    } else if (LEGACY_RARITY_MAP[data.filterConfig.minRarity] || !RARITY_INFO[data.filterConfig.minRarity]) {
-      data.filterConfig.minRarity = 'R4_GREEN';
     }
-
     if (!data.codex || typeof data.codex !== 'object') {
       data.codex = def.codex;
     } else {
@@ -2202,7 +2240,7 @@ class SaveManager {
 
 /**
  * ============================================================================
- * [모듈 7] GameCore (3종 직업, 자동습득 펫, 상위 자동장착, 자동해체, 보스레이드, 월드난이도)
+ * [모듈 7] GameCore (장비 레벨 동기화 + 5차 전직 + 3인 용병단 + 오픈월드 AI 유저)
  * ============================================================================
  */
 class GameCore {
@@ -2219,9 +2257,8 @@ class GameCore {
     this.autoAdvanceZone = false;
     this.invFullAlertCd = 0;
     this.lowHpBerserkActive = false;
-    this.respawnTimer = 1.4;
+    this.respawnTimer = 1.3;
 
-    // 보스 레이드 상태
     this.raidState = {
       active: false,
       raidDef: null,
@@ -2244,15 +2281,15 @@ class GameCore {
       phaseCd: 0
     };
 
-    // 자동습득 펫 엔티티
     this.petEntity = {
       x: 0, y: 0,
       wingPhase: 0,
-      targetDrop: null,
       beamTimer: 0,
       beamX: 0, beamY: 0
     };
 
+    this.mercEntities = [];
+    this.aiPlayerEntities = [];
     this.monsters = [];
     this.projectiles = [];
     this.playerProjectiles = [];
@@ -2299,6 +2336,12 @@ class GameCore {
     return CHAR_CLASSES[this.state.charClass] || CHAR_CLASSES.BERSERKER;
   }
 
+  getCurrentJobAdvancement() {
+    const cls = this.getCurrentClassDef();
+    const tier = Math.max(1, Math.min(5, this.state.jobTier || 1));
+    return cls.advancements[tier - 1] || cls.advancements[0];
+  }
+
   getCurrentWorldTier() {
     return WORLD_TIERS[this.state.worldTier] || WORLD_TIERS[0];
   }
@@ -2311,31 +2354,40 @@ class GameCore {
   }
 
   /**
-   * [직업 패시브 + 펫 보너스 + 월드 티어 보너스 + 7단계 무지개 장비 + 세트/보석 통합 계산]
+   * [요청 2 & 3 & 4 통합 스탯 계산]
+   * - 장비 레벨 제어율(Level Sync): 내 레벨(Lv*2+6)을 초과하는 고레벨 장비는 성능이 비례 감쇠됨
+   * - 1~5차 전직 보너스(finalDmgMult, bonusCritRate, bonusCdr) 및 용병 패시브 반영
    */
   recalcStats(fullHeal = false) {
     this.activeUniques.clear();
     this.activeSets = {};
 
     const cls = this.getCurrentClassDef();
+    const adv = this.getCurrentJobAdvancement();
     const wTier = this.getCurrentWorldTier();
     const petLv = (this.state.pet && this.state.pet.level) ? this.state.pet.level : 1;
     const petBonus = (this.state.pet && this.state.pet.enabled) ? petLv * 5 : 0;
 
+    // 용병 패시브 보너스
+    const paladin = this.state.mercenaries?.PALADIN;
+    const ranger = this.state.mercenaries?.RANGER;
+    const paladinDef = (paladin && paladin.hired) ? paladin.level * 4 : 0;
+    const rangerCritDmg = (ranger && ranger.hired) ? ranger.level * 3 : 0;
+
     const s = {
-      flatAtk: 18 + this.state.level * 5 + this.state.sanctuary.atkLv * 10 + (this.state.runSoulHarvestAtk || 0),
+      flatAtk: 18 + this.state.level * 6 + this.state.sanctuary.atkLv * 10 + (this.state.runSoulHarvestAtk || 0),
       pctAtk: cls.bonuses.pctAtk || 0,
       atkSpd: cls.bonuses.atkSpd || 0,
-      critRate: 8 + (cls.bonuses.critRate || 0),
-      critDmg: 150 + (cls.bonuses.critDmg || 0),
-      flatHp: 140 + this.state.level * 26 + this.state.sanctuary.hpLv * 55,
+      critRate: 8 + (cls.bonuses.critRate || 0) + (adv.bonusCritRate || 0),
+      critDmg: 150 + (cls.bonuses.critDmg || 0) + rangerCritDmg,
+      flatHp: 140 + this.state.level * 28 + this.state.sanctuary.hpLv * 55,
       pctHp: cls.bonuses.pctHp || 0,
       flatMp: 65 + this.state.level * 6 + (cls.bonuses.flatMp || 0),
-      flatDef: 6 + this.state.level * 2.5,
-      armorPen: 0,
+      flatDef: 6 + this.state.level * 3 + paladinDef,
+      armorPen: (this.state.jobTier >= 4) ? 20 : 0,
       moveSpd: cls.bonuses.moveSpd || 0,
       lifeSteal: cls.bonuses.lifeSteal || 0,
-      cdr: cls.bonuses.cdr || 0,
+      cdr: (cls.bonuses.cdr || 0) + (adv.bonusCdr || 0),
       dropRate: this.state.sanctuary.luckLv * 12 + petBonus + wTier.dropBonus,
       goldRate: petBonus + wTier.goldBonus,
       elemDmg: cls.bonuses.elemDmg || 0,
@@ -2343,17 +2395,26 @@ class GameCore {
       evasion: cls.bonuses.evasion || 0
     };
 
+    let syncSum = 0;
+    let eqCount = 0;
+
     Object.values(this.state.equipped).forEach(item => {
       if (!item) return;
       const starMult = 1 + item.star * 0.08;
-      s[item.baseStat.key] = (s[item.baseStat.key] || 0) + item.baseStat.value * starMult;
+      // 장비 레벨 제어율 적용!
+      const syncRatio = ItemGenerator.getLevelSyncRatio(item, this.state.level);
+      syncSum += syncRatio;
+      eqCount++;
+
+      const effMult = starMult * syncRatio;
+      s[item.baseStat.key] = (s[item.baseStat.key] || 0) + item.baseStat.value * effMult;
 
       item.options.forEach(opt => {
-        s[opt.id] = (s[opt.id] || 0) + opt.value * starMult;
+        s[opt.id] = (s[opt.id] || 0) + opt.value * effMult;
       });
 
       (item.additionalOptions || []).forEach(ao => {
-        s[ao.id] = (s[ao.id] || 0) + ao.value;
+        s[ao.id] = (s[ao.id] || 0) + ao.value * syncRatio;
       });
 
       (item.sockets || []).forEach(gemId => {
@@ -2370,6 +2431,8 @@ class GameCore {
       if (item.uniqueEffectId) this.activeUniques.add(item.uniqueEffectId);
       if (item.secondUniqueEffectId) this.activeUniques.add(item.secondUniqueEffectId);
     });
+
+    this.avgSyncPct = eqCount > 0 ? Math.round((syncSum / eqCount) * 100) : 100;
 
     Object.entries(this.activeSets).forEach(([setId, count]) => {
       const setDef = ITEM_SETS[setId];
@@ -2409,6 +2472,7 @@ class GameCore {
 
   applyFrameDynamicStats() {
     const s = this.baseStats;
+    const adv = this.getCurrentJobAdvancement();
     const isLowHp = this.player.hp <= (this.player.maxHp || 100) * 0.4;
     this.lowHpBerserkActive = this.activeUniques.has('BERSERK_LOWHP') && isLowHp;
 
@@ -2416,7 +2480,7 @@ class GameCore {
     const effLifeSteal = s.lifeSteal + (this.lowHpBerserkActive ? 8 : 0);
 
     this.stats = {
-      atk: Math.round(s.flatAtk * (1 + effPctAtk / 100)),
+      atk: Math.round(s.flatAtk * (1 + effPctAtk / 100) * (adv.finalDmgMult || 1.0)),
       atkSpd: Math.min(300, s.atkSpd),
       critRate: Math.min(100, s.critRate),
       critDmg: s.critDmg,
@@ -2426,7 +2490,7 @@ class GameCore {
       armorPen: Math.min(90, s.armorPen),
       moveSpd: Math.min(160, s.moveSpd),
       lifeSteal: effLifeSteal,
-      cdr: Math.min(70, s.cdr),
+      cdr: Math.min(72, s.cdr),
       dropRate: s.dropRate,
       goldRate: s.goldRate,
       elemDmg: s.elemDmg,
@@ -2435,9 +2499,50 @@ class GameCore {
     };
   }
 
-  /**
-   * [오픈월드 지역 입장]
-   */
+  initCompanions() {
+    // 1. 고용된 용병 엔티티 초기화
+    this.mercEntities = [];
+    MERCENARY_DEFS.forEach((def, idx) => {
+      const mState = this.state.mercenaries?.[def.id];
+      if (mState && mState.hired && mState.level > 0) {
+        this.mercEntities.push({
+          id: def.id,
+          def,
+          x: this.player.x + Math.cos(idx * 2.1) * 42,
+          y: this.player.y + Math.sin(idx * 2.1) * 42,
+          facing: 1,
+          atkTimer: 0.5 + idx * 0.2,
+          animPhase: idx * 1.5
+        });
+      }
+    });
+
+    // 2. 오픈월드 AI 유저 엔티티 초기화
+    this.aiPlayerEntities = [];
+    if (this.state.aiPlayersEnabled) {
+      AI_PLAYER_PROFILES.forEach((prof, idx) => {
+        const pos = this.findSafeSpawnPos(60);
+        this.aiPlayerEntities.push({
+          id: 'ai_' + idx,
+          name: prof.name,
+          cls: prof.cls,
+          color: prof.color,
+          title: prof.title,
+          x: pos.x,
+          y: pos.y,
+          facing: 1,
+          walkCycle: idx * 1.2,
+          swingAnim: 0,
+          atkTimer: 0.6 + idx * 0.15,
+          skillTimer: 3.0 + idx * 1.1,
+          chatText: '',
+          chatTimer: 0,
+          nextChatCd: 3.5 + idx * 2.8
+        });
+      });
+    }
+  }
+
   enterZone(zoneId) {
     this.raidState.active = false;
     this.raidState.raidDef = null;
@@ -2468,6 +2573,8 @@ class GameCore {
     this.lightningBolts = [];
     this.afterimages = [];
 
+    this.initCompanions();
+
     for (let i = 0; i < 14; i++) {
       this.spawnFieldMonster(i < 2);
     }
@@ -2475,16 +2582,13 @@ class GameCore {
     const effIlvl = this.getEffectiveDropIlvl();
     const wTier = this.getCurrentWorldTier();
     this.log(
-      `🗺️ [${zoneDef.code}] <b>${zoneDef.name} (${wTier.name})</b> 입장! (드랍 ilvl.${effIlvl})`,
+      `🗺️ [${zoneDef.code}] <b>${zoneDef.name} (${wTier.name})</b> 입장! (권장 Lv.${zoneDef.recLv} | 드랍 ilvl.${effIlvl})`,
       this.world.biomeDef.color
     );
     this.emit('zoneChanged', { zoneId: validId });
     this.emit('stateChanged', { reason: 'zone' });
   }
 
-  /**
-   * [요청 6: 보스 레이드 결투장 입장]
-   */
   enterRaid(raidId) {
     const raidDef = RAID_BOSSES[raidId];
     if (!raidDef) return;
@@ -2496,7 +2600,6 @@ class GameCore {
       clearWaitTimer: 0
     };
 
-    // 장애물 없는 원형 결투장 월드 생성
     const cols = 30;
     const rows = 24;
     const tileSize = 36;
@@ -2524,6 +2627,8 @@ class GameCore {
     this.playerProjectiles = [];
     this.groundZones = [];
     this.drops = [];
+
+    this.initCompanions();
 
     const wTier = this.getCurrentWorldTier();
     const maxHp = Math.round(raidDef.hp * wTier.statMult);
@@ -2564,7 +2669,7 @@ class GameCore {
     });
 
     this.emit('sfx', { type: 'mythicDrop' });
-    this.log(`🐉 [보스 레이드 개시!] <b>${raidDef.name}</b> 결투장에 입장했습니다! (제한시간 90초)`, '#c084fc');
+    this.log(`🐉 [보스 레이드 개시!] 용병단 및 AI 유저들과 함께 <b>${raidDef.name}</b> 토벌을 시작합니다!`, '#c084fc');
     this.emit('zoneChanged', { raid: true });
     this.emit('stateChanged', { reason: 'raidStart' });
   }
@@ -2742,9 +2847,10 @@ class GameCore {
     this.emit('sfx', { type: 'skill' });
 
     const lvScale = 1 + (sk.lv - 1) * 0.18;
+    const jobAreaBoost = (this.state.jobTier >= 3) ? 1.22 : 1.0;
 
     if (idx === 0) {
-      const radius = sk.branch === 'A' ? 135 : 100;
+      const radius = (sk.branch === 'A' ? 135 : 100) * jobAreaBoost;
       const dmgMult = 1.95 * lvScale;
       const bonusCritDmg = sk.branch === 'B' ? 60 : 0;
       this.player.swingAnim = 1.0;
@@ -2758,10 +2864,10 @@ class GameCore {
         }
       });
     } else if (idx === 1) {
-      const maxTargets = sk.branch === 'A' ? 7 : 4;
+      const maxTargets = (sk.branch === 'A' ? 7 : 4) + (this.state.jobTier >= 4 ? 2 : 0);
       const dmgMult = (sk.branch === 'B' ? 2.55 : 1.75) * lvScale;
       const sorted = [...this.monsters]
-        .filter(m => !m.dead && Math.hypot(m.x - this.player.x, m.y - this.player.y) < 340)
+        .filter(m => !m.dead && Math.hypot(m.x - this.player.x, m.y - this.player.y) < 350)
         .sort((a, b) => Math.hypot(a.x - this.player.x, a.y - this.player.y) - Math.hypot(b.x - this.player.x, b.y - this.player.y))
         .slice(0, maxTargets);
 
@@ -2791,7 +2897,6 @@ class GameCore {
         }
       }
 
-      // 도적(SHADOW)이나 전사(BERSERKER)는 E 스킬 시 목표 지점 근처로 순간 도약 연출
       if (cls.id === 'SHADOW') {
         const safe = this.resolveWorldPosition(tx, ty, this.player.radius, true);
         this.afterimages.push({ x: this.player.x, y: this.player.y, facing: this.player.facing, alpha: 0.8 });
@@ -2799,7 +2904,7 @@ class GameCore {
         this.player.y = safe.y;
       }
 
-      const radius = sk.branch === 'A' ? 140 : 95;
+      const radius = (sk.branch === 'A' ? 140 : 95) * jobAreaBoost;
       this.spawnRingEffect(tx, ty, radius, '#f97316');
 
       if (sk.branch === 'A') {
@@ -2823,18 +2928,39 @@ class GameCore {
       const healPct = sk.branch === 'A' ? 0.45 : 0.20;
       this.recalcStats(false);
       this.player.hp = Math.min(this.player.maxHp, this.player.hp + this.player.maxHp * healPct);
-      this.spawnRingEffect(this.player.x, this.player.y, 90, cls.color);
-      this.addFloatText(this.player.x, this.player.y - 24, `${def.name}!`, cls.color);
+      this.spawnRingEffect(this.player.x, this.player.y, 110, cls.color);
+      this.addFloatText(this.player.x, this.player.y - 24, `👑${def.name}!`, cls.color);
+
+      // 5차 전직 달성 시 R 궁극기 시전 즉시 주변 적에게 신격 폭발 피해!
+      if (this.state.jobTier >= 5) {
+        this.spawnRingEffect(this.player.x, this.player.y, 220, '#ffd700');
+        this.monsters.slice().forEach(m => {
+          if (!m.dead && Math.hypot(m.x - this.player.x, m.y - this.player.y) <= 220 + m.radius) {
+            this.dealDamage(m, this.stats.atk * 3.8 * lvScale);
+          }
+        });
+      }
     }
     return true;
   }
 
+  /**
+   * [요청 2 반영: 사냥터 권장 레벨(recLv) 대비 캐릭터 레벨이 낮으면 레벨 격차 피해 감쇠 적용]
+   */
   dealDamage(monster, rawDmg, opts = {}) {
     if (!monster || monster.dead || monster.hp <= 0) return 0;
 
     const isCrit = this.rng.next() * 100 < this.stats.critRate;
     let dmg = rawDmg * (1 + this.stats.elemDmg / 100);
     if (monster.isBoss) dmg *= (1 + this.stats.bossDmg / 100);
+
+    // 사냥터/레이드 권장 레벨 격차 페널티 (레벨이 낮으면 고등급 템만 믿고 학살 불가)
+    const reqLv = this.world.zoneDef?.recLv || 1;
+    const lvDeficit = Math.max(0, reqLv - this.state.level);
+    if (lvDeficit > 0) {
+      const lvPenaltyMult = Math.max(0.08, 1 / (1 + lvDeficit * 0.085));
+      dmg *= lvPenaltyMult;
+    }
 
     const mDef = monster.def || 0;
     const effectiveDef = Math.max(0, mDef * (1 - this.stats.armorPen / 100));
@@ -2857,7 +2983,7 @@ class GameCore {
     if (monster.shield && monster.shield > 0) {
       if (monster.shield >= finalDmg) {
         monster.shield -= finalDmg;
-        this.addFloatText(monster.x, monster.y - monster.radius, `🛡️-${finalDmg}`, '#38bdf8');
+        if (!opts.isAlly) this.addFloatText(monster.x, monster.y - monster.radius, `🛡️-${finalDmg}`, '#38bdf8');
         return finalDmg;
       } else {
         finalDmg -= monster.shield;
@@ -2867,30 +2993,32 @@ class GameCore {
 
     monster.hp -= finalDmg;
     monster.hitFlash = 0.14;
-    if (!opts.noSound) this.emit('sfx', { type: 'hit' });
+    if (!opts.noSound && !opts.isAlly) this.emit('sfx', { type: 'hit' });
 
-    if (this.stats.lifeSteal > 0) {
+    if (!opts.isAlly && this.stats.lifeSteal > 0) {
       this.player.hp = Math.min(this.player.maxHp, this.player.hp + finalDmg * (this.stats.lifeSteal / 100));
     }
 
-    this.addFloatText(
-      monster.x + (this.rng.next() - 0.5) * 16,
-      monster.y - monster.radius,
-      isCrit ? `💥${finalDmg.toLocaleString()}!` : `${finalDmg.toLocaleString()}`,
-      isCrit ? '#ffd700' : '#f8fafc'
-    );
+    if (!opts.isAlly || isCrit) {
+      this.addFloatText(
+        monster.x + (this.rng.next() - 0.5) * 16,
+        monster.y - monster.radius,
+        opts.isAlly ? `${finalDmg.toLocaleString()}` : isCrit ? `💥${finalDmg.toLocaleString()}!` : `${finalDmg.toLocaleString()}`,
+        opts.isAlly ? '#a5f3fc' : isCrit ? '#ffd700' : '#f8fafc'
+      );
+    }
 
     if (monster.hp <= 0) {
       this.onMonsterKill(monster);
       return finalDmg;
     }
 
-    if (this.activeUniques.has('VENOM_COAT') && !opts.isProc) {
+    if (!opts.isAlly && this.activeUniques.has('VENOM_COAT') && !opts.isProc) {
       monster.poisonTimer = 3.0;
       monster.poisonDps = this.stats.atk * 0.45;
     }
 
-    if (isCrit && !opts.isProc && this.activeUniques.has('LIGHTNING_CRIT') && this.rng.next() < 0.35) {
+    if (!opts.isAlly && isCrit && !opts.isProc && this.activeUniques.has('LIGHTNING_CRIT') && this.rng.next() < 0.35) {
       if (!this.headless) {
         this.lightningBolts.push({ x1: this.player.x, y1: this.player.y - 10, x2: monster.x, y2: monster.y, alpha: 1.0, color: '#38bdf8' });
       }
@@ -2923,7 +3051,6 @@ class GameCore {
     if (this.activeUniques.has('SOUL_HARVEST') && (m.isElite || m.isBoss)) {
       this.state.runSoulHarvestAtk = (this.state.runSoulHarvestAtk || 0) + 4;
       this.recalcStats(false);
-      this.addFloatText(this.player.x, this.player.y - 26, '영혼 수확! 공격력+4', '#c084fc');
     }
 
     if (this.activeUniques.has('CORPSE_EXPLODE')) {
@@ -2944,7 +3071,6 @@ class GameCore {
       });
     }
 
-    // [보스 레이드 클리어 보상 처리]
     if (m.isRaidBoss && this.raidState.active) {
       const rDef = this.raidState.raidDef;
       this.state.soulShards = (this.state.soulShards || 0) + rDef.rewardShards;
@@ -2955,7 +3081,6 @@ class GameCore {
       const gemKey = this.rng.pick(GEM_KEYS);
       this.state.gems[gemKey] = (this.state.gems[gemKey] || 0) + 2;
 
-      // 레이드 전용 상위 무지개 장비 5개 확정 드랍!
       for (let i = 0; i < 5; i++) {
         const forceR = i === 0 ? (this.rng.next() < 0.45 ? 'R7_VIOLET' : rDef.minRarity) : (this.rng.next() < 0.25 ? 'R7_VIOLET' : 'R6_INDIGO');
         this.spawnDropItem(m.x + (i - 2) * 36, m.y, forceR);
@@ -2964,7 +3089,7 @@ class GameCore {
       this.raidState.clearWaitTimer = 4.5;
       this.emit('sfx', { type: 'mythicDrop' });
       this.log(
-        `🎉 [레이드 토벌 성공!] <b>${rDef.name}</b> 처치! (👻영혼파편 +${rDef.rewardShards}, 🟢에디큐브 +${rDef.rewardAddCubes}, 상위 무지개 장비 5개 드랍! 4.5초 후 복귀)`,
+        `🎉 [레이드 토벌 성공!] <b>${rDef.name}</b> 처치! (👻영혼파편 +${rDef.rewardShards}, 🟢에디큐브 +${rDef.rewardAddCubes}, 상위 무지개 장비 5개 드랍!)`,
         '#cc5de8'
       );
       this.emit('stateChanged', { reason: 'raidClear' });
@@ -3046,79 +3171,72 @@ class GameCore {
   }
 
   /**
-   * [요청 2, 3, 4 핵심 통합: 아이템 습득 + 상위옵션 자동장착 + 하위장비 자동해체]
-   * - 캐릭터 또는 자동습득 펫이 바닥 아이템에 닿았을 때 호출됩니다.
+   * [요청 1 해결: 하위 장비는 등급(5/6/7단계) 불문 즉시 100% 자동해체하여 인벤토리 포화 원천 차단]
    */
   pickupDropItem(dropIndex, byPet = false) {
     const d = this.drops[dropIndex];
     if (!d) return;
     const item = d.item;
 
-    // 1. 도감 기록 (바닥에서 직접 습득한 아이템만!)
     CodexManager.recordLootedItem(item, this.state.codex);
 
-    // 2. 상위옵션 자동장착 검사
-    if (this.state.autoEquip) {
-      const currentEq = this.state.equipped[item.slot];
-      const newScore = ItemGenerator.scoreItemPower(item);
-      const oldScore = currentEq ? ItemGenerator.scoreItemPower(currentEq) : -1;
+    const currentEq = this.state.equipped[item.slot];
+    const newScore = ItemGenerator.scoreItemPower(item);
+    const oldScore = currentEq ? ItemGenerator.scoreItemPower(currentEq) : -1;
 
-      if (newScore > oldScore) {
-        this.state.equipped[item.slot] = item;
-        this.drops.splice(dropIndex, 1);
-        this.recalcStats(false);
+    // 1. 상위옵션 자동장착
+    if (this.state.autoEquip && newScore > oldScore) {
+      this.state.equipped[item.slot] = item;
+      this.drops.splice(dropIndex, 1);
+      this.recalcStats(false);
 
-        const rInfo = RARITY_INFO[item.rarity];
-        this.addFloatText(this.player.x, this.player.y - 28, `⬆️자동장착! (${rInfo.name})`, rInfo.color);
-        this.log(`⬆️ [상위옵션 자동장착] <b>${ItemGenerator.getDisplayName(item)}</b> (전투력 점수 ${oldScore > 0 ? oldScore : 0} ➔ <b>${newScore}</b>)`, '#4ade80');
+      const rInfo = RARITY_INFO[item.rarity];
+      this.addFloatText(this.player.x, this.player.y - 28, `⬆️자동장착! (${rInfo.name})`, rInfo.color);
+      this.log(`⬆️ [상위 자동장착] <b>${ItemGenerator.getDisplayName(item)}</b> (점수 ${oldScore > 0 ? oldScore : 0} ➔ <b>${newScore}</b>)`, '#4ade80');
 
-        // 기존 착용 중이던 구형 장비 처리: 자동해체가 켜져 있고 잠금/태초가 아니면 즉시 해체!
-        if (currentEq) {
-          if (this.state.filterConfig.enabled && !currentEq.locked && !currentEq.isMythic && !currentEq.isPerfect) {
-            const gain = RARITY_INFO[currentEq.rarity].salvageStones;
-            this.state.stones += gain;
-            this.state.gold += currentEq.ilvl * 15;
-          } else if (this.state.inventory.length < 36) {
-            this.state.inventory.push(currentEq);
-          }
+      if (currentEq) {
+        if (this.state.filterConfig.enabled && !currentEq.locked && !currentEq.isMythic && !currentEq.isPerfect) {
+          const gain = RARITY_INFO[currentEq.rarity].salvageStones;
+          this.state.stones += gain;
+          this.state.gold += currentEq.ilvl * 18;
+        } else if (this.state.inventory.length < 36) {
+          this.state.inventory.push(currentEq);
         }
-        this.emit('gridsChanged', {});
-        this.emit('stateChanged', { reason: 'autoEquip' });
+      }
+      this.emit('gridsChanged', {});
+      this.emit('stateChanged', { reason: 'autoEquip' });
+      return;
+    }
+
+    // 2. '🔨하위전부자동해체' 체크 시: 현재 착용 장비보다 약한 모든 장비(잠금/태초/완벽 제외)는 6~7단계라도 즉시 해체!
+    if (this.state.filterConfig.enabled && !item.isMythic && !item.isPerfect) {
+      const isWeakerThanEquipped = currentEq && newScore <= oldScore;
+      if (isWeakerThanEquipped || RARITY_INFO[item.rarity].rank < 7) {
+        const gain = RARITY_INFO[item.rarity].salvageStones;
+        const goldBonus = item.ilvl * 15;
+        this.state.stones += gain;
+        this.state.gold += goldBonus;
+        this.drops.splice(dropIndex, 1);
+        this.addFloatText(d.x, d.y - 12, `🔨해체 +${gain}💎`, '#4da6ff');
+        this.emit('stateChanged', { reason: 'autoSalvage' });
         return;
       }
     }
 
-    // 3. 자동장착 대상이 아닐 경우 -> 자동해체(FilterRuleEngine) 검사
-    if (!FilterRuleEngine.shouldKeepItem(item, this.state.filterConfig)) {
-      const gain = RARITY_INFO[item.rarity].salvageStones;
-      const goldBonus = item.ilvl * 12;
-      this.state.stones += gain;
-      this.state.gold += goldBonus;
-      this.drops.splice(dropIndex, 1);
-      this.addFloatText(d.x, d.y - 12, `🔨해체 +${gain}💎`, '#4da6ff');
-      this.emit('stateChanged', { reason: 'autoSalvage' });
-      return;
-    }
-
-    // 4. 인벤토리 보관
+    // 3. 인벤토리 보관
     if (this.state.inventory.length < 36) {
       this.state.inventory.push(item);
       this.drops.splice(dropIndex, 1);
-      if (byPet) {
-        this.addFloatText(d.x, d.y - 10, `🐉펫 습득!`, '#38bdf8');
-      }
+      if (byPet) this.addFloatText(d.x, d.y - 10, `🐉펫 습득!`, '#38bdf8');
       this.emit('gridsChanged', {});
       this.emit('stateChanged', { reason: 'loot' });
     } else if (this.invFullAlertCd <= 0) {
       this.invFullAlertCd = 2.0;
       this.addFloatText(this.player.x, this.player.y - 26, '인벤토리 가득 참!', '#f87171');
-      this.log('⚠️ 인벤토리가 가득 차(36/36) 아이템을 주울 수 없습니다! 자동해체를 켜거나 분해하세요.', '#f87171');
+      this.log('⚠️ 인벤토리가 가득 찼습니다! [🗑️잠금제외 인벤토리 전체 일괄해체] 버튼을 눌러주세요.', '#f87171');
     }
   }
 
-  /**
-   * [요청 2: 자동습득 신화 펫 AI 업데이트]
-   */
   updatePet(dt) {
     if (!this.state.pet || !this.state.pet.enabled) return;
     const pet = this.petEntity;
@@ -3126,9 +3244,8 @@ class GameCore {
     if (pet.beamTimer > 0) pet.beamTimer = Math.max(0, pet.beamTimer - dt);
 
     const petLv = this.state.pet.level || 1;
-    const petSpeed = 340 + petLv * 28;
+    const petSpeed = 350 + petLv * 30;
 
-    // 바닥에 아이템이 있고 (인벤토리 여유가 있거나 자동해체/자동장착이 켜져 있으면) 가장 가까운 아이템으로 날아가 습득
     if (this.drops.length > 0 && (this.state.inventory.length < 36 || this.state.filterConfig.enabled || this.state.autoEquip)) {
       let nearestIdx = 0;
       let minDist = Infinity;
@@ -3144,7 +3261,7 @@ class GameCore {
       const dy = targetDrop.y - pet.y;
       const dist = Math.hypot(dx, dy);
 
-      if (dist <= 46) {
+      if (dist <= 48) {
         pet.beamTimer = 0.22;
         pet.beamX = targetDrop.x;
         pet.beamY = targetDrop.y;
@@ -3154,7 +3271,6 @@ class GameCore {
         pet.y += (dy / dist) * petSpeed * dt;
       }
     } else {
-      // 평소에는 플레이어 후방 상단을 부드럽게 공전하며 호위
       const orbitX = this.player.x - (this.player.facing || 1) * 32 + Math.cos(pet.wingPhase * 0.25) * 10;
       const orbitY = this.player.y - 26 + Math.sin(pet.wingPhase * 0.5) * 6;
       pet.x += (orbitX - pet.x) * Math.min(1, dt * 7);
@@ -3162,17 +3278,148 @@ class GameCore {
     }
   }
 
+  /**
+   * [요청 4: 고용 용병단 & 오픈월드 AI 유저 멀티플레이 업데이트]
+   */
+  updateCompanionsAndAI(dt) {
+    const aliveMonsters = this.monsters.filter(m => !m.dead && m.hp > 0);
+
+    // 1. 고용 용병단 3인 업데이트
+    this.mercEntities.forEach((merc, idx) => {
+      const mState = this.state.mercenaries[merc.id];
+      if (!mState || !mState.hired || mState.level <= 0) return;
+
+      merc.animPhase += dt * 6;
+      const formAngle = idx * 2.1 + 0.5;
+      const goalX = this.player.x + Math.cos(formAngle) * 48;
+      const goalY = this.player.y + Math.sin(formAngle) * 48;
+
+      merc.x += (goalX - merc.x) * Math.min(1, dt * 5.5);
+      merc.y += (goalY - merc.y) * Math.min(1, dt * 5.5);
+      if (goalX - merc.x !== 0) merc.facing = goalX >= merc.x ? 1 : -1;
+
+      merc.atkTimer -= dt;
+      if (merc.atkTimer <= 0 && aliveMonsters.length > 0) {
+        const nearest = aliveMonsters.sort((a, b) => Math.hypot(a.x - merc.x, a.y - merc.y) - Math.hypot(b.x - merc.x, b.y - merc.y))[0];
+        if (nearest && Math.hypot(nearest.x - merc.x, nearest.y - merc.y) <= 230) {
+          merc.atkTimer = merc.def.cd;
+          merc.facing = nearest.x >= merc.x ? 1 : -1;
+          const mercDmg = this.stats.atk * merc.def.atkRatio * (1 + mState.level * 0.14);
+
+          if (merc.id === 'PRIEST') {
+            this.player.hp = Math.min(this.player.maxHp, this.player.hp + this.player.maxHp * 0.03);
+            this.spawnRingEffect(this.player.x, this.player.y, 26, '#f472b6');
+          }
+
+          const ang = Math.atan2(nearest.y - merc.y, nearest.x - merc.x);
+          this.playerProjectiles.push({
+            x: merc.x, y: merc.y - 6,
+            vx: Math.cos(ang) * 420, vy: Math.sin(ang) * 420,
+            dmg: mercDmg, color: merc.def.color, radius: 5, life: 0.9, isAlly: true
+          });
+        }
+      }
+    });
+
+    // 2. 오픈월드 AI 유저 4인 업데이트 (몬스터 추적, 스킬 이펙트, 말풍선 채팅)
+    if (!this.state.aiPlayersEnabled) return;
+    this.aiPlayerEntities.forEach(ai => {
+      ai.walkCycle += dt * 8;
+      if (ai.swingAnim > 0) ai.swingAnim = Math.max(0, ai.swingAnim - dt * 4);
+
+      // 실시간 채팅 말풍선 타이머
+      if (ai.chatTimer > 0) {
+        ai.chatTimer -= dt;
+      } else {
+        ai.nextChatCd -= dt;
+        if (ai.nextChatCd <= 0) {
+          ai.nextChatCd = 9 + this.rng.next() * 14;
+          ai.chatText = this.rng.pick(AI_CHAT_LINES);
+          ai.chatTimer = 4.2;
+        }
+      }
+
+      if (aliveMonsters.length > 0) {
+        const target = aliveMonsters.find(m => m.isBoss) || aliveMonsters[ai.id.charCodeAt(3) % aliveMonsters.length];
+        if (target) {
+          const dx = target.x - ai.x;
+          const dy = target.y - ai.y;
+          const dist = Math.hypot(dx, dy);
+          ai.facing = dx >= 0 ? 1 : -1;
+
+          const stopDist = ai.cls === 'ARCHMAGE' ? 140 : 52;
+          if (dist > stopDist) {
+            const nx = ai.x + (dx / dist) * 155 * dt;
+            const ny = ai.y + (dy / dist) * 155 * dt;
+            const res = this.resolveWorldPosition(nx, ny, 13, false);
+            ai.x = res.x;
+            ai.y = res.y;
+          }
+
+          ai.atkTimer -= dt;
+          if (ai.atkTimer <= 0 && dist <= stopDist + 45) {
+            ai.atkTimer = 0.75;
+            ai.swingAnim = 1.0;
+            this.dealDamage(target, this.stats.atk * 0.16, { isAlly: true, noSound: true });
+          }
+
+          ai.skillTimer -= dt;
+          if (ai.skillTimer <= 0 && dist <= 180) {
+            ai.skillTimer = 4.5 + this.rng.next() * 2.5;
+            this.spawnRingEffect(target.x, target.y, 55, ai.color);
+            this.dealDamage(target, this.stats.atk * 0.35, { isAlly: true, noSound: true });
+          }
+        }
+      }
+    });
+  }
+
   gainExp(amount) {
     this.state.exp += amount;
+    let leveledUp = false;
     while (this.state.exp >= this.state.level * 80) {
       const req = this.state.level * 80;
       this.state.exp -= req;
       this.state.level += 1;
       this.state.sp += 1;
-      this.recalcStats(true);
-      this.addFloatText(this.player.x, this.player.y - 30, 'LEVEL UP!', '#ffd700');
-      this.log(`🎉 레벨 업! Lv.${this.state.level} 달성 (스킬 포인트 +1)`, '#fde047');
+      leveledUp = true;
     }
+    if (leveledUp) {
+      // 레벨 달성 시 상위 차수 전직 가능 여부 자동 체크 및 알림
+      this.checkAutoJobAdvancement();
+      this.recalcStats(true);
+      this.addFloatText(this.player.x, this.player.y - 30, `LEVEL UP! (Lv.${this.state.level})`, '#ffd700');
+      this.log(`🎉 레벨 업! Lv.${this.state.level} 달성 (장비 최대 제어 ilvl: ${ItemGenerator.getMaxControllableIlvl(this.state.level)})`, '#fde047');
+    }
+  }
+
+  checkAutoJobAdvancement(manualClick = false) {
+    const curTier = this.state.jobTier || 1;
+    let newTier = curTier;
+    for (let t = 5; t >= 1; t--) {
+      if (this.state.level >= JOB_TIER_REQ_LVS[t - 1]) {
+        newTier = Math.max(newTier, t);
+        break;
+      }
+    }
+    if (newTier > curTier) {
+      this.state.jobTier = newTier;
+      const adv = this.getCurrentJobAdvancement();
+      SFX.mythicDrop();
+      this.spawnRingEffect(this.player.x, this.player.y, 160, '#ffd700');
+      this.log(`👑 [전직 각성 달성!] <b>${adv.title}</b> 각성 완료! (${adv.auraDesc})`, '#ffd700');
+      this.recalcStats(true);
+      this.emit('stateChanged', { reason: 'jobAdvance' });
+      return true;
+    } else if (manualClick) {
+      const nextReq = JOB_TIER_REQ_LVS[curTier];
+      if (!nextReq) {
+        this.log('👑 이미 최종 단계인 [5차 신격 전직]에 도달했습니다!', '#ffd700');
+      } else {
+        this.log(`⚠️ 다음 차수(${curTier + 1}차) 전직에는 <b>Lv.${nextReq}</b> 달성이 필요합니다. (현재 Lv.${this.state.level})`, '#f87171');
+      }
+    }
+    return false;
   }
 
   onPlayerDeath() {
@@ -3227,7 +3474,6 @@ class GameCore {
       return;
     }
 
-    // 펫이 꺼져 있을 때만 캐릭터가 직접 아이템을 주우러 이동
     const petActive = this.state.pet && this.state.pet.enabled;
     if (!petActive && this.drops.length > 0 && (this.state.inventory.length < 36 || this.state.filterConfig.enabled || this.state.autoEquip)) {
       const nearestDrop = [...this.drops].sort(
@@ -3294,7 +3540,6 @@ class GameCore {
 
     this.applyFrameDynamicStats();
 
-    // 레이드 타이머 및 클리어 후 복귀 타이머 처리
     if (this.raidState.active) {
       if (this.raidState.clearWaitTimer > 0) {
         this.raidState.clearWaitTimer -= dt;
@@ -3321,11 +3566,10 @@ class GameCore {
       }
     }
 
-    // 오픈월드 몬스터 리스폰 (레이드가 아닐 때만)
     if (!this.raidState.active) {
       this.respawnTimer -= dt;
       if (this.respawnTimer <= 0) {
-        this.respawnTimer = 1.6;
+        this.respawnTimer = 1.5;
         const normalCount = this.monsters.filter(m => !m.dead && !m.isBoss).length;
         if (normalCount < 14) {
           const need = Math.min(4, 14 - normalCount);
@@ -3362,7 +3606,6 @@ class GameCore {
       this.runAutoHuntAI(dt);
     }
 
-    // 플레이어 이동
     const dx = this.player.targetX - this.player.x;
     const dy = this.player.targetY - this.player.y;
     const dist = Math.hypot(dx, dy);
@@ -3391,10 +3634,10 @@ class GameCore {
       }
     }
 
-    // 자동습득 펫 업데이트
+    // 펫, 용병단, AI 유저 업데이트
     this.updatePet(dt);
+    this.updateCompanionsAndAI(dt);
 
-    // 직업별 기본 공격 처리 (전사: 대검 베기 / 마법사: 마력탄 발사 / 도적: 고속 쌍단검+수리검)
     const cls = this.getCurrentClassDef();
     this.player.atkTimer -= dt;
     if (this.player.atkTimer <= 0 && this.monsters.length > 0) {
@@ -3413,27 +3656,34 @@ class GameCore {
         this.player.basicAtkCount = (this.player.basicAtkCount || 0) + 1;
 
         const ang = Math.atan2(nearest.y - this.player.y, nearest.x - this.player.x);
+        const multiShot = this.state.jobTier >= 3 ? 2 : 1;
 
         if (cls.id === 'ARCHMAGE') {
-          this.playerProjectiles.push({
-            x: this.player.x, y: this.player.y - 8,
-            vx: Math.cos(ang) * 380, vy: Math.sin(ang) * 380,
-            dmg: this.stats.atk * 1.15, color: '#38bdf8', radius: 6, life: 1.2
-          });
+          for (let s = 0; s < multiShot; s++) {
+            const spread = (s - (multiShot - 1) / 2) * 0.14;
+            this.playerProjectiles.push({
+              x: this.player.x, y: this.player.y - 8,
+              vx: Math.cos(ang + spread) * 390, vy: Math.sin(ang + spread) * 390,
+              dmg: this.stats.atk * 1.15, color: '#38bdf8', radius: 6, life: 1.2
+            });
+          }
         } else if (cls.id === 'SHADOW') {
           if (!this.headless) {
             this.slashEffects.push({ x: this.player.x, y: this.player.y, angle: ang, radius: 38, alpha: 1.0, color: '#c084fc' });
           }
-          this.playerProjectiles.push({
-            x: this.player.x, y: this.player.y - 6,
-            vx: Math.cos(ang) * 440, vy: Math.sin(ang) * 440,
-            dmg: this.stats.atk * 0.95, color: '#e879f9', radius: 5, life: 0.9
-          });
+          for (let s = 0; s < multiShot; s++) {
+            const spread = (s - (multiShot - 1) / 2) * 0.16;
+            this.playerProjectiles.push({
+              x: this.player.x, y: this.player.y - 6,
+              vx: Math.cos(ang + spread) * 450, vy: Math.sin(ang + spread) * 450,
+              dmg: this.stats.atk * 0.95, color: '#e879f9', radius: 5, life: 0.9
+            });
+          }
         } else {
           if (!this.headless) {
             this.slashEffects.push({
               x: this.player.x, y: this.player.y,
-              angle: ang, radius: 48, alpha: 1.0,
+              angle: ang, radius: 48 + (this.state.jobTier >= 3 ? 12 : 0), alpha: 1.0,
               color: this.lowHpBerserkActive ? '#ff2a6d' : '#ef4444'
             });
           }
@@ -3453,7 +3703,6 @@ class GameCore {
       }
     }
 
-    // 플레이어 투사체(마법사 구체 / 도적 수리검) 업데이트
     for (let i = this.playerProjectiles.length - 1; i >= 0; i--) {
       const pp = this.playerProjectiles[i];
       pp.x += pp.vx * dt;
@@ -3465,13 +3714,12 @@ class GameCore {
       }
       const hitM = this.monsters.find(m => !m.dead && Math.hypot(m.x - pp.x, m.y - pp.y) <= m.radius + pp.radius + 4);
       if (hitM) {
-        this.dealDamage(hitM, pp.dmg);
-        this.spawnRingEffect(hitM.x, hitM.y, 22, pp.color);
+        this.dealDamage(hitM, pp.dmg, { isAlly: !!pp.isAlly, noSound: !!pp.isAlly });
+        this.spawnRingEffect(hitM.x, hitM.y, 20, pp.color);
         this.playerProjectiles.splice(i, 1);
       }
     }
 
-    // 장판 업데이트
     for (let i = this.groundZones.length - 1; i >= 0; i--) {
       const gz = this.groundZones[i];
       gz.life -= dt;
@@ -3499,7 +3747,6 @@ class GameCore {
       return;
     }
 
-    // 캐릭터 직접 루팅 체크
     for (let i = this.drops.length - 1; i >= 0; i--) {
       const d = this.drops[i];
       d.ttl -= dt;
@@ -3513,7 +3760,6 @@ class GameCore {
       }
     }
 
-    // 몬스터 & 레이드 보스 AI 업데이트
     const hasGravityAura = this.activeUniques.has('GRAVITY_AURA');
     this.monsters.slice().forEach(m => {
       if (m.dead || m.hp <= 0) return;
@@ -3609,7 +3855,6 @@ class GameCore {
             });
           }
         }
-        // 레이드 보스 전용 운석 폭격 장판 패턴
         if (m.isRaidBoss) {
           m.meteorCd = (m.meteorCd || 5.0) - dt;
           if (m.meteorCd <= 0) {
@@ -3684,7 +3929,13 @@ class GameCore {
       this.addFloatText(this.player.x, this.player.y - 18, '회피!', '#38bdf8');
       return;
     }
-    let reduced = Math.max(1, Math.round(rawAtk * (100 / (100 + this.stats.def))));
+
+    // 사냥터 권장 레벨보다 내 레벨이 낮을 때 받는 피해 증가
+    const reqLv = this.world.zoneDef?.recLv || 1;
+    const lvDeficit = Math.max(0, reqLv - this.state.level);
+    const lvVulnMult = 1 + lvDeficit * 0.06;
+
+    let reduced = Math.max(1, Math.round(rawAtk * lvVulnMult * (100 / (100 + this.stats.def))));
 
     if (this.player.shield > 0) {
       if (this.player.shield >= reduced) {
@@ -3719,7 +3970,7 @@ class GameCore {
 
 /**
  * ============================================================================
- * [모듈 8] CanvasRenderer (3종 직업 외형 + 자동습득 펫 + 7단계 무지개 아이템 + 거대 레이드보스)
+ * [모듈 8] CanvasRenderer (5차 전직 날개/후광 + 용병단 + AI 유저 말풍선 렌더링)
  * ============================================================================
  */
 class CanvasRenderer {
@@ -3803,7 +4054,6 @@ class CanvasRenderer {
       ctx.restore();
     });
 
-    // 무지개 7단계 바닥 드랍 아이템 렌더링
     core.drops.forEach(d => {
       this.drawDetailedDroppedItem(ctx, d, nowSec);
     });
@@ -3811,6 +4061,21 @@ class CanvasRenderer {
     core.monsters.forEach(m => {
       if (m.dead) return;
       this.drawMonsterSprite(ctx, m, nowSec);
+    });
+
+    // 오픈월드 AI 유저 렌더링 (말풍선 포함)
+    if (core.state.aiPlayersEnabled) {
+      core.aiPlayerEntities.forEach(ai => {
+        this.drawAIPlayer(ctx, ai, nowSec);
+      });
+    }
+
+    // 고용 용병단 렌더링
+    core.mercEntities.forEach(merc => {
+      const mState = core.state.mercenaries?.[merc.id];
+      if (mState && mState.hired && mState.level > 0) {
+        this.drawMercenary(ctx, merc, mState.level, nowSec);
+      }
     });
 
     core.afterimages.forEach(af => {
@@ -3826,15 +4091,13 @@ class CanvasRenderer {
       ctx.restore();
     });
 
-    // 직업별 캐릭터 렌더링
+    // 플레이어 캐릭터 (1~5차 전직 날개 및 신격 오라 포함)
     this.drawPlayerByClass(ctx, core.player, core, nowSec);
 
-    // 자동습득 신화 펫 렌더링
     if (core.state.pet && core.state.pet.enabled) {
       this.drawAutoLootPet(ctx, core.petEntity, core.state.pet.level || 1, nowSec);
     }
 
-    // 플레이어 투사체(마법사 구체 / 도적 수리검) 렌더링
     core.playerProjectiles.forEach(pp => {
       ctx.save();
       ctx.translate(pp.x, pp.y);
@@ -3921,7 +4184,6 @@ class CanvasRenderer {
   drawBiomeObstacle(ctx, ob, biome) {
     ctx.save();
     ctx.translate(ob.x, ob.y);
-
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.beginPath();
     ctx.ellipse(0, 14, ob.radius * 0.95, ob.radius * 0.45, 0, 0, Math.PI * 2);
@@ -3962,8 +4224,102 @@ class CanvasRenderer {
     ctx.restore();
   }
 
+  drawMercenary(ctx, merc, lv, nowSec) {
+    const bob = Math.sin(merc.animPhase) * 2;
+    ctx.save();
+    ctx.translate(merc.x, merc.y);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath();
+    ctx.ellipse(0, 12, 11, 4.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.save();
+    ctx.scale(merc.facing || 1, 1);
+    ctx.fillStyle = '#1e293b';
+    ctx.strokeStyle = merc.def.color;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.roundRect(-7, -4 + bob, 14, 13, 3);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = merc.def.color;
+    ctx.beginPath();
+    ctx.arc(0, -9 + bob, 6.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.font = 'bold 9px sans-serif';
+    ctx.fillStyle = merc.def.color;
+    ctx.textAlign = 'center';
+    ctx.fillText(`${merc.def.icon}Lv.${lv}`, 0, -19 + bob);
+    ctx.restore();
+  }
+
+  drawAIPlayer(ctx, ai, nowSec) {
+    const bob = Math.sin(ai.walkCycle) * 2;
+    ctx.save();
+    ctx.translate(ai.x, ai.y);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath();
+    ctx.ellipse(0, 13, 12, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.save();
+    ctx.scale(ai.facing || 1, 1);
+    // AI 유저 날개 & 갑주
+    ctx.fillStyle = ai.color;
+    ctx.globalAlpha = 0.35;
+    ctx.beginPath();
+    ctx.moveTo(0, -4 + bob);
+    ctx.lineTo(-16, -15 + bob);
+    ctx.lineTo(-10, 4 + bob);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = '#1e293b';
+    ctx.strokeStyle = ai.color;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.roundRect(-8, -5 + bob, 16, 14, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(0, -10 + bob, 7.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // AI 유저 닉네임 태그
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fde047';
+    ctx.fillText(`[${ai.title}] ${ai.name}`, 0, -22 + bob);
+
+    // 실시간 말풍선 채팅
+    if (ai.chatTimer > 0 && ai.chatText) {
+      ctx.font = '10px sans-serif';
+      const tw = ctx.measureText(ai.chatText).width + 12;
+      const cy = -40 + bob;
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(-tw / 2, cy - 11, tw, 16, 5);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(ai.chatText, 0, cy);
+    }
+
+    ctx.restore();
+  }
+
   drawAutoLootPet(ctx, pet, petLv, nowSec) {
-    // 자석 루팅 광선
     if (pet.beamTimer > 0) {
       ctx.save();
       ctx.strokeStyle = '#38bdf8';
@@ -3979,19 +4335,13 @@ class CanvasRenderer {
     ctx.save();
     ctx.translate(pet.x, pet.y + Math.sin(nowSec * 6) * 3);
 
-    // 펫 날개
     const flap = Math.sin(pet.wingPhase) * 6;
     ctx.fillStyle = '#38bdf8';
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(-13, -7 + flap);
-    ctx.lineTo(-8, 4);
-    ctx.moveTo(0, 0);
-    ctx.lineTo(13, -7 + flap);
-    ctx.lineTo(8, 4);
+    ctx.moveTo(0, 0); ctx.lineTo(-13, -7 + flap); ctx.lineTo(-8, 4);
+    ctx.moveTo(0, 0); ctx.lineTo(13, -7 + flap);  ctx.lineTo(8, 4);
     ctx.fill();
 
-    // 아기 드래곤 몸통
     ctx.fillStyle = '#fbbf24';
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1.2;
@@ -4000,7 +4350,6 @@ class CanvasRenderer {
     ctx.fill();
     ctx.stroke();
 
-    // 눈 & 머리 위 왕관
     ctx.fillStyle = '#090b10';
     ctx.fillRect(-3, -2, 2, 2);
     ctx.fillRect(1, -2, 2, 2);
@@ -4068,28 +4417,19 @@ class CanvasRenderer {
 
     if (item.slot === 'WEAPON') {
       ctx.beginPath();
-      ctx.moveTo(-7, 7);
-      ctx.lineTo(5, -8);
-      ctx.lineTo(9, -9);
-      ctx.lineTo(8, -5);
-      ctx.lineTo(-4, 9);
+      ctx.moveTo(-7, 7); ctx.lineTo(5, -8); ctx.lineTo(9, -9); ctx.lineTo(8, -5); ctx.lineTo(-4, 9);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
     } else if (item.slot === 'HELMET') {
       ctx.beginPath();
-      ctx.arc(0, 1, 7, Math.PI, 0);
-      ctx.lineTo(7, 7);
-      ctx.lineTo(-7, 7);
+      ctx.arc(0, 1, 7, Math.PI, 0); ctx.lineTo(7, 7); ctx.lineTo(-7, 7);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
     } else if (item.slot === 'ARMOR') {
       ctx.beginPath();
-      ctx.moveTo(-8, -7);
-      ctx.lineTo(8, -7);
-      ctx.lineTo(6, 8);
-      ctx.lineTo(-6, 8);
+      ctx.moveTo(-8, -7); ctx.lineTo(8, -7); ctx.lineTo(6, 8); ctx.lineTo(-6, 8);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
@@ -4100,12 +4440,7 @@ class CanvasRenderer {
       ctx.stroke();
     } else if (item.slot === 'BOOTS') {
       ctx.beginPath();
-      ctx.moveTo(-5, -7);
-      ctx.lineTo(2, -7);
-      ctx.lineTo(2, 3);
-      ctx.lineTo(8, 3);
-      ctx.lineTo(8, 8);
-      ctx.lineTo(-5, 8);
+      ctx.moveTo(-5, -7); ctx.lineTo(2, -7); ctx.lineTo(2, 3); ctx.lineTo(8, 3); ctx.lineTo(8, 8); ctx.lineTo(-5, 8);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
@@ -4115,10 +4450,6 @@ class CanvasRenderer {
       ctx.beginPath();
       ctx.arc(0, 2, 6, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.fillStyle = col;
-      ctx.beginPath();
-      ctx.arc(0, -5, 3.5, 0, Math.PI * 2);
-      ctx.fill();
     }
     ctx.restore();
 
@@ -4142,11 +4473,9 @@ class CanvasRenderer {
     ctx.restore();
   }
 
-  /**
-   * [요청 1 반영: 3종 직업별 고유 캐릭터 아트워크 렌더링]
-   */
   drawPlayerByClass(ctx, p, core, nowSec) {
     const clsId = core.state.charClass || 'BERSERKER';
+    const jobTier = core.state.jobTier || 1;
     const weapon = core.state.equipped.WEAPON;
     const weaponCol = weapon ? (RARITY_INFO[weapon.rarity]?.color || '#38bdf8') : '#94a3b8';
     const bob = Math.sin(p.walkCycle) * 2.2;
@@ -4159,31 +4488,50 @@ class CanvasRenderer {
     ctx.ellipse(0, 14, 14, 6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    if (p.buffTimer > 0 || core.lowHpBerserkActive || p.phaseTimer > 0) {
+    // 3차 이상 전직 후광(Halo) 및 5차 전직 신격 날개 연출
+    if (jobTier >= 3) {
+      ctx.save();
+      ctx.rotate(nowSec * 2.2);
       ctx.beginPath();
-      ctx.arc(0, 0, 22 + Math.sin(nowSec * 10) * 3, 0, Math.PI * 2);
-      ctx.strokeStyle = p.phaseTimer > 0 ? '#38bdf8' : CHAR_CLASSES[clsId].color;
-      ctx.lineWidth = 2.5;
+      ctx.arc(0, -6, 20 + jobTier * 2, 0, Math.PI * 2);
+      ctx.strokeStyle = jobTier >= 5 ? '#ffd700' : CHAR_CLASSES[clsId].color;
+      ctx.lineWidth = jobTier >= 5 ? 2.5 : 1.5;
+      ctx.setLineDash([5, 4]);
       ctx.stroke();
+      ctx.restore();
+    }
+
+    if (jobTier >= 4) {
+      const wingFlap = Math.sin(nowSec * 6) * 6;
+      ctx.save();
+      ctx.fillStyle = jobTier >= 5 ? 'rgba(255, 215, 0, 0.45)' : 'rgba(56, 189, 248, 0.35)';
+      ctx.strokeStyle = jobTier >= 5 ? '#ffd700' : CHAR_CLASSES[clsId].color;
+      ctx.lineWidth = 1.5;
+      [-1, 1].forEach(dir => {
+        ctx.beginPath();
+        ctx.moveTo(0, -6 + bob);
+        ctx.quadraticCurveTo(dir * 26, -24 + wingFlap, dir * 32, -4 + wingFlap);
+        ctx.quadraticCurveTo(dir * 18, 6, 0, 2 + bob);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      });
+      ctx.restore();
     }
 
     ctx.save();
     ctx.scale(p.facing || 1, 1);
 
     if (clsId === 'ARCHMAGE') {
-      // [아크메이지] 푸른 비전 로브 + 마법사 고깔모자 + 부유하는 아케인 오브 & 스태프
       ctx.fillStyle = '#1e3a8a';
       ctx.strokeStyle = '#60a5fa';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(0, -10 + bob);
-      ctx.lineTo(11, 13 + bob);
-      ctx.lineTo(-11, 13 + bob);
+      ctx.moveTo(0, -10 + bob); ctx.lineTo(11, 13 + bob); ctx.lineTo(-11, 13 + bob);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
 
-      // 얼굴 & 빛나는 눈
       ctx.fillStyle = '#0f172a';
       ctx.beginPath();
       ctx.arc(0, -11 + bob, 7.5, 0, Math.PI * 2);
@@ -4191,33 +4539,27 @@ class CanvasRenderer {
       ctx.fillStyle = '#38bdf8';
       ctx.fillRect(1, -13 + bob, 5, 2.5);
 
-      // 마법사 챙 모자
       ctx.fillStyle = '#172554';
       ctx.beginPath();
       ctx.ellipse(0, -16 + bob, 13, 3.5, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(-8, -16 + bob);
-      ctx.lineTo(0, -29 + bob);
-      ctx.lineTo(8, -16 + bob);
+      ctx.moveTo(-8, -16 + bob); ctx.lineTo(0, -29 + bob); ctx.lineTo(8, -16 + bob);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
 
-      // 아케인 스태프
       ctx.strokeStyle = '#fbbf24';
       ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.moveTo(9, 12 + bob);
-      ctx.lineTo(13, -12 + bob);
+      ctx.moveTo(9, 12 + bob); ctx.lineTo(13, -12 + bob);
       ctx.stroke();
       ctx.fillStyle = weaponCol;
       ctx.beginPath();
       ctx.arc(13, -15 + bob, 5, 0, Math.PI * 2);
       ctx.fill();
     } else if (clsId === 'SHADOW') {
-      // [섀도우블레이드] 암살자 후드 + 나부끼는 보라빛 머플러 + 역수 쌍단검
       const scarfWave = Math.sin(nowSec * 8) * 5;
       ctx.fillStyle = '#7e22ce';
       ctx.beginPath();
@@ -4226,7 +4568,6 @@ class CanvasRenderer {
       ctx.lineTo(-6, -2 + bob);
       ctx.fill();
 
-      // 날렵한 흑색 전투복
       ctx.fillStyle = '#1e1b4b';
       ctx.strokeStyle = '#c084fc';
       ctx.lineWidth = 1.5;
@@ -4235,7 +4576,6 @@ class CanvasRenderer {
       ctx.fill();
       ctx.stroke();
 
-      // 암살자 후드 & 붉은 안광
       ctx.fillStyle = '#090d16';
       ctx.beginPath();
       ctx.arc(0, -11 + bob, 8, 0, Math.PI * 2);
@@ -4244,16 +4584,12 @@ class CanvasRenderer {
       ctx.fillStyle = '#e879f9';
       ctx.fillRect(2, -13 + bob, 5, 2.5);
 
-      // 쌍단검
       ctx.fillStyle = weaponCol;
       ctx.beginPath();
-      ctx.moveTo(7, 0 + bob);
-      ctx.lineTo(20, -5 + bob);
-      ctx.lineTo(10, 4 + bob);
+      ctx.moveTo(7, 0 + bob); ctx.lineTo(20, -5 + bob); ctx.lineTo(10, 4 + bob);
       ctx.closePath();
       ctx.fill();
     } else {
-      // [버서커] 붉은 망토 + 중갑 + 뿔 투구 + 거대 룬 대검
       const capeWave = Math.sin(p.walkCycle * 0.8 + nowSec * 4) * 4;
       ctx.fillStyle = '#991b1b';
       ctx.beginPath();
@@ -4312,12 +4648,11 @@ class CanvasRenderer {
       ctx.stroke();
     }
 
-    if (core.autoHunt) {
-      ctx.fillStyle = '#fde047';
-      ctx.font = 'bold 10px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('⚡AUTO', 0, -29 + bob);
-    }
+    const advTitle = core.getCurrentJobAdvancement().title;
+    ctx.fillStyle = jobTier >= 5 ? '#ffd700' : '#bae6fd';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${core.autoHunt ? '⚡' : ''}[${advTitle}]`, 0, -30 + bob);
 
     ctx.restore();
   }
@@ -4389,21 +4724,12 @@ class CanvasRenderer {
       ctx.fillStyle = '#fde047';
       ctx.fillRect(-6, -18 + bob, 4, 3);
       ctx.fillRect(2, -18 + bob, 4, 3);
-
-      ctx.fillStyle = m.color || '#f97316';
-      ctx.beginPath();
-      ctx.moveTo(12, 2 + bob);
-      ctx.lineTo(34, -12 + bob);
-      ctx.lineTo(30, 8 + bob);
-      ctx.closePath();
-      ctx.fill();
     } else if (m.typeId === 'GOBLIN') {
       ctx.fillStyle = m.slowTimer > 0 ? '#60a5fa' : '#22c55e';
       ctx.beginPath();
       ctx.moveTo(-8, -6 + bob); ctx.lineTo(-17, -11 + bob); ctx.lineTo(-7, -1 + bob);
       ctx.moveTo(8, -6 + bob);  ctx.lineTo(17, -11 + bob);  ctx.lineTo(7, -1 + bob);
       ctx.fill();
-
       ctx.fillStyle = '#3f6212';
       ctx.beginPath();
       ctx.arc(0, 2 + bob, 10, 0, Math.PI * 2);
@@ -4412,9 +4738,6 @@ class CanvasRenderer {
       ctx.beginPath();
       ctx.arc(0, -6 + bob, 8.5, 0, Math.PI * 2);
       ctx.fill();
-
-      ctx.fillStyle = '#fde047';
-      ctx.fillRect(1, -8 + bob, 4, 2.5);
     } else if (m.typeId === 'ARCHER') {
       ctx.fillStyle = '#334155';
       ctx.beginPath();
@@ -4424,11 +4747,6 @@ class CanvasRenderer {
       ctx.beginPath();
       ctx.arc(0, -8 + bob, 8, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#fbbf24';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(6, 0 + bob, 10, -1.1, 1.1);
-      ctx.stroke();
     } else if (m.typeId === 'SLIME') {
       const stretch = Math.sin(m.animPhase * 1.5) * 2.5;
       ctx.fillStyle = 'rgba(56, 189, 248, 0.68)';
@@ -4443,9 +4761,7 @@ class CanvasRenderer {
       ctx.strokeStyle = '#c084fc';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(0, -15 + bob);
-      ctx.lineTo(11, 10 + bob);
-      ctx.lineTo(-11, 10 + bob);
+      ctx.moveTo(0, -15 + bob); ctx.lineTo(11, 10 + bob); ctx.lineTo(-11, 10 + bob);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
@@ -4480,7 +4796,7 @@ class CanvasRenderer {
 
 /**
  * ============================================================================
- * [모듈 9] GameApp (전체 UI 컨트롤러)
+ * [모듈 9] GameApp (전체 일괄해체/일괄장착, 5차전직, 용병단, 일괄성장 UI 컨트롤러)
  * ============================================================================
  */
 class GameApp {
@@ -4489,7 +4805,6 @@ class GameApp {
     this.autoRerollActive = false;
     this.autoRerollTargetUid = null;
     this.autoRerollTargetEquipped = false;
-    this.simRunning = false;
     this.selectedItemUid = null;
     this.pinnedTooltipUid = null;
 
@@ -4521,7 +4836,7 @@ class GameApp {
     this.core.on('banner', ({ item, isMythic }) => this.showSpecialBanner(item, isMythic));
     this.core.on('itemDropped', ({ item }) => {
       const rInfo = RARITY_INFO[item.rarity];
-      if (rInfo && rInfo.rank >= 5) {
+      if (rInfo && rInfo.rank >= 6) {
         this.appendLog(
           `🎁 드랍: [${rInfo.name}] ${ItemGenerator.getDisplayName(item)} (ilvl.${item.ilvl})`,
           rInfo.color
@@ -4539,7 +4854,6 @@ class GameApp {
     });
     this.core.on('gridsChanged', () => {
       this.renderGridsOnly();
-      this.renderCodexUI();
     });
     this.core.on('stateChanged', () => {
       this.updateTopBarAndStats();
@@ -4553,9 +4867,6 @@ class GameApp {
     document.getElementById('auto-opt-2').innerHTML = optHtml;
     document.getElementById('auto-opt-1').value = 'critDmg';
     document.getElementById('auto-opt-2').value = 'atkSpd';
-
-    document.getElementById('filter-add-opt').innerHTML =
-      OPTION_POOL.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
   }
 
   appendLog(msg, color = '#cbd5e1') {
@@ -4603,6 +4914,7 @@ class GameApp {
         const isCurrent = !this.core.raidState.active && z.id === currentZoneId;
         const effIlvl = z.ilvl + wTier.ilvlBonus;
         const tProbs = ItemGenerator.getTierProbsForIlvl(effIlvl);
+        const lvWarn = this.core.state.level < z.recLv;
         const card = document.createElement('div');
         card.className = 'zone-card' + (isCurrent ? ' active-zone' : '');
         card.innerHTML = `
@@ -4611,7 +4923,7 @@ class GameApp {
             <span style="font-size:10px; color:#38bdf8; font-weight:bold;">ilvl.${effIlvl}</span>
           </div>
           <div style="font-size:10px; color:#94a3b8; display:flex; justify-content:space-between;">
-            <span>권장 Lv.${z.recLv}</span>
+            <span style="color:${lvWarn ? '#f87171' : '#94a3b8'};">권장 Lv.${z.recLv}</span>
             <span style="color:#cc5de8;">T1 ${(tProbs.T1 * 100).toFixed(1)}%</span>
           </div>
         `;
@@ -4652,6 +4964,69 @@ class GameApp {
     });
   }
 
+  renderPartyTab() {
+    const st = this.core.state;
+    const petLv = st.pet?.level || 1;
+    const petCost = petLv * 1200;
+    document.getElementById('ui-pet-lv').textContent = petLv;
+    document.getElementById('chk-pet-active').checked = !!(st.pet && st.pet.enabled);
+    document.getElementById('ui-pet-desc').innerHTML =
+      `필드 아이템 자석 자동습득 | 비행속도 <b>${350 + petLv * 30}</b> | 골드·드랍 보너스 <b>+${petLv * 5}%</b> (1회 강화 비용: ${petCost.toLocaleString()}G)`;
+
+    const mercBox = document.getElementById('mercenary-list');
+    mercBox.innerHTML = MERCENARY_DEFS.map(def => {
+      const mState = st.mercenaries[def.id] || { hired: false, level: 0 };
+      const cost = def.baseCost * (mState.level + 1);
+      return `
+        <div class="forge-opt-row" style="padding:8px;">
+          <div style="flex:1;">
+            <b style="color:${def.color}; font-size:12px;">${def.icon} ${def.name} ${mState.hired ? `(Lv.${mState.level})` : '[미고용]'}</b>
+            <div style="font-size:10px; color:#94a3b8;">${def.desc}</div>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-gold" data-merc-up="${def.id}:1">${mState.hired ? `+1 (${cost.toLocaleString()}G)` : `고용 (${cost.toLocaleString()}G)`}</button>
+            <button class="btn btn-green" data-merc-up="${def.id}:10">+10</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    mercBox.querySelectorAll('[data-merc-up]').forEach(btn => {
+      btn.onclick = () => {
+        const [mId, cntStr] = btn.dataset.mercUp.split(':');
+        const cnt = Number(cntStr);
+        this.upgradeMercenary(mId, cnt);
+      };
+    });
+  }
+
+  upgradeMercenary(mercId, count = 1) {
+    const st = this.core.state;
+    const def = MERCENARY_DEFS.find(d => d.id === mercId);
+    if (!def) return;
+    const mState = st.mercenaries[mercId];
+    let upCount = 0;
+
+    for (let i = 0; i < count; i++) {
+      const cost = def.baseCost * (mState.level + 1);
+      if (st.gold < cost) break;
+      st.gold -= cost;
+      mState.hired = true;
+      mState.level += 1;
+      upCount++;
+    }
+
+    if (upCount > 0) {
+      SFX.enhanceSuccess();
+      this.core.initCompanions();
+      this.core.recalcStats(false);
+      this.appendLog(`🤝 용병 [${def.name}] +${upCount}단계 강화 완료! (현재 Lv.${mState.level})`, def.color);
+      this.renderAllUI();
+    } else {
+      this.appendLog('⚠️ 용병 고용/강화에 필요한 골드가 부족합니다.', '#f87171');
+    }
+  }
+
   findItemByUid(uid) {
     if (!uid) return null;
     const st = this.core.state;
@@ -4678,8 +5053,9 @@ class GameApp {
     if (found) {
       const itm = found.item;
       const rInfo = RARITY_INFO[itm.rarity];
+      const syncPct = Math.round(ItemGenerator.getLevelSyncRatio(itm, this.core.state.level) * 100);
       document.getElementById('selected-item-bar').innerHTML =
-        `<b style="color:${rInfo.color}">[${rInfo.name}] ${itm.star > 0 ? `+${itm.star} ` : ''}${ItemGenerator.getDisplayName(itm)} (전투력 ${ItemGenerator.scoreItemPower(itm)})</b>`;
+        `<b style="color:${rInfo.color}">[${rInfo.name}] ${itm.star > 0 ? `+${itm.star} ` : ''}${ItemGenerator.getDisplayName(itm)} (제어율 ${syncPct}%)</b>`;
     }
     this.renderForgeTab();
   }
@@ -4690,11 +5066,17 @@ class GameApp {
     const stats = this.core.stats;
     const curZone = this.core.getCurrentZone();
     const effIlvl = this.core.getEffectiveDropIlvl();
+    const maxSyncIlvl = ItemGenerator.getMaxControllableIlvl(st.level);
 
     document.getElementById('sel-world-tier').value = String(st.worldTier || 0);
     document.getElementById('sel-char-class').value = st.charClass || 'BERSERKER';
+    document.getElementById('ui-job-tier-badge').textContent = `[${st.jobTier || 1}차]`;
+    document.getElementById('ui-sync-ilvl').textContent = maxSyncIlvl;
+    document.getElementById('ui-inv-sync-ilvl').textContent = maxSyncIlvl;
+
     document.getElementById('chk-auto-equip').checked = !!st.autoEquip;
     document.getElementById('chk-auto-salvage').checked = !!(st.filterConfig && st.filterConfig.enabled);
+    document.getElementById('chk-ai-players').checked = !!st.aiPlayersEnabled;
 
     if (this.core.raidState.active && this.core.raidState.raidDef) {
       document.getElementById('ui-zone-name').textContent = `🐉 [레이드] ${this.core.raidState.raidDef.name}`;
@@ -4717,19 +5099,11 @@ class GameApp {
     document.getElementById('ui-shards').textContent = (st.soulShards || 0).toLocaleString();
     document.getElementById('ui-sp').textContent = st.sp;
     document.getElementById('inv-count').textContent = st.inventory.length;
-    document.getElementById('ui-seed-label').textContent = st.seed;
+    document.getElementById('codex-mythic-cnt').textContent = st.codex?.mythicCount || 0;
+    document.getElementById('codex-perfect-cnt').textContent = st.codex?.perfectCount || 0;
 
-    // 펫 UI 업데이트
-    const petLv = (st.pet && st.pet.level) ? st.pet.level : 1;
-    const petCost = petLv * 1200;
-    document.getElementById('ui-pet-lv').textContent = petLv;
-    document.getElementById('chk-pet-active').checked = !!(st.pet && st.pet.enabled);
-    document.getElementById('ui-pet-desc').textContent =
-      `필드 아이템 자석 자동습득 | 비행속도 ${340 + petLv * 28} | 골드·드랍 보너스 +${petLv * 5}%`;
-    document.getElementById('btn-pet-upgrade').textContent = `펫 강화 (${petCost.toLocaleString()}G)`;
-
-    // 직업별 스킬바 아이콘/이름 동기화
     const cls = this.core.getCurrentClassDef();
+    const adv = this.core.getCurrentJobAdvancement();
     cls.skills.forEach((sk, idx) => {
       document.getElementById(`sk-icon-${idx}`).textContent = sk.icon;
       document.getElementById(`sk-name-${idx}`).textContent = sk.name;
@@ -4748,16 +5122,17 @@ class GameApp {
     } else {
       setsBox.innerHTML = setEntries.map(([setId, cnt]) => {
         const def = ITEM_SETS[setId];
-        const b2 = cnt >= 2 ? `<span style="color:#4ade80;">[2세트 ON: ${def.bonuses[2].desc}]</span>` : `<span style="color:#64748b;">[2세트: ${def.bonuses[2].desc}]</span>`;
-        const b4 = cnt >= 4 ? `<span style="color:#4ade80;">[4세트 ON: ${def.bonuses[4].desc}]</span>` : `<span style="color:#64748b;">[4세트: ${def.bonuses[4].desc}]</span>`;
-        const b6 = cnt >= 6 ? `<span style="color:#ffd700; font-weight:bold;">[6세트 ON: ${def.bonuses[6].desc}]</span>` : `<span style="color:#64748b;">[6세트: ${def.bonuses[6].desc}]</span>`;
-        return `<div><b style="color:${def.color};">• ${def.name} (${cnt}/6)</b><br/>&nbsp;&nbsp;${b2} / ${b4}<br/>&nbsp;&nbsp;${b6}</div>`;
+        const b2 = cnt >= 2 ? `<span style="color:#4ade80;">[2세트 ON]</span>` : `<span style="color:#64748b;">[2세트]</span>`;
+        const b4 = cnt >= 4 ? `<span style="color:#4ade80;">[4세트 ON]</span>` : `<span style="color:#64748b;">[4세트]</span>`;
+        const b6 = cnt >= 6 ? `<span style="color:#ffd700; font-weight:bold;">[6세트 ON]</span>` : `<span style="color:#64748b;">[6세트]</span>`;
+        return `<div><b style="color:${def.color};">• ${def.name} (${cnt}/6)</b> ${b2} ${b4} ${b6}</div>`;
       }).join('');
     }
 
     const statBox = document.getElementById('char-stat-list');
     statBox.innerHTML = `
-      <div>직업: <b style="color:${cls.color};">${cls.icon} ${cls.name}</b></div>
+      <div>전직: <b style="color:#ffd700;">${adv.title}</b></div>
+      <div>장비 제어율: <b style="color:${this.core.avgSyncPct < 100 ? '#f87171' : '#4ade80'};">${this.core.avgSyncPct}%</b></div>
       <div>공격력: <b>${stats.atk.toLocaleString()}</b></div>
       <div>공격속도: <b>+${stats.atkSpd.toFixed(1)}%</b></div>
       <div>치명타 확률: <b>${stats.critRate.toFixed(1)}%</b></div>
@@ -4765,7 +5140,6 @@ class GameApp {
       <div>최대 생명력: <b>${stats.maxHp.toLocaleString()}</b></div>
       <div>방어력/관통: <b>${stats.def} / ${stats.armorPen.toFixed(1)}%</b></div>
       <div>생명력 흡수: <b>${stats.lifeSteal.toFixed(1)}%</b></div>
-      <div>쿨타임 감소: <b>${stats.cdr.toFixed(1)}%</b></div>
       <div>드랍/골드보너스: <b>+${stats.dropRate.toFixed(0)}% / +${stats.goldRate.toFixed(0)}%</b></div>
     `;
   }
@@ -4835,11 +5209,10 @@ class GameApp {
   renderAllUI() {
     this.renderWorldMapTab();
     this.renderRaidTab();
+    this.renderPartyTab();
     this.updateTopBarAndStats();
     this.renderGridsOnly();
     this.renderForgeTab();
-    this.renderFilterUI();
-    this.renderCodexUI();
     this.renderSkillTab();
     this.renderSanctuaryTab();
   }
@@ -4900,7 +5273,9 @@ class GameApp {
   buildTooltipHTML(item, titlePrefix = '', compareEquipped = null, showCloseBtn = false, isGallery = false) {
     const rInfo = RARITY_INFO[item.rarity] || RARITY_INFO.R1_RED;
     const starMult = 1 + item.star * 0.08;
-    const baseVal = Math.round(item.baseStat.value * starMult);
+    const syncRatio = ItemGenerator.getLevelSyncRatio(item, this.core.state.level);
+    const syncPct = Math.round(syncRatio * 100);
+    const baseVal = Math.round(item.baseStat.value * starMult * syncRatio);
     const ilvl = item.ilvl || item.floor || 1;
     const dispName = ItemGenerator.getDisplayName(item);
     const myScore = ItemGenerator.scoreItemPower(item);
@@ -4911,13 +5286,13 @@ class GameApp {
       const diff = myScore - eqScore;
       if (diff !== 0) {
         diffHtml = diff > 0
-          ? `<span style="color:#4ade80;">(전투력 ▲+${diff.toLocaleString()})</span>`
-          : `<span style="color:#f87171;">(전투력 ▼${diff.toLocaleString()})</span>`;
+          ? `<span style="color:#4ade80;">(▲+${diff.toLocaleString()})</span>`
+          : `<span style="color:#f87171;">(▼${diff.toLocaleString()})</span>`;
       }
     }
 
     const optsHtml = item.options.map(o => {
-      const val = (o.value * starMult).toFixed(o.unit === '%' ? 1 : 0);
+      const val = (o.value * starMult * syncRatio).toFixed(o.unit === '%' ? 1 : 0);
       const rollCol = o.rollPct >= 90 ? '#ffd700' : '#94a3b8';
       return `
         <div class="opt-line">
@@ -4938,7 +5313,7 @@ class GameApp {
            <div style="font-size:10px; color:#22c55e; font-weight:bold; margin-bottom:2px;">🟢 에디셔널 잠재옵션</div>
            ${addOpts.map(ao => `
              <div class="opt-line">
-               <div><span class="tier-tag t-${ao.tier}">${ao.tier}</span> <span style="color:#bbf7d0;">${ao.name} +<b>${ao.value}${ao.unit}</b></span></div>
+               <div><span class="tier-tag t-${ao.tier}">${ao.tier}</span> <span style="color:#bbf7d0;">${ao.name} +<b>${(ao.value * syncRatio).toFixed(1)}${ao.unit}</b></span></div>
                <span style="font-size:10px; color:#86efac;">${ao.rollPct.toFixed(0)}%</span>
              </div>
            `).join('')}
@@ -4953,14 +5328,6 @@ class GameApp {
              const g = GEM_TYPES[gId];
              return `<div style="color:${g.color};">${g.icon} 소켓 #${idx + 1}: <b>${g.name}</b> (${g.desc})</div>`;
            }).join('')}
-         </div>`
-      : '';
-
-    const setDef = item.setId ? ITEM_SETS[item.setId] : null;
-    const eqSetCount = setDef ? (this.core.activeSets[item.setId] || 0) : 0;
-    const setHtml = setDef
-      ? `<div style="margin-top:6px; padding-top:4px; border-top:1px solid #334155; font-size:10px; color:${setDef.color};">
-           👑 <b>${setDef.name} 세트 (${eqSetCount}/6 장착중)</b>
          </div>`
       : '';
 
@@ -4986,8 +5353,7 @@ class GameApp {
           ${showCloseBtn ? `<button class="btn btn-danger" id="btn-close-tooltip" style="padding:1px 6px; font-size:10px;">✕ 닫기</button>` : ''}
         </div>
       </div>
-      ${item.isMythic ? `<div style="color:#e599f7; font-size:11px; font-weight:bold; margin-bottom:4px;">🌈 [태초 무지개 신화] 5줄 올 1티어(T1) 달성!</div>` : ''}
-      ${!item.isMythic && item.isPerfect ? `<div style="color:#ffd700; font-size:11px; font-weight:bold; margin-bottom:4px;">★ 완벽한 아이템 (5줄 모두 T1~T2 달성) ★</div>` : ''}
+      ${syncPct < 100 ? `<div style="color:#f87171; font-size:10px; font-weight:bold; margin-bottom:3px;">⚠️ 캐릭터 레벨 부족으로 장비 성능 ${syncPct}% 발휘 중 (레벨업 시 상승)</div>` : ''}
       <div style="font-size:11px; color:#cbd5e1; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid #334155;">
         부위: ${SLOTS[item.slot].name} | <b style="color:#38bdf8;">ilvl: ${ilvl}</b> | 점수: <b>${myScore.toLocaleString()}</b> ${diffHtml}<br/>
         ${item.baseStat.label}: <b>+${baseVal.toLocaleString()}</b>
@@ -4995,7 +5361,6 @@ class GameApp {
       <div>${optsHtml}</div>
       ${addHtml}
       ${socketHtml}
-      ${setHtml}
       ${uniqueHtml}
     `;
   }
@@ -5054,10 +5419,6 @@ class GameApp {
     const found = this.findItemByUid(this.selectedItemUid);
     if (!found) return;
 
-    if (this.autoRerollActive && this.autoRerollTargetUid === found.item.uid) {
-      this.stopAutoReroll('⏹️ 장착 상태가 변경되어 자동 리롤을 정지했습니다.');
-    }
-
     const st = this.core.state;
     if (found.isEquipped) {
       if (st.inventory.length >= 36) {
@@ -5107,21 +5468,15 @@ class GameApp {
     }
 
     const pity = st.pity || { perfect: 0, mythic: 0 };
-    const pBonus = ForgeSystem.getPityBonusPct(st);
-    document.getElementById('pity-perfect-text').textContent =
-      `${pity.perfect} / ${DROP_CONSTANTS.PITY_PERFECT_MAX} (T1·T2 확률 보너스 +${pBonus.toFixed(1)}%)`;
-    document.getElementById('pity-perfect-bar').style.width =
-      `${Math.min(100, (pity.perfect / DROP_CONSTANTS.PITY_PERFECT_MAX) * 100)}%`;
-    document.getElementById('pity-mythic-text').textContent =
-      `${pity.mythic} / ${DROP_CONSTANTS.PITY_MYTHIC_MAX}`;
-    document.getElementById('pity-mythic-bar').style.width =
-      `${Math.min(100, (pity.mythic / DROP_CONSTANTS.PITY_MYTHIC_MAX) * 100)}%`;
+    document.getElementById('pity-perfect-text').textContent = `${pity.perfect} / ${DROP_CONSTANTS.PITY_PERFECT_MAX}`;
+    document.getElementById('pity-perfect-bar').style.width = `${Math.min(100, (pity.perfect / DROP_CONSTANTS.PITY_PERFECT_MAX) * 100)}%`;
+    document.getElementById('pity-mythic-text').textContent = `${pity.mythic} / ${DROP_CONSTANTS.PITY_MYTHIC_MAX}`;
+    document.getElementById('pity-mythic-bar').style.width = `${Math.min(100, (pity.mythic / DROP_CONSTANTS.PITY_MYTHIC_MAX) * 100)}%`;
 
     const optList = document.getElementById('forge-opt-list');
     optList.innerHTML = '';
     item.options.forEach((opt, idx) => {
       const nextTier = NEXT_TIER_MAP[opt.tier];
-      const upCfg = TIER_UPGRADE_RATES[opt.tier];
       const row = document.createElement('div');
       row.className = 'forge-opt-row';
       row.innerHTML = `
@@ -5154,54 +5509,35 @@ class GameApp {
       optList.appendChild(row);
     });
 
-    const u1 = item.uniqueEffectId ? LEGENDARY_UNIQUE_MAP[item.uniqueEffectId] : null;
-    const u2 = item.secondUniqueEffectId ? LEGENDARY_UNIQUE_MAP[item.secondUniqueEffectId] : null;
-    document.getElementById('forge-unique-line').innerHTML =
-      (u1 ? `★ 고유 효과 1 [${u1.name}]: ${u1.desc}<br/>` : '') +
-      (u2 ? `<span style="color:#e599f7;">★ 초월 효과 2 [${u2.name}]: ${u2.desc}</span>` : '');
-
     const cost = ForgeSystem.getRerollCost(item);
-    document.getElementById('reroll-cost-text').textContent =
-      `비용: ${cost.gold.toLocaleString()} G + 재련석 ${cost.stones}개`;
+    document.getElementById('reroll-cost-text').textContent = `비용: ${cost.gold.toLocaleString()} G + 재련석 ${cost.stones}개`;
 
     const divCost = ForgeSystem.getDivineValueRerollCost(item);
-    document.getElementById('divine-cost-text').textContent =
-      `비용: ${divCost.gold.toLocaleString()} G + 재련석 ${divCost.stones}개`;
+    document.getElementById('divine-cost-text').textContent = `비용: ${divCost.gold.toLocaleString()} G + 재련석 ${divCost.stones}개`;
 
     const addListEl = document.getElementById('forge-additional-list');
     const addOpts = item.additionalOptions || [];
-    if (addOpts.length === 0) {
-      addListEl.innerHTML = `<div style="color:#64748b;">3단계(노랑) 이상 장비에만 에디셔널 잠재옵션이 개방됩니다.</div>`;
-    } else {
-      addListEl.innerHTML = addOpts.map(ao => `
+    addListEl.innerHTML = addOpts.length === 0
+      ? `<div style="color:#64748b;">3단계(노랑) 이상 장비에만 개방됩니다.</div>`
+      : addOpts.map(ao => `
         <div class="forge-opt-row">
           <span><span class="tier-tag t-${ao.tier}">${ao.tier}</span> <span style="color:#bbf7d0;">${ao.name} +<b>${ao.value}${ao.unit}</b></span></span>
-          <span style="font-size:10px; color:#86efac;">[${ao.min}~${ao.max}] (${ao.rollPct.toFixed(0)}%)</span>
+          <span style="font-size:10px; color:#86efac;">(${ao.rollPct.toFixed(0)}%)</span>
         </div>
       `).join('');
-    }
 
     const gemInvEl = document.getElementById('forge-gem-inventory');
     gemInvEl.innerHTML = GEM_KEYS.map(gKey => {
       const g = GEM_TYPES[gKey];
       const cnt = st.gems[gKey] || 0;
-      return `<button class="btn" data-socket-gem="${gKey}" ${cnt < 1 ? 'disabled' : ''}>
-        ${g.icon} ${g.name} (${cnt}개)
-      </button>`;
+      return `<button class="btn" data-socket-gem="${gKey}" ${cnt < 1 ? 'disabled' : ''}>${g.icon} ${g.name} (${cnt})</button>`;
     }).join('');
 
     gemInvEl.querySelectorAll('[data-socket-gem]').forEach(btn => {
       btn.onclick = () => {
         const gKey = btn.dataset.socketGem;
-        if (!item.sockets || item.sockets.length === 0) {
-          this.appendLog('⚠️ 이 장비에는 보석 소켓이 없습니다.', '#f87171');
-          return;
-        }
-        const emptyIdx = item.sockets.findIndex(s => s === null);
-        if (emptyIdx === -1) {
-          this.appendLog('⚠️ 빈 소켓이 없습니다.', '#f87171');
-          return;
-        }
+        const emptyIdx = (item.sockets || []).findIndex(s => s === null);
+        if (emptyIdx === -1) return;
         st.gems[gKey] -= 1;
         item.sockets[emptyIdx] = gKey;
         SFX.enhanceSuccess();
@@ -5210,34 +5546,25 @@ class GameApp {
     });
 
     const sockListEl = document.getElementById('forge-socket-list');
-    if (!item.sockets || item.sockets.length === 0) {
-      sockListEl.innerHTML = `<div style="font-size:11px; color:#64748b;">소켓 없음</div>`;
-    } else {
-      sockListEl.innerHTML = item.sockets.map((gKey, sIdx) => {
-        if (!gKey || !GEM_TYPES[gKey]) {
-          return `<div class="forge-opt-row"><span style="color:#64748b;">◇ 소켓 #${sIdx + 1}: [비어 있음]</span></div>`;
-        }
-        const g = GEM_TYPES[gKey];
-        return `
-          <div class="forge-opt-row">
-            <span style="color:${g.color};">${g.icon} 소켓 #${sIdx + 1}: <b>${g.name}</b> (${g.desc})</span>
-            <button class="btn btn-danger" data-unsocket-idx="${sIdx}">해제</button>
-          </div>
-        `;
-      }).join('');
+    sockListEl.innerHTML = (!item.sockets || item.sockets.length === 0)
+      ? `<div style="font-size:11px; color:#64748b;">소켓 없음</div>`
+      : item.sockets.map((gKey, sIdx) => {
+          if (!gKey || !GEM_TYPES[gKey]) return `<div class="forge-opt-row"><span style="color:#64748b;">◇ 소켓 #${sIdx + 1}: [빈 소켓]</span></div>`;
+          const g = GEM_TYPES[gKey];
+          return `<div class="forge-opt-row"><span style="color:${g.color};">${g.icon} <b>${g.name}</b> (${g.desc})</span><button class="btn btn-danger" data-unsocket-idx="${sIdx}">해제</button></div>`;
+        }).join('');
 
-      sockListEl.querySelectorAll('[data-unsocket-idx]').forEach(btn => {
-        btn.onclick = () => {
-          const sIdx = Number(btn.dataset.unsocketIdx);
-          const gKey = item.sockets[sIdx];
-          if (gKey) {
-            st.gems[gKey] = (st.gems[gKey] || 0) + 1;
-            item.sockets[sIdx] = null;
-            this.renderAllUI();
-          }
-        };
-      });
-    }
+    sockListEl.querySelectorAll('[data-unsocket-idx]').forEach(btn => {
+      btn.onclick = () => {
+        const sIdx = Number(btn.dataset.unsocketIdx);
+        const gKey = item.sockets[sIdx];
+        if (gKey) {
+          st.gems[gKey] = (st.gems[gKey] || 0) + 1;
+          item.sockets[sIdx] = null;
+          this.renderAllUI();
+        }
+      };
+    });
   }
 
   startAutoReroll() {
@@ -5254,11 +5581,6 @@ class GameApp {
     const minKeepStones = Math.max(0, Number(document.getElementById('auto-min-stones').value) || 0);
     const maxAttempts = Math.max(1, Number(document.getElementById('auto-max-attempts').value) || 500);
 
-    if (!opt1 && !opt2 && !stopOnPerfect) {
-      this.appendLog('⚠️ 목표 조건을 지정해주세요.', '#f87171');
-      return;
-    }
-
     this.autoRerollActive = true;
     this.autoRerollTargetUid = found.item.uid;
     this.autoRerollTargetEquipped = found.isEquipped;
@@ -5266,7 +5588,7 @@ class GameApp {
     document.getElementById('btn-auto-reroll-start').disabled = true;
     document.getElementById('btn-auto-reroll-stop').disabled = false;
 
-    let attempts = 0, spentGold = 0, spentStones = 0;
+    let attempts = 0, spentGold = 0;
     const statEl = document.getElementById('auto-reroll-stats');
 
     const checkGoal = item => {
@@ -5281,7 +5603,7 @@ class GameApp {
       if (!this.autoRerollActive) return;
       const currentFound = this.findItemByUid(this.autoRerollTargetUid);
       if (!currentFound || currentFound.isEquipped !== this.autoRerollTargetEquipped) {
-        this.stopAutoReroll('⏹️ 대상 장비 상태가 변경되어 자동 리롤을 정지했습니다.');
+        this.stopAutoReroll('⏹️ 대상 장비 상태 변경으로 자동 리롤 정지.');
         return;
       }
       const item = currentFound.item;
@@ -5303,7 +5625,6 @@ class GameApp {
         }
         attempts++;
         spentGold += res.cost.gold;
-        spentStones += res.cost.stones;
 
         if (checkGoal(item)) {
           SFX.perfectDrop();
@@ -5330,64 +5651,14 @@ class GameApp {
     this.renderAllUI();
   }
 
-  renderFilterUI() {
-    const cfg = this.core.state.filterConfig;
-    document.getElementById('filter-min-rarity').value = cfg.minRarity || 'R4_GREEN';
-
-    const listEl = document.getElementById('filter-rule-list');
-    listEl.innerHTML = '';
-    if (!cfg.rules || cfg.rules.length === 0) {
-      listEl.innerHTML = `<div style="color:#64748b;">등록된 세부 옵션 조건이 없습니다.</div>`;
-      return;
-    }
-
-    cfg.rules.forEach((r, idx) => {
-      const row = document.createElement('div');
-      row.className = 'forge-opt-row';
-      row.innerHTML = `
-        <span>AND 조건 #${idx + 1}: <b>${OPTION_MAP[r.optId]?.name || r.optId}</b> <span class="tier-tag t-${r.minTier}">${r.minTier} 이상</span></span>
-        <button class="btn btn-danger" data-del-rule="${idx}">삭제</button>
-      `;
-      row.querySelector(`[data-del-rule="${idx}"]`).onclick = () => {
-        cfg.rules.splice(idx, 1);
-        if (!this.isResetting) SaveManager.save(this.core.state);
-        this.renderFilterUI();
-      };
-      listEl.appendChild(row);
-    });
-  }
-
-  renderCodexUI() {
-    const cdx = this.core.state.codex;
-    document.getElementById('codex-mythic-cnt').textContent = cdx.mythicCount || 0;
-    document.getElementById('codex-perfect-cnt').textContent = cdx.perfectCount || 0;
-
-    const galGrid = document.getElementById('codex-gallery-grid');
-    galGrid.innerHTML = '';
-    (cdx.gallery || []).slice(0, 12).forEach(itm => {
-      galGrid.appendChild(this.createSlotElement(itm, SLOTS[itm.slot].icon, '', true));
-    });
-
-    const bestBox = document.getElementById('codex-best-options');
-    bestBox.innerHTML = OPTION_POOL.map(o => {
-      const rec = cdx.bestOptions[o.id];
-      if (!rec) {
-        return `<div class="opt-line"><span style="color:#64748b;">${o.name}</span><span style="color:#475569;">미획득</span></div>`;
-      }
-      return `
-        <div class="opt-line">
-          <span><span class="tier-tag t-${rec.tier}">${rec.tier}</span> ${o.name}</span>
-          <span style="color:#ffd700;">최고 +<b>${rec.value}${o.unit}</b> (${rec.rollPct.toFixed(0)}%, ilvl.${rec.ilvl})</span>
-        </div>
-      `;
-    }).join('');
-  }
-
+  /**
+   * [요청 3 & 5: 1~5차 전직 시스템 UI 및 스킬 일괄 투자 UI]
+   */
   renderSkillTab() {
     const st = this.core.state;
     const curCls = this.core.getCurrentClassDef();
+    const curAdv = this.core.getCurrentJobAdvancement();
 
-    // 직업 선택 카드 렌더링
     const clsBox = document.getElementById('class-select-cards');
     clsBox.innerHTML = Object.values(CHAR_CLASSES).map(c => {
       const active = c.id === curCls.id;
@@ -5395,7 +5666,7 @@ class GameApp {
         <div class="zone-card ${active ? 'active-zone' : ''}" data-pick-class="${c.id}" style="text-align:center;">
           <div style="font-size:20px;">${c.icon}</div>
           <div style="font-size:12px; font-weight:bold; color:${c.color};">${c.name}</div>
-          <div style="font-size:9px; color:#cbd5e1; margin-top:3px;">${c.desc}</div>
+          <div style="font-size:9px; color:#cbd5e1; margin-top:2px;">${c.desc}</div>
         </div>
       `;
     }).join('');
@@ -5404,10 +5675,24 @@ class GameApp {
       card.onclick = () => {
         st.charClass = card.dataset.pickClass;
         this.core.recalcStats(false);
-        this.appendLog(`👤 직업 전직 완료: <b>${CHAR_CLASSES[st.charClass].name}</b>!`, CHAR_CLASSES[st.charClass].color);
         this.renderAllUI();
       };
     });
+
+    document.getElementById('job-advancement-info').innerHTML =
+      `현재 전직: <b style="color:#ffd700;">${curAdv.title}</b> — <span style="color:#86efac;">${curAdv.auraDesc}</span>`;
+
+    const stepBar = document.getElementById('job-step-bar');
+    stepBar.innerHTML = curCls.advancements.map(a => {
+      const isCur = a.tier === st.jobTier;
+      const isUnlocked = st.level >= a.reqLv;
+      return `
+        <div class="job-step-pill ${isCur ? 'current' : isUnlocked ? 'unlocked' : ''}">
+          <div>${a.title.split(':')[0]}</div>
+          <div style="font-size:9px;">Lv.${a.reqLv}</div>
+        </div>
+      `;
+    }).join('');
 
     const box = document.getElementById('skill-tree-list');
     box.innerHTML = '';
@@ -5416,9 +5701,13 @@ class GameApp {
       const div = document.createElement('div');
       div.className = 'forge-box';
       div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
           <b>[${def.key}] ${def.icon} ${def.name} (Lv.${sk.lv})</b>
-          <button class="btn btn-gold" data-sk-up="${def.id}">레벨업 (1 SP)</button>
+          <div style="display:flex; gap:4px;">
+            <button class="btn btn-gold" data-sk-up="${def.id}:1">+1</button>
+            <button class="btn btn-gold" data-sk-up="${def.id}:10">+10</button>
+            <button class="btn btn-green" data-sk-up="${def.id}:9999">MAX</button>
+          </div>
         </div>
         <div style="font-size:11px; color:#94a3b8; margin:4px 0 8px;">${def.desc}</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
@@ -5430,13 +5719,17 @@ class GameApp {
           </button>
         </div>
       `;
-      div.querySelector(`[data-sk-up="${def.id}"]`).onclick = () => {
-        if (st.sp < 1) return;
-        st.sp -= 1;
-        sk.lv += 1;
-        this.updateTopBarAndStats();
-        this.renderSkillTab();
-      };
+      div.querySelectorAll('[data-sk-up]').forEach(btn => {
+        btn.onclick = () => {
+          const [, amtStr] = btn.dataset.skUp.split(':');
+          const invest = Math.min(st.sp, Number(amtStr));
+          if (invest <= 0) return;
+          st.sp -= invest;
+          sk.lv += invest;
+          this.updateTopBarAndStats();
+          this.renderSkillTab();
+        };
+      });
       div.querySelectorAll('[data-br]').forEach(btn => {
         btn.onclick = () => {
           const [, br] = btn.dataset.br.split(':');
@@ -5452,29 +5745,42 @@ class GameApp {
     const st = this.core.state;
     const box = document.getElementById('sanctuary-list');
     const items = [
-      { key: 'atkLv',  name: '태초의 무력 (영구 공격력 +10)',  cost: (st.sanctuary.atkLv + 1) * 3 },
-      { key: 'hpLv',   name: '불멸의 육체 (영구 생명력 +55)',  cost: (st.sanctuary.hpLv + 1) * 3 },
-      { key: 'luckLv', name: '심연의 축복 (영구 드랍률 +12%)', cost: (st.sanctuary.luckLv + 1) * 4 }
+      { key: 'atkLv',  name: '태초의 무력 (영구 공격력 +10)',  baseMult: 3 },
+      { key: 'hpLv',   name: '불멸의 육체 (영구 생명력 +55)',  baseMult: 3 },
+      { key: 'luckLv', name: '심연의 축복 (영구 드랍률 +12%)', baseMult: 4 }
     ];
     box.innerHTML = '';
     items.forEach(u => {
       const lv = st.sanctuary[u.key];
+      const cost = (lv + 1) * u.baseMult;
       const div = document.createElement('div');
       div.className = 'forge-opt-row';
       div.innerHTML = `
         <div><b>${u.name}</b> <span style="color:#ffd700;">(Lv.${lv})</span></div>
-        <button class="btn btn-soul">👻 ${u.cost}개 강화</button>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-soul" data-sanc-up="${u.key}:1">+1 (👻${cost})</button>
+          <button class="btn btn-soul" data-sanc-up="${u.key}:10">+10</button>
+          <button class="btn btn-green" data-sanc-up="${u.key}:9999">MAX</button>
+        </div>
       `;
-      div.querySelector('button').onclick = () => {
-        if ((st.soulShards || 0) < u.cost) {
-          this.appendLog(`⚠️ 영혼 파편이 부족합니다. (필요: ${u.cost}개)`, '#f87171');
-          return;
-        }
-        st.soulShards -= u.cost;
-        st.sanctuary[u.key] += 1;
-        SFX.enhanceSuccess();
-        this.renderAllUI();
-      };
+      div.querySelectorAll('[data-sanc-up]').forEach(btn => {
+        btn.onclick = () => {
+          const [, cntStr] = btn.dataset.sancUp.split(':');
+          const maxCnt = Number(cntStr);
+          let up = 0;
+          for (let i = 0; i < maxCnt; i++) {
+            const c = (st.sanctuary[u.key] + 1) * u.baseMult;
+            if ((st.soulShards || 0) < c) break;
+            st.soulShards -= c;
+            st.sanctuary[u.key] += 1;
+            up++;
+          }
+          if (up > 0) {
+            SFX.enhanceSuccess();
+            this.renderAllUI();
+          }
+        };
+      });
       box.appendChild(div);
     });
   }
@@ -5489,11 +5795,8 @@ class GameApp {
       }
     });
 
-    // 상단 월드 난이도 및 직업 변경
     document.getElementById('sel-world-tier').onchange = e => {
       this.core.state.worldTier = Number(e.target.value);
-      const wt = this.core.getCurrentWorldTier();
-      this.appendLog(`🔥 월드 난이도가 <b>[${wt.name}]</b>(몬스터 x${wt.statMult}, 드랍 ilvl +${wt.ilvlBonus})로 변경되었습니다!`, '#fde047');
       this.core.enterZone(this.core.state.zoneId);
       this.renderAllUI();
     };
@@ -5501,11 +5804,9 @@ class GameApp {
     document.getElementById('sel-char-class').onchange = e => {
       this.core.state.charClass = e.target.value;
       this.core.recalcStats(false);
-      this.appendLog(`👤 직업 전직: <b>${this.core.getCurrentClassDef().name}</b>!`, '#38bdf8');
       this.renderAllUI();
     };
 
-    // 상위 자동장착 & 자동해체 체크박스
     document.getElementById('chk-auto-equip').onchange = e => {
       this.core.state.autoEquip = e.target.checked;
       SaveManager.save(this.core.state);
@@ -5514,24 +5815,164 @@ class GameApp {
       this.core.state.filterConfig.enabled = e.target.checked;
       SaveManager.save(this.core.state);
     };
+    document.getElementById('chk-ai-players').onchange = e => {
+      this.core.state.aiPlayersEnabled = e.target.checked;
+      this.core.initCompanions();
+      SaveManager.save(this.core.state);
+    };
 
-    // 펫 소환 & 펫 강화
+    // [요청 1: 인벤토리 전체 일괄 해체 & 상위장비 전체 일괄 장착]
+    document.getElementById('btn-salvage-all').onclick = () => {
+      let count = 0, stones = 0, bonusGold = 0;
+      this.core.state.inventory = this.core.state.inventory.filter(itm => {
+        if (!itm.locked && !itm.isMythic && !itm.isPerfect) {
+          const r = RARITY_INFO[itm.rarity] || RARITY_INFO.R1_RED;
+          count++;
+          stones += r.salvageStones;
+          bonusGold += (itm.ilvl || 1) * 15;
+          return false;
+        }
+        return true;
+      });
+      this.core.state.stones += stones;
+      this.core.state.gold += bonusGold;
+      this.selectedItemUid = null;
+      this.hideTooltip();
+      this.appendLog(`🗑️ [전체 일괄해체 완료] 잠금/태초 제외 <b>${count}개</b> 장비 해체 ➔ 재련석 <b>+${stones}개</b>, 골드 <b>+${bonusGold.toLocaleString()}G</b> 획득!`, '#4ade80');
+      this.renderAllUI();
+    };
+
+    document.getElementById('btn-equip-all-best').onclick = () => {
+      const st = this.core.state;
+      let swapCount = 0;
+      Object.keys(SLOTS).forEach(slotKey => {
+        let bestIdx = -1;
+        let bestScore = st.equipped[slotKey] ? ItemGenerator.scoreItemPower(st.equipped[slotKey]) : -1;
+        st.inventory.forEach((itm, idx) => {
+          if (itm.slot === slotKey) {
+            const sc = ItemGenerator.scoreItemPower(itm);
+            if (sc > bestScore) {
+              bestScore = sc;
+              bestIdx = idx;
+            }
+          }
+        });
+        if (bestIdx !== -1) {
+          const prev = st.equipped[slotKey];
+          st.equipped[slotKey] = st.inventory[bestIdx];
+          st.inventory.splice(bestIdx, 1);
+          if (prev) st.inventory.push(prev);
+          swapCount++;
+        }
+      });
+      if (swapCount > 0) {
+        SFX.enhanceSuccess();
+        this.appendLog(`⬆️ 인벤토리 내 상위 장비 <b>${swapCount}부위</b>를 일괄 장착했습니다!`, '#4ade80');
+        this.renderAllUI();
+      } else {
+        this.appendLog('ℹ️ 인벤토리에 현재 착용 장비보다 전투력이 높은 장비가 없습니다.', '#94a3b8');
+      }
+    };
+
+    // [요청 5: 펫 +1 / +10 / MAX 일괄 강화]
+    const upgradePetBulk = maxTimes => {
+      const pet = this.core.state.pet;
+      let cnt = 0;
+      for (let i = 0; i < maxTimes; i++) {
+        const cost = pet.level * 1200;
+        if (this.core.state.gold < cost) break;
+        this.core.state.gold -= cost;
+        pet.level += 1;
+        cnt++;
+      }
+      if (cnt > 0) {
+        SFX.enhanceSuccess();
+        this.appendLog(`🐉 신화 펫 [루비곤] +${cnt}단계 일괄 성장! (현재 Lv.${pet.level})`, '#38bdf8');
+        this.renderAllUI();
+      }
+    };
+    document.getElementById('btn-pet-up-1').onclick = () => upgradePetBulk(1);
+    document.getElementById('btn-pet-up-10').onclick = () => upgradePetBulk(10);
+    document.getElementById('btn-pet-up-max').onclick = () => upgradePetBulk(500);
     document.getElementById('chk-pet-active').onchange = e => {
       this.core.state.pet.enabled = e.target.checked;
       this.updateTopBarAndStats();
     };
-    document.getElementById('btn-pet-upgrade').onclick = () => {
-      const pet = this.core.state.pet;
-      const cost = pet.level * 1200;
-      if (this.core.state.gold < cost) {
-        this.appendLog(`⚠️ 펫 강화 골드가 부족합니다. (${cost.toLocaleString()}G 필요)`, '#f87171');
-        return;
+
+    // [요청 5: 전 용병 골드 균등 MAX 일괄 강화]
+    document.getElementById('btn-merc-all-max').onclick = () => {
+      const st = this.core.state;
+      let totalUp = 0;
+      let progressed = true;
+      while (progressed && totalUp < 600) {
+        progressed = false;
+        for (const def of MERCENARY_DEFS) {
+          const mState = st.mercenaries[def.id];
+          const cost = def.baseCost * (mState.level + 1);
+          if (st.gold >= cost) {
+            st.gold -= cost;
+            mState.hired = true;
+            mState.level += 1;
+            totalUp++;
+            progressed = true;
+          }
+        }
       }
-      this.core.state.gold -= cost;
-      pet.level += 1;
+      if (totalUp > 0) {
+        SFX.enhanceSuccess();
+        this.core.initCompanions();
+        this.appendLog(`🤝 3인 용병단 전체 총 +${totalUp}단계 일괄 강화 완료!`, '#fbbf24');
+        this.renderAllUI();
+      }
+    };
+
+    // [요청 3 & 5: 전직 각성 버튼, 성소 전체 MAX, 스킬 SP 전체 균등 MAX]
+    document.getElementById('btn-job-advance').onclick = () => {
+      this.core.checkAutoJobAdvancement(true);
+      this.renderAllUI();
+    };
+
+    document.getElementById('btn-sanctuary-all-max').onclick = () => {
+      const st = this.core.state;
+      const keys = [
+        { k: 'atkLv', m: 3 },
+        { k: 'hpLv',  m: 3 },
+        { k: 'luckLv',m: 4 }
+      ];
+      let totalUp = 0;
+      let progressed = true;
+      while (progressed && totalUp < 1000) {
+        progressed = false;
+        for (const item of keys) {
+          const cost = (st.sanctuary[item.k] + 1) * item.m;
+          if ((st.soulShards || 0) >= cost) {
+            st.soulShards -= cost;
+            st.sanctuary[item.k] += 1;
+            totalUp++;
+            progressed = true;
+          }
+        }
+      }
+      if (totalUp > 0) {
+        SFX.enhanceSuccess();
+        this.appendLog(`🏛️ 영구 성소 총 +${totalUp}단계 일괄 강화 완료!`, '#e0aaff');
+        this.renderAllUI();
+      }
+    };
+
+    document.getElementById('btn-skill-all-max').onclick = () => {
+      const st = this.core.state;
+      if (st.sp <= 0) return;
+      const totalSp = st.sp;
+      while (st.sp > 0) {
+        for (let i = 0; i < 4 && st.sp > 0; i++) {
+          st.skills[i].lv += 1;
+          st.sp -= 1;
+        }
+      }
       SFX.enhanceSuccess();
-      this.appendLog(`🐉 신화 펫 [루비곤]이 Lv.${pet.level}로 성장했습니다! (비행속도 및 드랍/골드 보너스 상승)`, '#38bdf8');
-      this.updateTopBarAndStats();
+      this.appendLog(`⚡ 남은 스킬 포인트 ${totalSp} SP를 4종 스킬에 균등 일괄 투자했습니다!`, '#4ade80');
+      this.renderAllUI();
     };
 
     document.getElementById('btn-exit-raid').onclick = () => {
@@ -5638,22 +6079,6 @@ class GameApp {
       this.appendLog(`🔨 아이템 분해 완료: 재련석 +${gain}개 획득`, '#4da6ff');
       this.renderAllUI();
     };
-    document.getElementById('btn-salvage-low').onclick = () => {
-      let count = 0, stones = 0;
-      this.core.state.inventory = this.core.state.inventory.filter(itm => {
-        const r = RARITY_INFO[itm.rarity];
-        if (!itm.locked && !itm.isMythic && !itm.isPerfect && r && r.rank <= 4) {
-          count++;
-          stones += r.salvageStones;
-          return false;
-        }
-        return true;
-      });
-      this.core.state.stones += stones;
-      this.hideTooltip();
-      this.appendLog(`🔨 4단계(초록) 이하 ${count}개 일괄 해체: 재련석 +${stones}개 획득`, '#4da6ff');
-      this.renderAllUI();
-    };
     document.getElementById('btn-sort').onclick = () => {
       this.core.state.inventory.sort((a, b) =>
         (Number(b.isMythic) - Number(a.isMythic)) ||
@@ -5692,22 +6117,23 @@ class GameApp {
       this.appendLog(res.msg, res.ok ? '#ffd700' : '#f87171');
       this.renderAllUI();
     };
+    document.getElementById('btn-starforce-10').onclick = () => {
+      const found = this.findItemByUid(this.selectedItemUid);
+      if (!found) return;
+      const res = ForgeSystem.enhanceStarforceBulk(found.item, 10, this.core.state, this.core.rng);
+      this.appendLog(res.msg, res.ok ? '#ffd700' : '#f87171');
+      this.renderAllUI();
+    };
+    document.getElementById('btn-starforce-15').onclick = () => {
+      const found = this.findItemByUid(this.selectedItemUid);
+      if (!found) return;
+      const res = ForgeSystem.enhanceStarforceBulk(found.item, 15, this.core.state, this.core.rng);
+      this.appendLog(res.msg, res.ok ? '#4ade80' : '#f87171');
+      this.renderAllUI();
+    };
 
     document.getElementById('btn-auto-reroll-start').onclick = () => this.startAutoReroll();
     document.getElementById('btn-auto-reroll-stop').onclick = () => this.stopAutoReroll('⏹️ 사용자가 자동 리롤을 정지했습니다.');
-
-    document.getElementById('filter-min-rarity').onchange = e => {
-      this.core.state.filterConfig.minRarity = e.target.value;
-      if (!this.isResetting) SaveManager.save(this.core.state);
-    };
-    document.getElementById('btn-add-filter-rule').onclick = () => {
-      const optId = document.getElementById('filter-add-opt').value;
-      const minTier = document.getElementById('filter-add-tier').value;
-      if (this.core.state.filterConfig.rules.length >= 4) return;
-      this.core.state.filterConfig.rules.push({ optId, minTier });
-      if (!this.isResetting) SaveManager.save(this.core.state);
-      this.renderFilterUI();
-    };
 
     document.getElementById('btn-save').onclick = () => {
       const res = SaveManager.save(this.core.state);
@@ -5721,10 +6147,6 @@ class GameApp {
         SaveManager.clearAllSaves();
         location.reload();
       }
-    };
-
-    document.getElementById('btn-sim-1m').onclick = () => {
-      runMillionItemSimulationAsync(this);
     };
   }
 
@@ -5743,62 +6165,6 @@ class GameApp {
       requestAnimationFrame(t => this.loop(t));
     }
   }
-}
-
-/**
- * ============================================================================
- * [확률 검증] 5줄 무지개 장비(R7_VIOLET) 100만 회 생성 시뮬레이션
- * ============================================================================
- */
-function runMillionItemSimulationAsync(appInstance) {
-  if (appInstance && appInstance.simRunning) return;
-  const btn = document.getElementById('btn-sim-1m');
-  const TOTAL = 1_000_000;
-  const CHUNK_SIZE = 20_000;
-  const simRng = new SeededRNG(7777777);
-
-  if (appInstance) {
-    appInstance.simRunning = true;
-    appInstance.appendLog(`⏳ 7단계[보라] 5줄 무지개 장비 100만 회 생성 확률 검증을 시작합니다...`, '#60a5fa');
-  }
-  if (btn) btn.disabled = true;
-
-  let processed = 0, all5T1MythicCount = 0, fourPlusT1Count = 0, perfectCount = 0;
-  const t0 = performance.now();
-
-  function processChunk() {
-    const limit = Math.min(processed + CHUNK_SIZE, TOTAL);
-    for (let i = processed; i < limit; i++) {
-      const item = ItemGenerator.generateItem(1, 0, 'R7_VIOLET', null, simRng);
-      let t1Lines = 0;
-      for (let k = 0; k < item.options.length; k++) {
-        if (item.options[k].tier === 'T1') t1Lines++;
-      }
-      if (item.isMythic) all5T1MythicCount++;
-      if (t1Lines >= 4) fourPlusT1Count++;
-      if (item.isPerfect) perfectCount++;
-    }
-    processed = limit;
-    if (btn) btn.textContent = `⏳ ${Math.floor((processed / TOTAL) * 100)}%`;
-
-    if (processed < TOTAL) {
-      setTimeout(processChunk, 0);
-    } else {
-      const elapsedMs = (performance.now() - t0).toFixed(0);
-      if (appInstance) {
-        appInstance.simRunning = false;
-        appInstance.appendLog(
-          `🎲 [100만 회 실측 완료 (${elapsedMs}ms)] 🌈태초신화(5줄 올T1): <b>${all5T1MythicCount}개</b> | 🌟완벽(5줄 T1~T2): <b>${perfectCount}개</b> | 4줄+ T1: ${fourPlusT1Count}개`,
-          '#ffd700'
-        );
-      }
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = '🎲 100만회';
-      }
-    }
-  }
-  setTimeout(processChunk, 0);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
