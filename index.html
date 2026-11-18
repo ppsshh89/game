@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>심연의 연대기 : 무한의 선택 (v2.0)</title>
+<title>심연의 연대기 v3.0 : 운명의 대개편</title>
 <style>
   :root {
     --bg-dark: #0b090d;
@@ -71,7 +71,7 @@
   /* 상단 HUD */
   .top-hud {
     background: linear-gradient(180deg, #1b1520 0%, #110d14 100%);
-    border-bottom: 2px solid var(--border-gold);
+    border-bottom: 1px solid var(--border-gold);
     padding: 7px 10px;
     flex-shrink: 0;
     box-shadow: 0 3px 10px rgba(0,0,0,0.65);
@@ -100,6 +100,16 @@
     font-size: 10px;
     padding: 1px 5px;
     border-radius: 4px;
+  }
+
+  .cp-pill {
+    background: #1f172b;
+    border: 1px solid #6b4c9a;
+    color: #dcb8ff;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
   }
 
   .depth-badge {
@@ -163,6 +173,77 @@
   .soul-txt { color: var(--accent-soul); }
   .rep-txt { color: #82e0aa; }
 
+  /* [A-1] 전 탭 상시 표시 자동 진행 미니 스트립 */
+  .auto-mini-strip {
+    background: linear-gradient(90deg, #141b18 0%, #1a1522 100%);
+    border-bottom: 2px solid var(--border-gold);
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .auto-mini-strip.running {
+    background: linear-gradient(90deg, #132a1c 0%, #1c1726 100%);
+    border-bottom-color: #4cd964;
+  }
+  .strip-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .strip-top-line {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #a8e6cf;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .strip-sub-line {
+    font-size: 10.5px;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .strip-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .strip-btn {
+    background: #282030;
+    border: 1px solid var(--border-gold);
+    color: var(--text-main);
+    padding: 4px 7px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .strip-btn.active {
+    background: #1e4628;
+    border-color: #4cd964;
+    color: #eaffea;
+  }
+  .strip-btn.upgrade-ready {
+    background: linear-gradient(180deg, #4a3319 0%, #2e1f0f 100%);
+    border-color: var(--accent-gold);
+    color: #ffe28a;
+    animation: pulseBorder 1.2s infinite alternate;
+  }
+  @keyframes pulseBorder {
+    0% { box-shadow: 0 0 2px rgba(240,194,75,0.3); }
+    100% { box-shadow: 0 0 8px rgba(240,194,75,0.85); }
+  }
+
   /* 메인 컨텐츠 영역 */
   .main-view {
     flex: 1;
@@ -189,7 +270,7 @@
     padding: 6px 8px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
     flex-shrink: 0;
   }
 
@@ -208,7 +289,7 @@
   }
 
   .map-node {
-    height: 26px;
+    height: 25px;
     border-radius: 4px;
     background: #1f1924;
     border: 1px solid #352a3d;
@@ -237,7 +318,7 @@
 
   .auto-bar {
     display: flex;
-    gap: 5px;
+    gap: 4px;
     align-items: center;
   }
 
@@ -246,15 +327,16 @@
     background: #211a26;
     border: 1px solid #483852;
     color: var(--text-main);
-    padding: 5px 6px;
+    padding: 5px 5px;
     border-radius: 5px;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
+    white-space: nowrap;
   }
   .auto-btn.active {
     background: linear-gradient(90deg, #1d4028, #275936);
@@ -265,7 +347,7 @@
 
   /* 2. 비주얼 전투씬 & 이벤트 스테이지 */
   .battle-stage {
-    height: 128px;
+    height: 122px;
     border-radius: 8px;
     border: 1px solid var(--border-gold);
     background: linear-gradient(180deg, #140f1d 0%, #231829 65%, #19131c 100%);
@@ -285,7 +367,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    font-size: 46px;
+    font-size: 44px;
     opacity: 0.08;
     pointer-events: none;
   }
@@ -295,7 +377,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 22px;
+    height: 20px;
     background: linear-gradient(180deg, #2b212e 0%, #120e14 100%);
     border-top: 1px solid #4a3931;
   }
@@ -312,16 +394,15 @@
 
   .unit-sprite-wrap {
     position: relative;
-    width: 58px;
-    height: 58px;
+    width: 54px;
+    height: 54px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 38px;
+    font-size: 36px;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
   }
 
-  /* 전직 단계별 오라 이펙트 */
   .aura-ring {
     position: absolute;
     inset: -4px;
@@ -343,7 +424,7 @@
     position: absolute;
     bottom: 0;
     right: -4px;
-    font-size: 20px;
+    font-size: 19px;
     transform: rotate(-15deg);
   }
 
@@ -351,12 +432,12 @@
     position: absolute;
     bottom: 2px;
     left: -18px;
-    font-size: 20px;
+    font-size: 19px;
     filter: drop-shadow(0 2px 3px #000);
   }
 
   .unit-name-tag {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     background: rgba(10, 8, 12, 0.8);
     padding: 1px 6px;
@@ -378,18 +459,17 @@
 
   .intent-bubble {
     position: absolute;
-    top: -18px;
+    top: -16px;
     background: rgba(40, 12, 16, 0.92);
     border: 1px solid #cc4444;
     color: #ffd180;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
     padding: 1px 6px;
     border-radius: 10px;
     white-space: nowrap;
   }
 
-  /* 전투 애니메이션 클래스 */
   .lunge-right { transform: translateX(48px) scale(1.12) !important; }
   .lunge-left  { transform: translateX(-48px) scale(1.12) !important; }
   .hit-shake   { animation: unitShake 0.28s ease; filter: brightness(2) sepia(1) hue-rotate(-50deg); }
@@ -400,7 +480,6 @@
     75% { transform: translateX(7px); }
   }
 
-  /* 데미지 플로팅 텍스트 */
   .dmg-float {
     position: absolute;
     z-index: 30;
@@ -421,10 +500,10 @@
     background: linear-gradient(160deg, #231c26 0%, #161218 100%);
     border: 1px solid var(--border-gold);
     border-radius: 7px;
-    padding: 9px 11px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
   }
 
   .event-header {
@@ -445,17 +524,17 @@
   }
 
   .story-text {
-    font-size: 13px;
+    font-size: 12.5px;
     line-height: 1.45;
     color: var(--text-main);
-    min-height: 38px;
+    min-height: 34px;
   }
 
   .result-box {
     background: rgba(10, 8, 13, 0.8);
     border-left: 3px solid var(--border-bright);
     padding: 6px 9px;
-    font-size: 12px;
+    font-size: 11.5px;
     line-height: 1.4;
     border-radius: 0 4px 4px 0;
     display: none;
@@ -466,7 +545,7 @@
   .choices-wrap {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
     margin-top: auto;
   }
 
@@ -474,7 +553,7 @@
     background: linear-gradient(180deg, #2b2330 0%, #1b151f 100%);
     border: 1px solid var(--border-gold);
     color: var(--text-main);
-    padding: 9px 11px;
+    padding: 8px 10px;
     border-radius: 6px;
     text-align: left;
     display: flex;
@@ -494,7 +573,7 @@
   }
 
   .choice-left { display: flex; flex-direction: column; gap: 2px; padding-right: 6px; }
-  .choice-title { font-size: 13px; font-weight: 700; }
+  .choice-title { font-size: 12.5px; font-weight: 700; }
   .choice-desc { font-size: 10.5px; color: var(--text-muted); }
   .choice-prob {
     font-size: 10.5px;
@@ -511,7 +590,7 @@
     border: 1px solid #2b2230;
     border-radius: 5px;
     padding: 5px 8px;
-    max-height: 58px;
+    max-height: 54px;
     overflow-y: auto;
     font-size: 10.5px;
     color: var(--text-muted);
@@ -587,6 +666,31 @@
     font-size: 11.5px;
   }
 
+  /* [A-2] 장비 점수 비교 뱃지 */
+  .cmp-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: 4px;
+    display: inline-block;
+  }
+  .cmp-up {
+    background: rgba(69, 184, 88, 0.2);
+    border: 1px solid #4cd964;
+    color: #69f0ae;
+  }
+  .cmp-down {
+    background: rgba(214, 60, 60, 0.15);
+    border: 1px solid #802f2f;
+    color: #ff8a80;
+  }
+  .cmp-same {
+    background: rgba(158, 145, 129, 0.15);
+    border: 1px solid #555;
+    color: #aaa;
+  }
+
   /* 7등급 색상 */
   .g-common { color: var(--g-common); }
   .g-uncommon { color: var(--g-uncommon); }
@@ -602,6 +706,27 @@
   @keyframes genesisPulse {
     0% { filter: drop-shadow(0 0 2px #00f5d4); }
     100% { filter: drop-shadow(0 0 7px #ff007f); }
+  }
+
+  /* 설정 스위치 행 */
+  .setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 11.5px;
+  }
+  .setting-row:last-child { border-bottom: none; }
+
+  .select-dark {
+    background: #151119;
+    color: var(--text-main);
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-weight: 700;
   }
 
   /* 하단 탭바 */
@@ -694,6 +819,7 @@
         <span id="hud-lv">Lv.1</span>
         <span id="hud-title">강철의 검투사</span>
         <span class="tier-pill" id="hud-tier">1차</span>
+        <span class="cp-pill" id="hud-cp">전투력 0</span>
       </div>
       <div class="depth-badge" id="hud-depth">심연 1층</div>
     </div>
@@ -724,6 +850,22 @@
     </div>
   </header>
 
+  <!-- [A-1] 어느 탭에서든 항상 표시되는 자동 진행 미니 스트립 -->
+  <div class="auto-mini-strip" id="auto-mini-strip" onclick="jumpToAdventureTab()">
+    <div class="strip-info">
+      <div class="strip-top-line">
+        <span id="strip-status-txt">⏸️ 수동 탐색 중</span>
+        <span>|</span>
+        <span id="strip-floor-txt" style="color:var(--border-bright);">심연 1층 1/10</span>
+      </div>
+      <div class="strip-sub-line" id="strip-recent-txt">방금: 심연 원정을 시작했습니다.</div>
+    </div>
+    <div class="strip-actions" onclick="event.stopPropagation();">
+      <button class="strip-btn" id="strip-btn-equip" onclick="batchEquipBest(true)">⬆️ 일괄장착</button>
+      <button class="strip-btn" id="strip-btn-pause" onclick="toggleAutoPlay()">▶️ 자동시작</button>
+    </div>
+  </div>
+
   <!-- 메인 컨텐츠 뷰 -->
   <main class="main-view">
     <!-- 1. 모험 탭 (미니맵 + 오토바 + 전투씬 + 선택지) -->
@@ -736,9 +878,10 @@
         </div>
         <div class="node-track" id="node-track"></div>
         <div class="auto-bar">
-          <button class="auto-btn" id="btn-auto-toggle" onclick="toggleAutoPlay()">🤖 자동선택: OFF</button>
-          <button class="auto-btn" id="btn-auto-speed" onclick="cycleAutoSpeed()" style="flex:0.55;">⚡ 1x</button>
-          <button class="auto-btn" id="btn-auto-mode" onclick="cycleAutoMode()" style="flex:0.85;">🎯 성향: 균형</button>
+          <button class="auto-btn" id="btn-auto-toggle" onclick="toggleAutoPlay()">🤖 자동: OFF</button>
+          <button class="auto-btn" id="btn-auto-speed" onclick="cycleAutoSpeed()" style="flex:0.45;">⚡ 1x</button>
+          <button class="auto-btn" id="btn-auto-mode" onclick="cycleAutoMode()" style="flex:0.75;">🎯 균형</button>
+          <button class="auto-btn" id="btn-map-equip" onclick="batchEquipBest(true)" style="flex:0.95; border-color:var(--border-bright); color:var(--accent-gold);">⬆️ 일괄장착</button>
         </div>
       </div>
 
@@ -814,16 +957,22 @@
       </div>
 
       <div class="card">
-        <div class="section-title">장착 중인 장비 (클릭하여 상세/강화)</div>
+        <div class="section-title">
+          <span>장착 중인 장비 (🔺표시는 인벤에 상위 장비 보유)</span>
+          <button class="btn-sm" onclick="batchEquipBest(true)">⬆️ 일괄 장착</button>
+        </div>
         <div class="equip-grid" id="equipped-grid"></div>
       </div>
     </section>
 
     <!-- 3. 인벤토리 & 합성 탭 -->
     <section id="tab-inv" class="tab-panel">
-      <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
-        <span style="font-size:12px; font-weight:700;">보유 장비 (<span id="inv-count">0</span>/35)</span>
-        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+      <div class="card" style="display:flex; flex-direction:column; gap:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:12px; font-weight:700;">보유 장비 (<span id="inv-count">0</span>/35)</span>
+          <button class="btn-sm" id="btn-inv-equip" style="background:linear-gradient(90deg,#4a3319,#2e1f0f); border-color:var(--accent-gold); color:#ffe28a;" onclick="batchEquipBest(true)">⬆️ 더 좋은 장비 일괄 장착</button>
+        </div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
           <button class="btn-sm" style="background:#263849; border-color:#5ca4ff;" onclick="synthesizeAll()">⚗️ 동일등급 3개 합성</button>
           <button class="btn-sm" onclick="salvageBelow('rare')">희귀↓ 분해</button>
           <button class="btn-sm" onclick="salvageBelow('epic')">영웅↓ 분해</button>
@@ -873,6 +1022,37 @@
 
     <!-- 6. 도감 / 업적 / 설정 탭 -->
     <section id="tab-codex" class="tab-panel">
+      <!-- [A-1 & A-2] 자동화 및 편의성 설정 카드 -->
+      <div class="card" style="border-color:var(--border-bright);">
+        <div class="section-title">⚙️ 스마트 자동화 & 편의성 설정</div>
+        <div class="setting-row">
+          <span>⬆️ 획득 즉시 상위 장비 자동 장착</span>
+          <button class="btn-sm" id="set-auto-equip" onclick="toggleSetting('autoEquipOnDrop')">OFF</button>
+        </div>
+        <div class="setting-row">
+          <span>♻️ 하위 장비 획득 즉시 자동 분해</span>
+          <select class="select-dark" id="set-auto-salvage" onchange="changeAutoSalvage(this.value)">
+            <option value="-1">사용 안 함 (OFF)</option>
+            <option value="0">일반 등급 분해</option>
+            <option value="1">고급 이하 분해</option>
+            <option value="2">희귀 이하 분해</option>
+            <option value="3">영웅 이하 분해</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <span>⏸️ 레벨업 달성 시 자동진행 일시정지</span>
+          <button class="btn-sm" id="set-pause-lv" onclick="toggleSetting('pauseOnLvUp')">OFF</button>
+        </div>
+        <div class="setting-row">
+          <span>⏸️ 전직 가능 도달 시 자동진행 일시정지</span>
+          <button class="btn-sm" id="set-pause-promo" onclick="toggleSetting('pauseOnPromo')">OFF</button>
+        </div>
+        <div class="setting-row">
+          <span>⏸️ 신규 유니크 획득 시 자동진행 일시정지</span>
+          <button class="btn-sm" id="set-pause-unique" onclick="toggleSetting('pauseOnUnique')">OFF</button>
+        </div>
+      </div>
+
       <div class="card">
         <div class="section-title">
           <span>🏆 영구 업적 (달성 시 능력치 영구 상승)</span>
@@ -890,7 +1070,7 @@
       </div>
 
       <div class="card">
-        <div class="section-title">⚙️ 게임 설정 & 세이브 관리</div>
+        <div class="section-title">💾 사운드 & 세이브 데이터 관리</div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="btn-sm" onclick="toggleSound()" id="btn-sound">🔊 효과음: 켜짐</button>
           <button class="btn-sm" onclick="exportSave()">💾 세이브 복사</button>
@@ -902,21 +1082,21 @@
 
   <!-- 하단 내비게이션 탭 -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="switchTab('adventure', this)"><span>🧭</span><span>모험</span></button>
-    <button class="nav-btn" onclick="switchTab('char', this)">
+    <button class="nav-btn active" id="nav-adventure" onclick="switchTab('adventure', this)"><span>🧭</span><span>모험</span></button>
+    <button class="nav-btn" id="nav-char" onclick="switchTab('char', this)">
       <span>🛡️</span><span>캐릭터</span>
       <span class="badge-dot" id="dot-char"></span>
     </button>
-    <button class="nav-btn" onclick="switchTab('inv', this)">
+    <button class="nav-btn" id="nav-inv" onclick="switchTab('inv', this)">
       <span>🎒</span><span>인벤토리</span>
       <span class="badge-dot" id="dot-inv"></span>
     </button>
-    <button class="nav-btn" onclick="switchTab('skill', this)">
+    <button class="nav-btn" id="nav-skill" onclick="switchTab('skill', this)">
       <span>📘</span><span>스킬/환생</span>
       <span class="badge-dot" id="dot-skill"></span>
     </button>
-    <button class="nav-btn" onclick="switchTab('shop', this)"><span>🏰</span><span>던전/상점</span></button>
-    <button class="nav-btn" onclick="switchTab('codex', this)"><span>📖</span><span>도감/업적</span></button>
+    <button class="nav-btn" id="nav-shop" onclick="switchTab('shop', this)"><span>🏰</span><span>던전/상점</span></button>
+    <button class="nav-btn" id="nav-codex" onclick="switchTab('codex', this)"><span>📖</span><span>도감/설정</span></button>
   </nav>
 
   <!-- 모달 오버레이 -->
@@ -927,36 +1107,44 @@
 
 <script>
 /* =========================================================================
- * [심연의 연대기 v2.0 - 밸런스 공식 및 시스템 설계 주석]
+ * [심연의 연대기 v3.0 (Stage 1: Part A) - 밸런스 공식 및 장비 점수 표]
  * -------------------------------------------------------------------------
  * 1. 레벨 경험치 및 몬스터 스케일링 공식:
- *    - 필요 경험치 ReqEXP(lv) = floor( 48 * (lv ^ 1.62) )
- *    - NG+(환생 회차) 난이도 배율 NG_Mult = 1 + (ngPlus * 0.35)
- *    - 몬스터 스케일 Scale = (1 + depth * 0.18) * (1 + lv * 0.07) * NG_Mult * (보스 2.8 / 정예 1.6 / 일반 1.0)
+ *    - ReqEXP(lv) = floor( 48 * (lv ^ 1.62) )
+ *    - NG_Mult = 1 + (ngPlus * 0.35)
+ *    - MonsterScale = (1 + depth * 0.18) * (1 + lv * 0.07) * NG_Mult * (보스 2.8 / 정예 1.6 / 일반 1.0)
  *
- * 2. 2차~5차 전직 시스템 (Lv.10 / Lv.25 / Lv.50 / Lv.100):
- *    - 전직 달성 시 고유 칭호 변경, 영구 올스탯 보너스(+10 / +25 / +60 / +150),
- *      최종 공격력·생명력 배율 증폭, 캐릭터 전투씬 오라(Aura) 이펙트 진화.
+ * 2. [A-2] 장비 점수(Item Score) 계산 공식:
+ *    Score = (기본스탯 × 강화배율(1 + enh*0.12) × 직업기본가중치)
+ *          + Σ(옵션수치 × 직업별옵션가중치[classKey][optId])
+ *          + 세트진행보너스(2세트 완성 시 +180, 4세트 완성 시 +360, 단일 보유 +35)
+ *          + 고유등급보너스(유니크 +120 + 등급Idx*35, 일반 등급Idx*15)
  *
- * 3. 환생(프레스티지) 및 영혼석(Soul Stone) 공식:
- *    - Lv.20 이상 또는 심연 15층 이상에서 환생 가능.
- *    - 획득 영혼석 = floor( (depth * 1.5) + (lv * 0.8) ) * (1 + ngPlus * 0.2)
- *    - 환생 시 레벨/층수/골드는 초기화되지만 [장착 장비, 인벤토리, 영혼 유물, 도감, 업적]은 영구 보존.
+ * 3. 직업별 옵션 가중치 표 (CLASS_WEIGHTS):
+ *    -----------------------------------------------------------------------
+ *    직업   | baseAtk | baseHp | atkPct | hpPct | crit | critDmg | vamp | 주스탯(STR/DEX/INT/LUK)
+ *    -----------------------------------------------------------------------
+ *    전사   |  2.6    |  0.50  |   19   |  14   |  10  |    7    |  15  | STR:16, DEX:5,  INT:2,  LUK:6
+ *    도적   |  2.5    |  0.32  |   15   |   6   |  22  |   15    |  12  | DEX:17, LUK:15, STR:5,  INT:2
+ *    마법사 |  2.7    |  0.32  |   21   |   7   |  14  |   14    |  10  | INT:19, LUK:8,  DEX:5,  STR:2
+ *    성직자 |  2.1    |  0.60  |   14   |  19   |   9  |    7    |  22  | INT:16, STR:13, LUK:8,  DEX:4
+ *    -----------------------------------------------------------------------
  *
- * 4. 층별 10노드 미니맵 & 스마트 자동선택(Auto-Choice) AI:
- *    - 각 층은 1~10번 방(노드)으로 구성 (5번 방: 보물/성소 확정, 10번 방: 계층 보스 확정).
- *    - 자동선택 ON 시 설정된 속도(1x/2x/4x)와 성향(균형/파밍/안전)에 따라
- *      전투 스킬·물약·비전투 선택지를 실시간 하이라이트하며 자동 실행.
+ * 4. [A-1] 백그라운드 드리프트 보정 공식:
+ *    - 탭 비활성화 등으로 인해 경과시간(Date.now() - lastTickTime)이 설정 틱 주기의 3.5배 이상 벌어지면
+ *      놓친 턴 수(최대 300턴)를 일괄 시뮬레이션하여 골드, 경험치, 장비 드롭(자동장착/분해 적용), 층수 진행을 즉시 반영.
  * ========================================================================= */
 
+// 확장된 숫자 단위 포맷터 (K ~ Dc)
 function fmt(n) {
   if (n === undefined || n === null || isNaN(n)) return '0';
-  n = Math.floor(n);
-  if (n < 1000) return n.toString();
-  const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi'];
+  const sign = n < 0 ? '-' : '';
+  n = Math.floor(Math.abs(n));
+  if (n < 1000) return sign + n.toString();
+  const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
   let u = -1, val = n;
   while (val >= 1000 && u < units.length - 1) { val /= 1000; u++; }
-  return val.toFixed(val >= 100 ? 0 : val >= 10 ? 1 : 2) + units[u];
+  return sign + val.toFixed(val >= 100 ? 0 : val >= 10 ? 1 : 2) + units[u];
 }
 
 // Web Audio API 사운드 엔진
@@ -1022,6 +1210,14 @@ const SFX = {
       }
     } catch (e) {}
   }
+};
+
+// 직업별 장비 점수 가중치 테이블
+const CLASS_WEIGHTS = {
+  warrior: { baseAtk: 2.6, baseHp: 0.50, atkPct: 19, str: 16, hpPct: 14, vamp: 15, crit: 10, critDmg: 7, luk: 6, dex: 5, int: 2, goldPct: 3 },
+  rogue:   { baseAtk: 2.5, baseHp: 0.32, crit: 22, critDmg: 15, dex: 17, luk: 15, atkPct: 15, vamp: 12, hpPct: 6, str: 5, int: 2, goldPct: 5 },
+  mage:    { baseAtk: 2.7, baseHp: 0.32, atkPct: 21, int: 19, critDmg: 14, crit: 14, vamp: 10, luk: 8, hpPct: 7, dex: 5, str: 2, goldPct: 3 },
+  cleric:  { baseAtk: 2.1, baseHp: 0.60, vamp: 22, hpPct: 19, int: 16, atkPct: 14, str: 13, crit: 9, luk: 8, critDmg: 7, dex: 4, goldPct: 4 }
 };
 
 // 4대 직업 & 전직 트리(1차~5차) & 4단계 스킬 트리
@@ -1096,7 +1292,7 @@ const CLASSES = {
   }
 };
 
-// 영혼 유물 5종 (환생 재화로 강화)
+// 영혼 유물 5종
 const RELICS = [
   { id: 'grail',   name: '🍷 심연의 성배', desc: '최종 공격력 영구 +25% / Lv', baseCost: 5 },
   { id: 'heart',   name: '❤️ 불멸자의 심장', desc: '최대 생명력 영구 +30% / Lv', baseCost: 5 },
@@ -1105,7 +1301,7 @@ const RELICS = [
   { id: 'hammer',  name: '🔨 창조주의 망치', desc: '고등급 드롭 보정 & 강화 비용 -5% / Lv', baseCost: 10 }
 ];
 
-// 업적 목록 (영구 보너스)
+// 영구 업적
 const ACHIEVEMENTS = [
   { id: 'kill50',   name: '심연의 사냥꾼', desc: '몬스터 30마리 처치', goal: 30, key: 'kills', bonusTxt: '공격력 +10%' },
   { id: 'depth20',  name: '심층 탐사자', desc: '심연 20층 도달', goal: 20, key: 'maxDepth', bonusTxt: '공격력 +15%' },
@@ -1165,7 +1361,7 @@ const UNIQUE_NAMES = {
 
 const PLACES = [
   { name: '안개 낀 고대 묘지', decos: ['🪦','🕯️','🕸️'] },
-  { name: '무너진 지하 대성당', decos: ['⛪',' stained_glass' ? '🕯️' : '🕯️','✝️'] },
+  { name: '무너진 지하 대성당', decos: ['⛪','🕯️','✝️'] },
   { name: '독기가 피어오르는 늪', decos: ['🍄','🌿','🐍'] },
   { name: '버려진 드워프 용광로', decos: ['⚒️','🔥','⚙️'] },
   { name: '얼어붙은 심연의 회랑', decos: ['❄️','🧊','🏛️'] },
@@ -1186,25 +1382,26 @@ const MONSTERS = [
 let state = null;
 let currentEnemy = null;
 
-// 오토 플레이 상태
+// 오토 플레이 상태 (드리프트 보정용 lastTickTime 포함)
 let autoPlay = {
   enabled: false,
-  speedIdx: 0, // 0: 1x(1100ms), 1: 2x(550ms), 2: 4x(260ms)
+  speedIdx: 0,
   speeds: [
-    { label: '1x', ms: 1050 },
-    { label: '2x', ms: 520 },
-    { label: '4x', ms: 250 }
+    { label: '1x', ms: 1000 },
+    { label: '2x', ms: 500 },
+    { label: '4x', ms: 240 }
   ],
-  modeIdx: 0, // 0: 균형, 1: 파밍(적극), 2: 안전(생존)
+  modeIdx: 0,
   modes: ['균형', '파밍', '안전'],
-  timer: null
+  timer: null,
+  lastTickTime: 0
 };
 
-// 신규 세이브 생성
+// 신규 세이브 생성 (v3.0 신규 필드 포함)
 function createNewState(classKey) {
   const c = CLASSES[classKey];
   return {
-    version: 2,
+    version: 3.0,
     classKey,
     jobTier: 1,
     lv: 1,
@@ -1238,21 +1435,35 @@ function createNewState(classKey) {
       { id: 'q_kill', name: '심연 몬스터 5마리 처치', prog: 0, goal: 5, rewardGold: 250, rewardSoul: 2 },
       { id: 'q_node', name: '탐사 방(노드) 10회 돌파', prog: 0, goal: 10, rewardGold: 300, rewardSoul: 2 }
     ],
+    settings: {
+      autoEquipOnDrop: false,
+      autoSalvageGradeIdx: -1,
+      pauseOnLvUp: false,
+      pauseOnPromo: false,
+      pauseOnUnique: false,
+      sound: true
+    },
+    lastActionSummary: '심연 원정을 시작했습니다.',
     lastSaveTime: Date.now()
   };
 }
 
-// 1단계 세이브 호환 마이그레이션 포함 로드
+// 기존 ABYSS_RPG_SAVE_V2 및 V1 완벽 호환 마이그레이션
 function loadGame() {
-  const rawV2 = localStorage.getItem('ABYSS_RPG_SAVE_V2') || localStorage.getItem('ABYSS_RPG_SAVE_V1');
-  if (!rawV2) return false;
+  const raw = localStorage.getItem('ABYSS_RPG_SAVE_V2') || localStorage.getItem('ABYSS_RPG_SAVE_V1');
+  if (!raw) return false;
   try {
-    const parsed = JSON.parse(rawV2);
+    const parsed = JSON.parse(raw);
     const def = createNewState(parsed.classKey || 'warrior');
-    state = { ...def, ...parsed };
-    state.skills = { ...def.skills, ...(parsed.skills || {}) };
-    state.relics = { ...def.relics, ...(parsed.relics || {}) };
-    state.records = { ...def.records, ...(parsed.records || {}) };
+    state = { ...def, ...parsed, version: 3.0 };
+    state.stats    = { ...def.stats, ...(parsed.stats || {}) };
+    state.skills   = { ...def.skills, ...(parsed.skills || {}) };
+    state.relics   = { ...def.relics, ...(parsed.relics || {}) };
+    state.flags    = { ...def.flags, ...(parsed.flags || {}) };
+    state.equipped = { ...def.equipped, ...(parsed.equipped || {}) };
+    state.records  = { ...def.records, ...(parsed.records || {}) };
+    state.settings = { ...def.settings, ...(parsed.settings || {}) };
+    SFX.enabled = state.settings.sound !== false;
     if (!state.floorNodes || state.floorNodes.length !== 10) {
       generateFloorNodes();
     }
@@ -1266,6 +1477,253 @@ function saveGame() {
   if (!state) return;
   state.lastSaveTime = Date.now();
   localStorage.setItem('ABYSS_RPG_SAVE_V2', JSON.stringify(state));
+}
+
+// 최근 사건 1줄 요약 업데이트 및 상단 미니 스트립 갱신
+function setRecentSummary(plainText) {
+  if (!state) return;
+  state.lastActionSummary = plainText;
+  updateAutoStrip();
+}
+
+function updateAutoStrip() {
+  if (!state) return;
+  const strip = document.getElementById('auto-mini-strip');
+  const statusEl = document.getElementById('strip-status-txt');
+  const floorEl = document.getElementById('strip-floor-txt');
+  const recentEl = document.getElementById('strip-recent-txt');
+  const pauseBtn = document.getElementById('strip-btn-pause');
+
+  strip.classList.toggle('running', autoPlay.enabled);
+  const spd = autoPlay.speeds[autoPlay.speedIdx].label;
+  const mode = autoPlay.modes[autoPlay.modeIdx];
+
+  if (autoPlay.enabled) {
+    statusEl.textContent = `🤖 자동 진행 중 (${spd}·${mode})`;
+    statusEl.style.color = '#4cd964';
+    pauseBtn.textContent = '⏸️ 일시정지';
+    pauseBtn.classList.add('active');
+  } else {
+    statusEl.textContent = `⏸️ 수동 진행 (${mode})`;
+    statusEl.style.color = '#d4a959';
+    pauseBtn.textContent = '▶️ 자동시작';
+    pauseBtn.classList.remove('active');
+  }
+
+  floorEl.textContent = `심연 ${state.depth}층 ${(state.nodeIdx || 0) + 1}/10`;
+  recentEl.textContent = `방금: ${state.lastActionSummary || '탐색 중...'}`;
+}
+
+function jumpToAdventureTab() {
+  const advNavBtn = document.getElementById('nav-adventure');
+  switchTab('adventure', advNavBtn);
+}
+
+// =========================================================================
+// [A-2] 장비 점수(Equipment Score) 계산기 & 일괄 장착 시스템
+// =========================================================================
+function calcItemScore(item, customEquippedMap = null) {
+  if (!item || item.unidentified) return 0;
+  const eqMap = customEquippedMap || state.equipped;
+  const w = CLASS_WEIGHTS[state.classKey] || CLASS_WEIGHTS.warrior;
+
+  const enhMult = 1 + (item.enhance || 0) * 0.12;
+  const effBase = Math.floor(item.baseVal * enhMult);
+
+  let baseScore = 0;
+  if (item.baseStat === 'atk')  baseScore = effBase * w.baseAtk;
+  else if (item.baseStat === 'hp') baseScore = effBase * w.baseHp;
+  else if (item.baseStat === 'dex') baseScore = effBase * (w.dex || 10);
+  else if (item.baseStat === 'crit') baseScore = effBase * (w.crit || 15);
+  else if (item.baseStat === 'luk') baseScore = effBase * (w.luk || 10);
+
+  let optScore = 0;
+  (item.options || []).forEach(opt => {
+    const weight = w[opt.id] || 6;
+    optScore += opt.val * weight;
+  });
+
+  // 세트 진행 보너스 계산 (자신의 슬롯을 제외한 동일 세트 장착 개수 확인)
+  let setBonus = 0;
+  if (item.setId) {
+    let otherSetPieces = 0;
+    Object.entries(eqMap).forEach(([slotKey, eqItm]) => {
+      if (slotKey !== item.slotId && eqItm && eqItm.setId === item.setId) {
+        otherSetPieces++;
+      }
+    });
+    if (otherSetPieces >= 3) setBonus = 360;      // 4세트 완성!
+    else if (otherSetPieces === 2) setBonus = 95; // 3피스
+    else if (otherSetPieces === 1) setBonus = 180;// 2세트 완성!
+    else setBonus = 35;                           // 세트 잠재력
+  }
+
+  // 고유 효과 및 등급 보너스
+  const uniqueBonus = (item.isUnique ? 120 + item.gradeIdx * 35 : item.gradeIdx * 15);
+
+  return Math.round(baseScore + optScore + setBonus + uniqueBonus);
+}
+
+// 현재 장착 장비 대비 점수 차이 반환
+function getItemScoreDiff(item) {
+  if (!item || item.unidentified) return null;
+  const myScore = calcItemScore(item);
+  const curEq = state.equipped[item.slotId];
+  const eqScore = curEq ? calcItemScore(curEq) : 0;
+  return { myScore, eqScore, diff: myScore - eqScore };
+}
+
+// 슬롯별 업그레이드 가능한 최고 장비 탐색
+function getUpgradeableSlots() {
+  if (!state) return [];
+  const upgrades = [];
+  SLOTS.forEach(sl => {
+    const curEq = state.equipped[sl.id];
+    const curScore = curEq ? calcItemScore(curEq) : 0;
+    let bestCandidate = null;
+    let bestScore = curScore;
+
+    state.inventory.forEach(itm => {
+      if (!itm.unidentified && itm.slotId === sl.id) {
+        const sc = calcItemScore(itm);
+        if (sc > bestScore) {
+          bestScore = sc;
+          bestCandidate = itm;
+        }
+      }
+    });
+
+    if (bestCandidate) {
+      upgrades.push({
+        slot: sl,
+        newItem: bestCandidate,
+        oldItem: curEq,
+        oldScore: curScore,
+        newScore: bestScore,
+        diff: bestScore - curScore
+      });
+    }
+  });
+  return upgrades;
+}
+
+// 종합 전투력 계산
+function calcCombatPower() {
+  const { stats } = getTotalStats();
+  const critFactor = 1 + (stats.crit / 100) * ((stats.critDmg - 100) / 100);
+  const offPower = stats.atk * critFactor * (1 + stats.vamp / 100);
+  const defPower = stats.maxHp * 0.22 + stats.maxMp * 0.1;
+  return Math.floor(offPower + defPower);
+}
+
+// [A-2] 더 좋은 장비 일괄 장착 실행
+function batchEquipBest(showModalSummary = true) {
+  if (!state) return;
+  const beforeCP = calcCombatPower();
+  const beforeStats = getTotalStats().stats;
+  const changes = {};
+
+  // 세트 시너지 재평가를 위해 2패스 탐색
+  for (let pass = 0; pass < 2; pass++) {
+    SLOTS.forEach(sl => {
+      const curEq = state.equipped[sl.id];
+      const curScore = curEq ? calcItemScore(curEq) : 0;
+      let bestIdx = -1;
+      let bestScore = curScore;
+
+      state.inventory.forEach((itm, idx) => {
+        if (!itm.unidentified && itm.slotId === sl.id) {
+          const sc = calcItemScore(itm);
+          if (sc > bestScore) {
+            bestScore = sc;
+            bestIdx = idx;
+          }
+        }
+      });
+
+      if (bestIdx !== -1) {
+        const picked = state.inventory[bestIdx];
+        const firstOldScore = changes[sl.id] ? changes[sl.id].oldScore : curScore;
+        state.inventory.splice(bestIdx, 1);
+        if (curEq) state.inventory.push(curEq);
+        state.equipped[sl.id] = picked;
+
+        changes[sl.id] = {
+          slotName: sl.name,
+          slotIcon: sl.icon,
+          newItem: picked,
+          oldScore: firstOldScore,
+          newScore: calcItemScore(picked),
+          diff: calcItemScore(picked) - firstOldScore
+        };
+      }
+    });
+  }
+
+  const changedList = Object.values(changes).filter(c => c.diff > 0);
+  if (changedList.length === 0) {
+    SFX.play('click');
+    if (showModalSummary) {
+      const overlay = document.getElementById('modal-overlay');
+      const content = document.getElementById('modal-content');
+      overlay.classList.add('show');
+      content.innerHTML = `
+        <div style="text-align:center;">
+          <div style="font-size:32px;">🛡️</div>
+          <div style="font-size:15px; font-weight:800; color:var(--border-bright); margin-top:4px;">이미 최상의 장비를 착용 중입니다</div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">인벤토리에 현재 장착품보다 점수가 높은 감정된 장비가 없습니다.</div>
+        </div>
+        <button class="choice-btn" data-autoclose="true" style="justify-content:center;" onclick="closeModal()">확인</button>
+      `;
+    }
+    return;
+  }
+
+  SFX.play('legend');
+  const afterCP = calcCombatPower();
+  const afterStats = getTotalStats().stats;
+  const cpDiff = afterCP - beforeCP;
+
+  const summaryShort = changedList.map(c => `${c.slotName} ▲+${fmt(c.diff)}`).join(', ');
+  addLog(`⬆️ [일괄장착] ${summaryShort} (전투력 ▲+${fmt(Math.max(0, cpDiff))})`);
+  setRecentSummary(`일괄 장착 완료! (${summaryShort})`);
+
+  updateHUD();
+  refreshActiveTab();
+  saveGame();
+
+  if (showModalSummary) {
+    const overlay = document.getElementById('modal-overlay');
+    const content = document.getElementById('modal-content');
+    overlay.classList.add('show');
+
+    const rowsHtml = changedList.map(c => `
+      <div class="item-row" style="cursor:default;">
+        <div>
+          <span style="font-size:11px; color:var(--text-muted);">${c.slotIcon} ${c.slotName}</span><br>
+          <strong class="${c.newItem.gradeCls}">[${c.newItem.gradeName}] ${c.newItem.name} ${c.newItem.enhance ? '+' + c.newItem.enhance : ''}</strong>
+        </div>
+        <span class="cmp-badge cmp-up" style="font-size:11.5px;">점수 ▲+${fmt(c.diff)}</span>
+      </div>
+    `).join('');
+
+    content.innerHTML = `
+      <div style="text-align:center;">
+        <div style="font-size:16px; font-weight:800; color:var(--border-bright);">⬆️ 상위 장비 일괄 장착 완료!</div>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">직업(${CLASSES[state.classKey].name}) 맞춤 가중치로 최적 장비를 착용했습니다.</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:5px; max-height:210px; overflow-y:auto;">
+        ${rowsHtml}
+      </div>
+      <div class="card" style="text-align:center; font-size:12.5px; line-height:1.6;">
+        <div>⚡ 총 전투력: <strong>${fmt(beforeCP)}</strong> ➔ <strong style="color:#4cd964">${fmt(afterCP)} (${cpDiff >= 0 ? '▲+' : '▼'}${fmt(cpDiff)})</strong></div>
+        <div style="font-size:11.5px; color:var(--text-muted);">
+          공격력 ${fmt(beforeStats.atk)} ➔ ${fmt(afterStats.atk)} | 최대 HP ${fmt(beforeStats.maxHp)} ➔ ${fmt(afterStats.maxHp)}
+        </div>
+      </div>
+      <button class="choice-btn" data-autoclose="true" style="justify-content:center; font-weight:700;" onclick="closeModal()">확인</button>
+    `;
+  }
 }
 
 // =========================================================================
@@ -1324,7 +1782,7 @@ function renderMinimap() {
 }
 
 // =========================================================================
-// 캐릭터 총합 능력치 계산 (전직 + 스킬 패시브 + 유물 + 세트 + 도감/업적)
+// 캐릭터 총합 능력치 계산
 // =========================================================================
 function getTotalStats() {
   const c = CLASSES[state.classKey];
@@ -1348,7 +1806,6 @@ function getTotalStats() {
     hpPct: (state.relics.heart || 0) * 30
   };
 
-  // 패시브 스킬(s2) 보너스
   const s2Lv = state.lv >= 5 ? (state.skills.s2 || 1) : 0;
   if (s2Lv > 0) {
     if (state.classKey === 'warrior') { s.atkPct += s2Lv * 15; s.hpPct += s2Lv * 15; }
@@ -1357,7 +1814,6 @@ function getTotalStats() {
     if (state.classKey === 'cleric')  { s.atkPct += s2Lv * 14; s.hpPct += s2Lv * 14; }
   }
 
-  // 도감 & 업적 영구 보너스
   const codexBonus = state.codexUniques.length * 2;
   let achBonus = 0;
   ACHIEVEMENTS.forEach(a => {
@@ -1365,7 +1821,6 @@ function getTotalStats() {
   });
   s.atkPct += codexBonus + achBonus;
 
-  // 주 스탯 공격력 반영
   if (state.classKey === 'warrior') s.atk += Math.floor(s.str * 2.4);
   if (state.classKey === 'rogue')   s.atk += Math.floor(s.dex * 2.1 + s.luk * 0.9);
   if (state.classKey === 'mage')    s.atk += Math.floor(s.int * 2.7);
@@ -1415,7 +1870,6 @@ function updateBattleStage(targetIcon, targetName, isCombat = false) {
   const c = CLASSES[state.classKey];
   const { stats, promo } = getTotalStats();
 
-  // 아군 스프라이트 & 오라
   document.getElementById('hero-sprite').textContent = c.sprite;
   document.getElementById('hero-weapon').textContent = state.equipped.weapon ? state.equipped.weapon.icon : c.icon;
   document.getElementById('hero-companion').style.display = state.flags.companion ? 'inline' : 'none';
@@ -1425,7 +1879,6 @@ function updateBattleStage(targetIcon, targetName, isCombat = false) {
   const aura = document.getElementById('hero-aura');
   aura.className = 'aura-ring' + (state.jobTier >= 2 ? ` aura-t${state.jobTier}` : '');
 
-  // 타겟 스프라이트
   if (targetIcon) document.getElementById('target-sprite').textContent = targetIcon;
   if (targetName) document.getElementById('target-stage-name').textContent = targetName;
 
@@ -1465,7 +1918,6 @@ function playCombatAnim(attacker, dmgText, color = '#fff', isCrit = false) {
     }, 140);
   }
 
-  // 데미지 플로팅 생성
   const fl = document.createElement('div');
   fl.className = 'dmg-float';
   fl.style.color = color;
@@ -1478,14 +1930,26 @@ function playCombatAnim(attacker, dmgText, color = '#fff', isCrit = false) {
 }
 
 // =========================================================================
-// 스마트 자동선택 (오토 플레이) 컨트롤러
+// [A-1] 전 탭 동작 스마트 자동선택 & 백그라운드 드리프트 보정 컨트롤러
 // =========================================================================
+function syncAutoButtonsUI() {
+  const btn = document.getElementById('btn-auto-toggle');
+  if (btn) {
+    btn.textContent = `🤖 자동: ${autoPlay.enabled ? 'ON' : 'OFF'}`;
+    btn.classList.toggle('active', autoPlay.enabled);
+  }
+  const spdBtn = document.getElementById('btn-auto-speed');
+  if (spdBtn) spdBtn.textContent = `⚡ ${autoPlay.speeds[autoPlay.speedIdx].label}`;
+  const modeBtn = document.getElementById('btn-auto-mode');
+  if (modeBtn) modeBtn.textContent = `🎯 ${autoPlay.modes[autoPlay.modeIdx]}`;
+  updateAutoStrip();
+}
+
 function toggleAutoPlay() {
   SFX.play('click');
   autoPlay.enabled = !autoPlay.enabled;
-  const btn = document.getElementById('btn-auto-toggle');
-  btn.textContent = `🤖 자동선택: ${autoPlay.enabled ? 'ON' : 'OFF'}`;
-  btn.classList.toggle('active', autoPlay.enabled);
+  autoPlay.lastTickTime = Date.now();
+  syncAutoButtonsUI();
 
   if (autoPlay.enabled) {
     scheduleAutoTick();
@@ -1495,17 +1959,30 @@ function toggleAutoPlay() {
   }
 }
 
+function pauseAutoPlay(reasonMsg) {
+  if (!autoPlay.enabled) return;
+  autoPlay.enabled = false;
+  if (autoPlay.timer) {
+    clearTimeout(autoPlay.timer);
+    autoPlay.timer = null;
+  }
+  SFX.play('legend');
+  addLog(`⏸️ ${reasonMsg}`);
+  setRecentSummary(reasonMsg);
+  syncAutoButtonsUI();
+}
+
 function cycleAutoSpeed() {
   SFX.play('click');
   autoPlay.speedIdx = (autoPlay.speedIdx + 1) % autoPlay.speeds.length;
-  document.getElementById('btn-auto-speed').textContent = `⚡ ${autoPlay.speeds[autoPlay.speedIdx].label}`;
+  syncAutoButtonsUI();
   if (autoPlay.enabled) scheduleAutoTick();
 }
 
 function cycleAutoMode() {
   SFX.play('click');
   autoPlay.modeIdx = (autoPlay.modeIdx + 1) % autoPlay.modes.length;
-  document.getElementById('btn-auto-mode').textContent = `🎯 성향: ${autoPlay.modes[autoPlay.modeIdx]}`;
+  syncAutoButtonsUI();
 }
 
 function scheduleAutoTick() {
@@ -1515,21 +1992,94 @@ function scheduleAutoTick() {
   autoPlay.timer = setTimeout(executeAutoStep, delay);
 }
 
+// 백그라운드 탭 복귀 및 타이머 드리프트 발생 시 밀린 턴 요약 처리
+function checkAndCompensateDrift() {
+  if (!autoPlay.enabled || !state) return false;
+  const now = Date.now();
+  const stepMs = autoPlay.speeds[autoPlay.speedIdx].ms;
+  const elapsed = now - (autoPlay.lastTickTime || now);
+
+  if (elapsed >= stepMs * 4) {
+    const missedTurns = Math.min(300, Math.floor(elapsed / stepMs) - 1);
+    if (missedTurns >= 3) {
+      autoPlay.lastTickTime = now;
+      processDriftTurns(missedTurns);
+      return true;
+    }
+  }
+  return false;
+}
+
+function processDriftTurns(turns) {
+  const { stats } = getTotalStats();
+  let totalGold = 0;
+  let totalExp = 0;
+  let kills = 0;
+  let drops = 0;
+
+  for (let i = 0; i < turns; i++) {
+    const g = Math.floor((14 + state.depth * 5) * (1 + stats.goldPct / 100) * 0.65);
+    const ex = Math.floor((16 + state.depth * 6) * (1 + (state.relics.compass || 0) * 0.3) * 0.65);
+    totalGold += g;
+    totalExp += ex;
+
+    if (Math.random() < 0.45) {
+      kills++;
+      state.records.kills = (state.records.kills || 0) + 1;
+      if (state.quests && state.quests[0]) state.quests[0].prog++;
+    }
+
+    if (Math.random() < 0.18) {
+      const itm = generateItem(state.depth, 0, false);
+      acquireItemWithChest(itm, false);
+      drops++;
+    }
+
+    if (i % 2 === 0) {
+      state.nodeIdx++;
+      if (state.quests && state.quests[1]) state.quests[1].prog++;
+      if (state.nodeIdx >= 10) {
+        state.depth++;
+        if (state.depth > (state.records.maxDepth || 1)) state.records.maxDepth = state.depth;
+        generateFloorNodes();
+      }
+    }
+    if (!autoPlay.enabled) break; // 자동 일시정지 조건 발동 시 중단
+  }
+
+  state.gold += totalGold;
+  gainExp(totalExp);
+
+  const msg = `⚡ 백그라운드 ${turns}턴 요약 정산: +${fmt(totalGold)}G, +${fmt(totalExp)}EXP, 장비 ${drops}개`;
+  addLog(msg);
+  setRecentSummary(msg);
+  nextTurnEvent();
+  refreshActiveTab();
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && autoPlay.enabled) {
+    checkAndCompensateDrift();
+    scheduleAutoTick();
+  }
+});
+
+// [A-1] 어떤 탭에 있든 멈추지 않고 실행되는 자동 진행 핵심 루프
 function executeAutoStep() {
   if (!autoPlay.enabled) return;
-  // 모달이 열려 있으면 보물상자 확인 버튼만 자동 닫기
+
+  // 드리프트 체크
+  if (checkAndCompensateDrift()) {
+    scheduleAutoTick();
+    return;
+  }
+  autoPlay.lastTickTime = Date.now();
+
+  // 자동 닫기 대상 모달(보물상자/오프라인보상 등)이 떠 있으면 즉시 닫기
   const modal = document.getElementById('modal-overlay');
   if (modal.classList.contains('show')) {
     const closeBtn = modal.querySelector('button[data-autoclose="true"]');
     if (closeBtn) closeBtn.click();
-    scheduleAutoTick();
-    return;
-  }
-
-  // 모험 탭이 아닐 때는 대기
-  if (!document.getElementById('tab-adventure').classList.contains('active')) {
-    scheduleAutoTick();
-    return;
   }
 
   const btns = Array.from(document.querySelectorAll('#choices-wrap .choice-btn'));
@@ -1540,6 +2090,15 @@ function executeAutoStep() {
 
   const { stats } = getTotalStats();
   const hpRatio = state.hp / stats.maxHp;
+
+  // [A-1] 체력이 낮고 물약 골드(50G)가 없으면 자동으로 '안전' 성향 전환
+  if (hpRatio < 0.38 && state.gold < 50 && autoPlay.modes[autoPlay.modeIdx] !== '안전') {
+    autoPlay.modeIdx = 2; // '안전'
+    syncAutoButtonsUI();
+    addLog(`⚠️ 체력과 포션 골드가 부족하여 자동 성향이 [🎯 안전]으로 전환되었습니다.`);
+    setRecentSummary(`체력/골드 부족 ➔ [🎯 안전] 성향 자동 전환!`);
+  }
+
   const mode = autoPlay.modes[autoPlay.modeIdx];
   let chosen = btns[0];
 
@@ -1571,13 +2130,11 @@ function executeAutoStep() {
 
     if (specialBtn) {
       chosen = specialBtn;
-    } else if ((mode === '안전' || hpRatio < 0.35) && safeBtn) {
+    } else if ((mode === '안전' || hpRatio < 0.38) && safeBtn) {
       chosen = safeBtn;
     } else if (mode === '파밍') {
-      // 첫 번째 주 보상 선택지 우선
       chosen = btns[0];
     } else {
-      // 균형: 확률이 가장 높은 보상 선택지 선택
       let bestProb = -1;
       btns.forEach(b => {
         const p = parseInt(b.dataset.prob || '60', 10);
@@ -1593,15 +2150,25 @@ function executeAutoStep() {
     chosen.classList.add('auto-picked');
     setTimeout(() => {
       if (chosen) chosen.click();
+      refreshActiveTab();
       scheduleAutoTick();
-    }, 130);
+    }, 95);
   } else {
     scheduleAutoTick();
   }
 }
 
+// 모험 외 다른 탭이 열려 있을 때도 실시간으로 UI 갱신
+function refreshActiveTab() {
+  if (document.getElementById('tab-char').classList.contains('active')) renderCharTab();
+  else if (document.getElementById('tab-inv').classList.contains('active')) renderInvTab();
+  else if (document.getElementById('tab-skill').classList.contains('active')) renderSkillTab();
+  else if (document.getElementById('tab-shop').classList.contains('active')) renderShopTab();
+  else if (document.getElementById('tab-codex').classList.contains('active')) renderCodexTab();
+}
+
 // =========================================================================
-// 아이템 생성, 상자 연출, 합성 시스템
+// 아이템 생성, 획득(자동 장착/자동 분해/유니크 일시정지 연동), 상자 연출
 // =========================================================================
 function generateItem(depth, forceMinGradeIdx = 0, isUnidentified = false) {
   const { stats } = getTotalStats();
@@ -1660,21 +2227,57 @@ function generateItem(depth, forceMinGradeIdx = 0, isUnidentified = false) {
 function acquireItemWithChest(item, isChestModal = true) {
   state.codexGrades[item.gradeId] = (state.codexGrades[item.gradeId] || 0) + 1;
   if (item.gradeIdx >= 4) state.records.legendCnt = (state.records.legendCnt || 0) + 1;
+
+  let isNewUnique = false;
   if (item.isUnique && !state.codexUniques.includes(item.name)) {
     state.codexUniques.push(item.name);
+    isNewUnique = true;
     addLog(`📖 신규 유니크 도감 등록: [${item.name}] (영구 공격력 +2%!)`);
   }
 
-  if (state.inventory.length >= 35) {
-    const dustGain = (item.gradeIdx + 1) * 5;
+  // [A-1] 신규 유니크 획득 시 자동 일시정지 옵션 체크
+  if (isNewUnique && state.settings && state.settings.pauseOnUnique && autoPlay.enabled) {
+    pauseAutoPlay(`신규 유니크 [${item.name}] 획득으로 일시정지!`);
+  }
+
+  let itemToStore = item;
+
+  // [A-2] 획득 즉시 상위 장비 자동 장착 토글 처리
+  if (!item.unidentified && state.settings && state.settings.autoEquipOnDrop) {
+    const cmp = getItemScoreDiff(item);
+    if (cmp && cmp.diff > 0) {
+      const prevEquipped = state.equipped[item.slotId];
+      state.equipped[item.slotId] = item;
+      itemToStore = prevEquipped; // 교체된 이전 장비를 인벤토리/분해 대상으로 전달
+      addLog(`⬆️ [자동장착] ${item.slotName}에 [${item.gradeName}] ${item.name} 착용 (점수 ▲+${fmt(cmp.diff)})`);
+      setRecentSummary(`자동장착: [${item.gradeName}] ${item.name} (▲+${fmt(cmp.diff)})`);
+    }
+  }
+
+  // [A-2] 하위 장비 자동 분해 토글 처리
+  const autoSalvageMaxIdx = state.settings ? state.settings.autoSalvageGradeIdx : -1;
+  if (itemToStore && !itemToStore.unidentified && autoSalvageMaxIdx >= 0 && itemToStore.gradeIdx <= autoSalvageMaxIdx) {
+    const dustGain = (itemToStore.gradeIdx + 1) * 4;
+    const goldGain = itemToStore.lv * 10;
     state.dust += dustGain;
-    addLog(`🎒 가방이 가득 차 [${item.name}] 자동 분해 (가루 +${dustGain})`);
+    state.gold += goldGain;
+    addLog(`♻️ [자동분해] [${itemToStore.gradeName}] ${itemToStore.name} ➔ 가루 +${dustGain}, +${fmt(goldGain)}G`);
     updateHUD();
+    saveGame();
     return;
   }
 
-  state.inventory.unshift(item);
-  document.getElementById('dot-inv').classList.add('show');
+  if (itemToStore) {
+    if (state.inventory.length >= 35) {
+      const dustGain = (itemToStore.gradeIdx + 1) * 5;
+      state.dust += dustGain;
+      addLog(`🎒 가방이 가득 차 [${itemToStore.name}] 자동 분해 (가루 +${dustGain})`);
+      updateHUD();
+      saveGame();
+      return;
+    }
+    state.inventory.unshift(itemToStore);
+  }
 
   if (item.gradeIdx >= 4 && !item.unidentified) {
     triggerScreenFlash(GRADES[item.gradeIdx].color);
@@ -1683,13 +2286,18 @@ function acquireItemWithChest(item, isChestModal = true) {
     SFX.play('success');
   }
 
+  // [A-1] 자동 진행 중에는 상자 모달을 절대 띄우지 않고 로그로만 일관 처리
   if (isChestModal && !autoPlay.enabled) {
     showChestModal(item);
   } else {
-    addLog(`🎁 획득: [${item.gradeName}] ${item.unidentified ? '미감정 ' + item.slotName : item.name}`);
+    const label = item.unidentified ? `미감정 ${item.slotName}` : item.name;
+    addLog(`🎁 획득: [${item.gradeName}] ${label}`);
+    setRecentSummary(`아이템 획득: [${item.gradeName}] ${label}`);
   }
-  saveGame();
+
   updateHUD();
+  refreshActiveTab();
+  saveGame();
 }
 
 function triggerScreenFlash(color) {
@@ -1700,6 +2308,7 @@ function triggerScreenFlash(color) {
 }
 
 function showChestModal(item) {
+  if (autoPlay.enabled) return;
   const overlay = document.getElementById('modal-overlay');
   const content = document.getElementById('modal-content');
   overlay.classList.add('show');
@@ -1712,7 +2321,12 @@ function showChestModal(item) {
   `;
 
   setTimeout(() => {
+    if (autoPlay.enabled) { closeModal(); return; }
     const titleStr = item.unidentified ? `❓ 미감정 ${item.slotName}` : `${item.icon} [${item.gradeName}] ${item.name}`;
+    const cmp = !item.unidentified ? getItemScoreDiff(item) : null;
+    const cmpHtml = cmp
+      ? `<div style="margin-top:4px;"><span class="cmp-badge ${cmp.diff > 0 ? 'cmp-up' : cmp.diff < 0 ? 'cmp-down' : 'cmp-same'}">장비점수 ${fmt(cmp.myScore)} (${cmp.diff > 0 ? '🔺 ▲+' + fmt(cmp.diff) : cmp.diff < 0 ? '▼' + fmt(cmp.diff) : '━ 0'})</span></div>`
+      : '';
     const optsHtml = item.unidentified
       ? `<div style="color:#ffd180; font-size:12px;">감정 시 숨겨진 등급과 옵션이 공개됩니다!</div>`
       : item.options.map(o => `<div style="font-size:11.5px;">• [T${o.tier}] ${o.name} +${o.val}${o.unit}</div>`).join('');
@@ -1722,6 +2336,7 @@ function showChestModal(item) {
         <div style="font-size:42px;">${item.icon}</div>
         <div class="${item.unidentified ? '' : item.gradeCls}" style="font-size:16px; font-weight:800;">${titleStr}</div>
         ${item.setName && !item.unidentified ? `<div style="font-size:11px; color:#4cd964;">세트: [${item.setName}]</div>` : ''}
+        ${cmpHtml}
       </div>
       <div class="card">
         <div style="font-size:12px; font-weight:700; margin-bottom:4px;">기본: ${item.baseStat.toUpperCase()} +${item.baseVal} (Lv.${item.lv})</div>
@@ -1752,7 +2367,6 @@ function nextTurnEvent() {
   if (state.flags.cursed > 0) state.flags.cursed--;
   if (state.flags.blessed > 0) state.flags.blessed--;
 
-  // 태양왕 4세트 재생
   const { stats, setCounts } = getTotalStats();
   if ((setCounts['solar'] || 0) >= 4) {
     state.hp = Math.min(stats.maxHp, state.hp + Math.floor(stats.maxHp * 0.07));
@@ -1760,7 +2374,6 @@ function nextTurnEvent() {
 
   document.getElementById('result-box').classList.remove('show');
 
-  // 배경 테마 업데이트
   const placeObj = PLACES[state.depth % PLACES.length];
   document.getElementById('stage-bg-deco').innerHTML = placeObj.decos.map(d => `<span>${d}</span>`).join('');
 
@@ -1789,8 +2402,7 @@ function nextTurnEvent() {
   saveGame();
 }
 
-function advanceNodeAndShowNext(resultHtml) {
-  // 퀘스트 진행도(노드 돌파)
+function advanceNodeAndShowNext(resultHtml, plainSummary = '') {
   if (state.quests && state.quests[1]) state.quests[1].prog++;
 
   state.nodeIdx++;
@@ -1799,6 +2411,13 @@ function advanceNodeAndShowNext(resultHtml) {
     if (state.depth > (state.records.maxDepth || 1)) state.records.maxDepth = state.depth;
     generateFloorNodes();
     addLog(`🔥 심연 ${state.depth}층으로 진입했습니다!`);
+  }
+
+  if (plainSummary) {
+    setRecentSummary(plainSummary);
+  } else {
+    const stripped = resultHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    setRecentSummary(stripped.slice(0, 48));
   }
 
   const rb = document.getElementById('result-box');
@@ -1812,6 +2431,7 @@ function advanceNodeAndShowNext(resultHtml) {
   `;
   renderMinimap();
   updateHUD();
+  refreshActiveTab();
   saveGame();
 }
 
@@ -2133,6 +2753,7 @@ function startCombat(tier, placeName) {
   document.getElementById('ev-title').textContent = `${currentEnemy.name} 조우!`;
   document.getElementById('ev-tag').textContent = tier === 'boss' ? '보스전' : '전투';
   document.getElementById('ev-text').textContent = `${placeName}에서 ${currentEnemy.name}이(가) 살기를 뿜으며 가로막습니다!`;
+  setRecentSummary(`${currentEnemy.name} 교전 시작!`);
 
   renderCombatChoices();
 }
@@ -2219,6 +2840,7 @@ function combatAction(act) {
   const { stats } = getTotalStats();
   const c = CLASSES[state.classKey];
   let logMsg = '';
+  let actionSummary = '';
 
   if (act === 'heal') {
     if (state.gold < 50) {
@@ -2233,6 +2855,7 @@ function combatAction(act) {
     SFX.play('success');
     playCombatAnim('enemy', `+${fmt(h)}`, '#4cd964');
     logMsg += `🧪 비약을 마셔 HP +${fmt(h)} 회복!<br>`;
+    actionSummary = `응급 비약 사용 (HP +${fmt(h)})`;
   } else {
     let mult = 1.0;
     let skillName = '기본 공격';
@@ -2241,7 +2864,6 @@ function combatAction(act) {
     } else {
       const skObj = c.skills.find(x => x.id === act);
       if (!skObj || state.mp < skObj.mp) {
-        // 마나 부족 시 평타로 자동 전환
         state.mp = Math.min(stats.maxMp, state.mp + 8);
       } else {
         state.mp -= skObj.mp;
@@ -2272,6 +2894,7 @@ function combatAction(act) {
 
     playCombatAnim('hero', `${isCrit ? '💥' : ''}-${fmt(dmg)}`, isCrit ? '#ffd180' : '#ffffff', isCrit);
     logMsg += `⚔️ <strong>[${skillName}]</strong> ${isCrit ? '치명타! ' : ''}<strong>${fmt(dmg)}</strong> 피해!<br>`;
+    actionSummary = `[${skillName}] ${currentEnemy.name}에게 ${fmt(dmg)} 피해!`;
   }
 
   if (currentEnemy.hp <= 0) {
@@ -2279,7 +2902,6 @@ function combatAction(act) {
     return;
   }
 
-  // 적 턴 행동
   if (currentEnemy.stunned) {
     logMsg += `💫 적이 기절하여 행동하지 못했습니다!`;
     currentEnemy.stunned = false;
@@ -2302,10 +2924,11 @@ function combatAction(act) {
     const lostGold = Math.floor(state.gold * 0.1);
     state.gold -= lostGold;
     currentEnemy = null;
-    advanceNodeAndShowNext(`${logMsg}<br><br>💀 쓰러졌으나 수호성의 가호로 즉시 부활했습니다! (골드 -${fmt(lostGold)})`);
+    advanceNodeAndShowNext(`${logMsg}<br><br>💀 쓰러졌으나 수호성의 가호로 즉시 부활했습니다! (골드 -${fmt(lostGold)})`, `부활 완료 (골드 -${fmt(lostGold)})`);
     return;
   }
 
+  setRecentSummary(actionSummary);
   const rb = document.getElementById('result-box');
   rb.innerHTML = logMsg;
   rb.classList.add('show');
@@ -2332,6 +2955,7 @@ function winCombat(logMsg) {
     state.dungeonTickets = Math.min(5, (state.dungeonTickets || 0) + 1);
   }
 
+  const eName = currentEnemy.name;
   gainExp(expGain);
 
   let dropHtml = '';
@@ -2343,14 +2967,19 @@ function winCombat(logMsg) {
     dropHtml = `<br>🎁 전리품: <span class="${itm.gradeCls}">[${itm.gradeName}] ${itm.unidentified ? '미감정 ' + itm.slotName : itm.name}</span>`;
   }
 
-  const eName = currentEnemy.name;
   currentEnemy = null;
   updateBattleStage('🏆', '전투 승리!', false);
-  advanceNodeAndShowNext(`${logMsg}🏆 <strong>${eName} 처치!</strong> (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)${isBoss ? '<br>💎 보스 처치 보상: 영혼석 & 던전 티켓 획득!' : ''}${dropHtml}`);
+  advanceNodeAndShowNext(
+    `${logMsg}🏆 <strong>${eName} 처치!</strong> (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)${isBoss ? '<br>💎 보스 처치 보상: 영혼석 & 던전 티켓 획득!' : ''}${dropHtml}`,
+    `🏆 ${eName} 처치! (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)`
+  );
 }
 
 function gainExp(amount) {
+  const prevLv = state.lv;
   state.exp += amount;
+  let leveledUp = false;
+
   while (state.exp >= state.reqExp) {
     state.exp -= state.reqExp;
     state.lv++;
@@ -2359,8 +2988,21 @@ function gainExp(amount) {
     const { stats } = getTotalStats();
     state.hp = stats.maxHp;
     state.mp = stats.maxMp;
+    leveledUp = true;
     SFX.play('legend');
     addLog(`🎉 레벨 업! Lv.${state.lv} 달성! (스탯 포인트 +4)`);
+  }
+
+  if (leveledUp) {
+    const c = CLASSES[state.classKey];
+    const nextPromo = c.promotions[state.jobTier];
+    const promoJustUnlocked = nextPromo && prevLv < nextPromo.reqLv && state.lv >= nextPromo.reqLv;
+
+    if (promoJustUnlocked && state.settings && state.settings.pauseOnPromo && autoPlay.enabled) {
+      pauseAutoPlay(`${nextPromo.tier}차 전직 가능 레벨(Lv.${nextPromo.reqLv}) 도달로 일시정지!`);
+    } else if (state.settings && state.settings.pauseOnLvUp && autoPlay.enabled) {
+      pauseAutoPlay(`Lv.${state.lv} 달성으로 자동 진행 일시정지!`);
+    }
   }
 }
 
@@ -2369,11 +3011,11 @@ function addLog(msg) {
   const div = document.createElement('div');
   div.innerHTML = msg;
   lb.prepend(div);
-  while (lb.children.length > 25) lb.removeChild(lb.lastChild);
+  while (lb.children.length > 30) lb.removeChild(lb.lastChild);
 }
 
 // =========================================================================
-// 탭 UI 렌더링 (캐릭터/전직, 인벤토리/합성, 스킬/환생, 던전/상점, 도감/업적)
+// 탭 UI 렌더링 (캐릭터/전직, 인벤토리/합성, 스킬/환생, 던전/상점, 도감/설정)
 // =========================================================================
 function updateHUD() {
   if (!state) return;
@@ -2386,6 +3028,7 @@ function updateHUD() {
   document.getElementById('hud-lv').textContent = `Lv.${state.lv}`;
   document.getElementById('hud-title').textContent = promo.title;
   document.getElementById('hud-tier').textContent = `${state.jobTier}차`;
+  document.getElementById('hud-cp').textContent = `⚡ ${fmt(calcCombatPower())}`;
   document.getElementById('hud-depth').textContent = `${state.ngPlus > 0 ? 'NG+' + state.ngPlus + ' ' : ''}심연 ${state.depth}층`;
 
   document.getElementById('hud-hp-bar').style.width = `${(state.hp / stats.maxHp) * 100}%`;
@@ -2405,11 +3048,32 @@ function updateHUD() {
   if (state.flags.companion)   flagsTxt += `🛡️용병`;
   document.getElementById('hud-status-flags').textContent = flagsTxt;
 
-  // 전직 가능 알림 도트
+  // [A-2] 업그레이드 가능한 슬롯 수 계산 및 3곳의 일괄장착 버튼 뱃지 동기화
+  const upgrades = getUpgradeableSlots();
+  const upgCnt = upgrades.length;
+  const equipLabel = upgCnt > 0 ? `⬆️ 일괄장착(${upgCnt}🔺)` : `⬆️ 일괄장착`;
+
+  const stripEqBtn = document.getElementById('strip-btn-equip');
+  if (stripEqBtn) {
+    stripEqBtn.textContent = equipLabel;
+    stripEqBtn.classList.toggle('upgrade-ready', upgCnt > 0);
+  }
+  const mapEqBtn = document.getElementById('btn-map-equip');
+  if (mapEqBtn) {
+    mapEqBtn.textContent = equipLabel;
+  }
+  const invEqBtn = document.getElementById('btn-inv-equip');
+  if (invEqBtn) {
+    invEqBtn.textContent = upgCnt > 0 ? `⬆️ 더 좋은 장비 일괄 장착 (${upgCnt}개 발견 🔺)` : `⬆️ 더 좋은 장비 일괄 장착`;
+  }
+
   const nextPromo = c.promotions[state.jobTier];
   const canPromote = nextPromo && state.lv >= nextPromo.reqLv;
-  document.getElementById('dot-char').classList.toggle('show', state.statPts > 0 || canPromote);
+  document.getElementById('dot-char').classList.toggle('show', state.statPts > 0 || canPromote || upgCnt > 0);
+  document.getElementById('dot-inv').classList.toggle('show', upgCnt > 0);
   document.getElementById('dot-skill').classList.toggle('show', state.lv >= 20 || state.depth >= 15);
+
+  updateAutoStrip();
 }
 
 function switchTab(tabId, btn) {
@@ -2420,16 +3084,13 @@ function switchTab(tabId, btn) {
   if (btn) btn.classList.add('active');
 
   if (tabId === 'char') renderCharTab();
-  if (tabId === 'inv') {
-    document.getElementById('dot-inv').classList.remove('show');
-    renderInvTab();
-  }
+  if (tabId === 'inv') renderInvTab();
   if (tabId === 'skill') renderSkillTab();
   if (tabId === 'shop') renderShopTab();
   if (tabId === 'codex') renderCodexTab();
 }
 
-// 캐릭터 & 전직 탭
+// 캐릭터 & 전직 탭 (업그레이드 가능 슬롯 🔺 표시 포함)
 function renderCharTab() {
   const { stats, setCounts, promo } = getTotalStats();
   const c = CLASSES[state.classKey];
@@ -2438,7 +3099,7 @@ function renderCharTab() {
   const nextPromo = c.promotions[state.jobTier];
   const promoBox = document.getElementById('promotion-box');
   if (!nextPromo) {
-    promoBox.innerHTML = `<div style="font-size:12px; color:#00f5d4; font-weight:700;">🌟 최종 5차 신화 전직을 모두 달성했습니다! (모든 능력치 극대화)</div>`;
+    promoBox.innerHTML = `<div style="font-size:12px; color:#00f5d4; font-weight:700;">🌟 최종 5차 신화 전직을 모두 달성했습니다!</div>`;
   } else {
     const canP = state.lv >= nextPromo.reqLv;
     promoBox.innerHTML = `
@@ -2483,10 +3144,21 @@ function renderCharTab() {
   });
   document.getElementById('active-sets-box').innerHTML = setHtml || '<span style="color:#777">장착 중인 세트 효과 없음</span>';
 
+  const upgMap = {};
+  getUpgradeableSlots().forEach(u => { upgMap[u.slot.id] = u; });
+
   document.getElementById('equipped-grid').innerHTML = SLOTS.map(sl => {
     const itm = state.equipped[sl.id];
-    if (!itm) return `<div class="item-row" style="opacity:0.45;"><span>${sl.icon} ${sl.name}: 비어있음</span></div>`;
-    return `<div class="item-row" onclick="openItemDetail('${itm.uid}', true)"><span class="${itm.gradeCls}">${itm.icon} ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''}</span></div>`;
+    const hasUpg = upgMap[sl.id];
+    const upgMarker = hasUpg ? `<span title="인벤토리에 +${hasUpg.diff}점 상위 장비 보유">🔺</span>` : '';
+    if (!itm) {
+      return `<div class="item-row" style="opacity:${hasUpg ? '1' : '0.45'}; border-color:${hasUpg ? 'var(--accent-gold)' : '#33293a'};" onclick="${hasUpg ? 'batchEquipBest(true)' : ''}"><span>${sl.icon} ${sl.name}: 비어있음 ${upgMarker}</span></div>`;
+    }
+    return `
+      <div class="item-row" style="${hasUpg ? 'border-color:var(--accent-gold);' : ''}" onclick="openItemDetail('${itm.uid}', true)">
+        <span class="${itm.gradeCls}">${itm.icon} ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''} ${upgMarker}</span>
+      </div>
+    `;
   }).join('');
 }
 
@@ -2498,6 +3170,7 @@ function promoteJob() {
   triggerScreenFlash('#00f5d4');
   SFX.play('legend');
   addLog(`👑 축하합니다! ${state.jobTier}차 전직 [${nextPromo.title}] 달성!`);
+  setRecentSummary(`${state.jobTier}차 전직 [${nextPromo.title}] 달성!`);
   updateHUD();
   renderCharTab();
   saveGame();
@@ -2513,7 +3186,7 @@ function investStat(k) {
   saveGame();
 }
 
-// 인벤토리 & 동일등급 3개 합성
+// [A-2] 인벤토리 렌더링 (장비 점수 및 ▲+120 / ▼-30 비교 뱃지 표시)
 function renderInvTab() {
   document.getElementById('inv-count').textContent = state.inventory.length;
   const list = document.getElementById('inv-list');
@@ -2521,16 +3194,38 @@ function renderInvTab() {
     list.innerHTML = `<div class="card" style="text-align:center; color:#777;">보유 중인 장비가 없습니다.</div>`;
     return;
   }
+
   list.innerHTML = state.inventory.map(itm => {
-    const title = itm.unidentified
-      ? `<span style="color:#ffd180">❓ 미감정 ${itm.slotName} (Lv.${itm.lv})</span>`
-      : `<span class="${itm.gradeCls}">${itm.icon} [${itm.gradeName}] ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''}</span>`;
+    if (itm.unidentified) {
+      return `
+        <div class="item-row" onclick="openItemDetail('${itm.uid}', false)">
+          <div>
+            <div style="font-weight:700; color:#ffd180;">❓ 미감정 ${itm.slotName} (Lv.${itm.lv})</div>
+            <div style="font-size:10.5px; color:var(--text-muted);">클릭하여 감정하기</div>
+          </div>
+          <span class="btn-sm">감정</span>
+        </div>
+      `;
+    }
+
+    const cmp = getItemScoreDiff(itm);
+    let badgeHtml = '';
+    if (cmp) {
+      if (cmp.diff > 0) badgeHtml = `<span class="cmp-badge cmp-up">🔺 ▲+${fmt(cmp.diff)}</span>`;
+      else if (cmp.diff < 0) badgeHtml = `<span class="cmp-badge cmp-down">▼${fmt(cmp.diff)}</span>`;
+      else badgeHtml = `<span class="cmp-badge cmp-same">━ 0</span>`;
+    }
+
+    const effBase = Math.floor(itm.baseVal * (1 + (itm.enhance || 0) * 0.12));
     return `
-      <div class="item-row" onclick="openItemDetail('${itm.uid}', false)">
+      <div class="item-row" style="${cmp && cmp.diff > 0 ? 'border-color:rgba(76,217,100,0.5);' : ''}" onclick="openItemDetail('${itm.uid}', false)">
         <div>
-          <div style="font-weight:700;">${title}</div>
+          <div style="font-weight:700;">
+            <span class="${itm.gradeCls}">${itm.icon} [${itm.gradeName}] ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''}</span>
+            ${badgeHtml}
+          </div>
           <div style="font-size:10.5px; color:var(--text-muted);">
-            ${itm.unidentified ? '클릭하여 감정하기' : `기본 ${itm.baseStat.toUpperCase()} +${Math.floor(itm.baseVal * (1 + (itm.enhance || 0) * 0.12))} | 옵션 ${itm.options.length}줄`}
+            [${itm.slotName}] 점수 ${fmt(cmp ? cmp.myScore : 0)} | 기본 ${itm.baseStat.toUpperCase()} +${effBase} | 옵션 ${itm.options.length}줄
           </div>
         </div>
         <span class="btn-sm">관리</span>
@@ -2599,6 +3294,8 @@ function openItemDetail(uid, isEquipped) {
   const enhCost = Math.floor((35 + item.lv * 12) * Math.pow(1.35, enh) * discount);
   const enhProb = enh < 5 ? 90 - enh * 5 : enh < 10 ? 60 - (enh - 5) * 4 : Math.max(15, 32 - (enh - 10) * 3);
   const rerollCost = 5 + item.gradeIdx * 3;
+  const sc = calcItemScore(item);
+  const cmp = !isEquipped ? getItemScoreDiff(item) : null;
 
   const optsHtml = item.options.map(o => `
     <div style="font-size:11.5px; padding:1px 0;">• <strong style="color:#e6c88a">[T${o.tier}]</strong> ${o.name} <strong>+${o.val}${o.unit}</strong> <span style="color:#777">(${o.min}~${o.max}${o.unit})</span></div>
@@ -2606,8 +3303,14 @@ function openItemDetail(uid, isEquipped) {
 
   content.innerHTML = `
     <div>
-      <div class="${item.gradeCls}" style="font-size:15px; font-weight:800;">${item.icon} [${item.gradeName}] ${item.name} ${enh ? '+' + enh : ''}</div>
-      <div style="font-size:11px; color:var(--text-muted);">슬롯: ${item.slotName} (Lv.${item.lv}) ${item.setName ? `| <span style="color:#4cd964">세트: ${item.setName}</span>` : ''}</div>
+      <div class="${item.gradeCls}" style="font-size:15px; font-weight:800;">
+        ${item.icon} [${item.gradeName}] ${item.name} ${enh ? '+' + enh : ''}
+      </div>
+      <div style="font-size:11px; color:var(--text-muted);">
+        슬롯: ${item.slotName} (Lv.${item.lv}) | 장비점수: <strong style="color:var(--border-bright)">${fmt(sc)}</strong>
+        ${cmp ? `<span class="cmp-badge ${cmp.diff > 0 ? 'cmp-up' : cmp.diff < 0 ? 'cmp-down' : 'cmp-same'}">${cmp.diff > 0 ? '▲+' + fmt(cmp.diff) : cmp.diff < 0 ? '▼' + fmt(cmp.diff) : '━ 0'}</span>` : ''}
+        ${item.setName ? `<br><span style="color:#4cd964">세트: ${item.setName}</span>` : ''}
+      </div>
     </div>
     <div class="card">
       <div style="font-size:12px; font-weight:700; margin-bottom:4px;">기본: ${item.baseStat.toUpperCase()} +${curBase}</div>
@@ -2740,7 +3443,6 @@ function renderSkillTab() {
     `;
   }).join('');
 
-  // 환생 계산
   document.getElementById('ng-plus-txt').textContent = state.ngPlus || 0;
   document.getElementById('soul-stone-txt').textContent = fmt(state.soulStones);
   const canPrestige = state.lv >= 20 || state.depth >= 15;
@@ -2796,6 +3498,7 @@ function doPrestige(soulGain) {
   state.hp = stats.maxHp;
   state.mp = stats.maxMp;
   addLog(`🌌 [NG+${state.ngPlus}] 차원 환생 완료! 영혼석 +${soulGain}개 및 보너스 스탯을 획득했습니다!`);
+  setRecentSummary(`NG+${state.ngPlus} 차원 환생 완료! (💎+${soulGain})`);
   updateHUD();
   renderSkillTab();
   saveGame();
@@ -2928,11 +3631,30 @@ function buyMysteryBox(minGrade, cost) {
   renderShopTab();
 }
 
-// 도감 & 업적 탭
+// =========================================================================
+// 도감 / 업적 / 설정 탭 (A-1 & A-2 토글 제어 포함)
+// =========================================================================
 function renderCodexTab() {
   const { codexBonus, achBonus } = getTotalStats();
   document.getElementById('ach-bonus-txt').textContent = `영구 공격력 +${achBonus}%`;
   document.getElementById('codex-bonus-txt').textContent = `영구 공격력 +${codexBonus}%`;
+
+  // 설정 UI 상태 반영
+  const st = state.settings || {};
+  const bindBtn = (id, flag) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = flag ? 'ON' : 'OFF';
+    el.style.borderColor = flag ? '#4cd964' : 'var(--border-bright)';
+    el.style.color = flag ? '#69f0ae' : 'var(--text-main)';
+  };
+  bindBtn('set-auto-equip', st.autoEquipOnDrop);
+  bindBtn('set-pause-lv', st.pauseOnLvUp);
+  bindBtn('set-pause-promo', st.pauseOnPromo);
+  bindBtn('set-pause-unique', st.pauseOnUnique);
+
+  const salvageSel = document.getElementById('set-auto-salvage');
+  if (salvageSel) salvageSel.value = String(st.autoSalvageGradeIdx !== undefined ? st.autoSalvageGradeIdx : -1);
 
   document.getElementById('achievement-list').innerHTML = ACHIEVEMENTS.map(a => {
     const cur = state.records[a.key] || 0;
@@ -2957,9 +3679,26 @@ function renderCodexTab() {
   `;
 }
 
+function toggleSetting(key) {
+  SFX.play('click');
+  if (!state.settings) state.settings = {};
+  state.settings[key] = !state.settings[key];
+  renderCodexTab();
+  saveGame();
+}
+
+function changeAutoSalvage(val) {
+  SFX.play('click');
+  if (!state.settings) state.settings = {};
+  state.settings.autoSalvageGradeIdx = parseInt(val, 10);
+  saveGame();
+}
+
 function toggleSound() {
   SFX.enabled = !SFX.enabled;
+  if (state && state.settings) state.settings.sound = SFX.enabled;
   document.getElementById('btn-sound').textContent = SFX.enabled ? '🔊 효과음: 켜짐' : '🔇 효과음: 꺼짐';
+  saveGame();
 }
 
 function exportSave() {
@@ -3011,6 +3750,7 @@ function startNewGame(classKey) {
 
   closeModal();
   addLog(`🚩 [${CLASSES[classKey].name}] 클래스로 심연 원정을 시작합니다!`);
+  setRecentSummary(`[${CLASSES[classKey].name}] 클래스로 원정 개시!`);
   updateHUD();
   nextTurnEvent();
 }
@@ -3044,6 +3784,8 @@ function checkOfflineReward() {
 
 window.addEventListener('DOMContentLoaded', () => {
   if (loadGame()) {
+    document.getElementById('btn-sound').textContent = SFX.enabled ? '🔊 효과음: 켜짐' : '🔇 효과음: 꺼짐';
+    syncAutoButtonsUI();
     updateHUD();
     checkOfflineReward();
     nextTurnEvent();
