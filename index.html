@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>심연의 연대기 v3.0 : 운명의 대개편</title>
+<title>심연의 연대기 v4.0 : 쾌적함 &amp; 비주얼 대개편</title>
 <style>
   :root {
     --bg-dark: #0b090d;
@@ -68,11 +68,42 @@
     transition: opacity 0.55s ease-out;
   }
 
+  /* [1-5] 하단 토스트 알림 (alert 완전 대체) */
+  #toast-container {
+    position: absolute;
+    bottom: 62px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 950;
+    pointer-events: none;
+  }
+  .toast-item {
+    background: rgba(24, 19, 30, 0.96);
+    border: 1px solid var(--border-bright);
+    color: #fff3d6;
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.85);
+    animation: toastIn 0.2s ease-out;
+  }
+  .toast-item.warn { border-color: #ff5252; color: #ffb8b8; }
+  .toast-item.good { border-color: #4cd964; color: #c8f7c5; }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* 상단 HUD */
   .top-hud {
     background: linear-gradient(180deg, #1b1520 0%, #110d14 100%);
     border-bottom: 1px solid var(--border-gold);
-    padding: 7px 10px;
+    padding: 6px 10px;
     flex-shrink: 0;
     box-shadow: 0 3px 10px rgba(0,0,0,0.65);
   }
@@ -82,13 +113,13 @@
     justify-content: space-between;
     align-items: center;
     font-size: 12px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
 
   .char-badge {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     font-weight: 700;
     color: var(--border-bright);
   }
@@ -107,7 +138,7 @@
     border: 1px solid #6b4c9a;
     color: #dcb8ff;
     font-size: 10px;
-    padding: 1px 6px;
+    padding: 1px 5px;
     border-radius: 4px;
     font-weight: 700;
   }
@@ -115,7 +146,7 @@
   .depth-badge {
     background: #281e30;
     border: 1px solid var(--border-gold);
-    padding: 2px 8px;
+    padding: 2px 7px;
     border-radius: 10px;
     font-size: 11px;
     color: #f0d290;
@@ -159,13 +190,13 @@
     justify-content: space-between;
     align-items: center;
     font-size: 11px;
-    margin-top: 4px;
+    margin-top: 3px;
     color: var(--text-muted);
   }
 
   .currency-group {
     display: flex;
-    gap: 8px;
+    gap: 7px;
     font-weight: 700;
   }
   .gold-txt { color: var(--accent-gold); }
@@ -173,7 +204,7 @@
   .soul-txt { color: var(--accent-soul); }
   .rep-txt { color: #82e0aa; }
 
-  /* [A-1] 전 탭 상시 표시 자동 진행 미니 스트립 */
+  /* 전 탭 상시 표시 자동 진행 미니 스트립 + 원클릭 정비 */
   .auto-mini-strip {
     background: linear-gradient(90deg, #141b18 0%, #1a1522 100%);
     border-bottom: 2px solid var(--border-gold);
@@ -181,7 +212,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     flex-shrink: 0;
     cursor: pointer;
     transition: background 0.2s;
@@ -203,7 +234,7 @@
     color: #a8e6cf;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
   }
   .strip-sub-line {
     font-size: 10.5px;
@@ -214,16 +245,16 @@
   }
   .strip-actions {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     flex-shrink: 0;
   }
   .strip-btn {
     background: #282030;
     border: 1px solid var(--border-gold);
     color: var(--text-main);
-    padding: 4px 7px;
+    padding: 4px 6px;
     border-radius: 4px;
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
@@ -232,6 +263,11 @@
     background: #1e4628;
     border-color: #4cd964;
     color: #eaffea;
+  }
+  .strip-btn.maint-btn {
+    background: linear-gradient(180deg, #273c4d 0%, #172530 100%);
+    border-color: #5ca4ff;
+    color: #bfe0ff;
   }
   .strip-btn.upgrade-ready {
     background: linear-gradient(180deg, #4a3319 0%, #2e1f0f 100%);
@@ -262,7 +298,7 @@
   }
   .tab-panel.active { display: flex; }
 
-  /* 1. 미니맵 & 오토 컨트롤 바 */
+  /* 미니맵 & 오토 컨트롤 바 */
   .minimap-card {
     background: #151118;
     border: 1px solid #3b2e42;
@@ -289,14 +325,14 @@
   }
 
   .map-node {
-    height: 25px;
+    height: 24px;
     border-radius: 4px;
     background: #1f1924;
     border: 1px solid #352a3d;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11.5px;
     position: relative;
     transition: transform 0.2s, border-color 0.2s;
   }
@@ -318,8 +354,9 @@
 
   .auto-bar {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .auto-btn {
@@ -327,15 +364,15 @@
     background: #211a26;
     border: 1px solid #483852;
     color: var(--text-main);
-    padding: 5px 5px;
+    padding: 5px 4px;
     border-radius: 5px;
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 2px;
     white-space: nowrap;
   }
   .auto-btn.active {
@@ -345,9 +382,9 @@
     box-shadow: 0 0 8px rgba(76, 217, 100, 0.35);
   }
 
-  /* 2. 비주얼 전투씬 & 이벤트 스테이지 */
+  /* 비주얼 전투씬 & 이벤트 스테이지 */
   .battle-stage {
-    height: 122px;
+    height: 116px;
     border-radius: 8px;
     border: 1px solid var(--border-gold);
     background: linear-gradient(180deg, #140f1d 0%, #231829 65%, #19131c 100%);
@@ -367,7 +404,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    font-size: 44px;
+    font-size: 42px;
     opacity: 0.08;
     pointer-events: none;
   }
@@ -377,7 +414,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 20px;
+    height: 18px;
     background: linear-gradient(180deg, #2b212e 0%, #120e14 100%);
     border-top: 1px solid #4a3931;
   }
@@ -394,12 +431,12 @@
 
   .unit-sprite-wrap {
     position: relative;
-    width: 54px;
-    height: 54px;
+    width: 52px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 34px;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
   }
 
@@ -424,7 +461,7 @@
     position: absolute;
     bottom: 0;
     right: -4px;
-    font-size: 19px;
+    font-size: 18px;
     transform: rotate(-15deg);
   }
 
@@ -432,7 +469,7 @@
     position: absolute;
     bottom: 2px;
     left: -18px;
-    font-size: 19px;
+    font-size: 18px;
     filter: drop-shadow(0 2px 3px #000);
   }
 
@@ -459,7 +496,7 @@
 
   .intent-bubble {
     position: absolute;
-    top: -16px;
+    top: -15px;
     background: rgba(40, 12, 16, 0.92);
     border: 1px solid #cc4444;
     color: #ffd180;
@@ -527,7 +564,7 @@
     font-size: 12.5px;
     line-height: 1.45;
     color: var(--text-main);
-    min-height: 34px;
+    min-height: 32px;
   }
 
   .result-box {
@@ -590,7 +627,7 @@
     border: 1px solid #2b2230;
     border-radius: 5px;
     padding: 5px 8px;
-    max-height: 54px;
+    max-height: 52px;
     overflow-y: auto;
     font-size: 10.5px;
     color: var(--text-muted);
@@ -616,6 +653,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 6px;
   }
 
   .stat-grid {
@@ -635,18 +673,47 @@
     font-size: 11.5px;
   }
 
+  .stat-row-full {
+    background: #151119;
+    border: 1px solid #2e2536;
+    border-radius: 5px;
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    gap: 6px;
+  }
+
+  .btn-group-mini {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+
   .btn-sm {
     background: #3a2c1e;
     border: 1px solid var(--border-bright);
     color: var(--text-main);
-    padding: 4px 8px;
+    padding: 4px 7px;
     border-radius: 4px;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
   }
   .btn-sm:disabled { opacity: 0.35; cursor: default; }
+  .btn-sm.on {
+    background: #1e4229;
+    border-color: #4cd964;
+    color: #b8ffcb;
+  }
+  .btn-sm.confirm-armed {
+    background: #7a1c1c !important;
+    border-color: #ff5252 !important;
+    color: #fff !important;
+    animation: pulseBorder 0.7s infinite alternate;
+  }
 
   .equip-grid {
     display: grid;
@@ -664,9 +731,22 @@
     align-items: center;
     cursor: pointer;
     font-size: 11.5px;
+    gap: 6px;
   }
 
-  /* [A-2] 장비 점수 비교 뱃지 */
+  .lock-btn {
+    background: #231c29;
+    border: 1px solid #483a54;
+    border-radius: 4px;
+    padding: 3px 5px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .lock-btn.locked {
+    background: #3b2a14;
+    border-color: var(--accent-gold);
+  }
+
   .cmp-badge {
     font-size: 10px;
     font-weight: 800;
@@ -691,7 +771,6 @@
     color: #aaa;
   }
 
-  /* 7등급 색상 */
   .g-common { color: var(--g-common); }
   .g-uncommon { color: var(--g-uncommon); }
   .g-rare { color: var(--g-rare); }
@@ -708,18 +787,18 @@
     100% { filter: drop-shadow(0 0 7px #ff007f); }
   }
 
-  /* 설정 스위치 행 */
   .setting-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 0;
+    padding: 5px 0;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     font-size: 11.5px;
+    gap: 8px;
   }
   .setting-row:last-child { border-bottom: none; }
 
-  .select-dark {
+  .select-dark, .input-dark {
     background: #151119;
     color: var(--text-main);
     border: 1px solid var(--border-bright);
@@ -728,6 +807,7 @@
     font-size: 11px;
     font-weight: 700;
   }
+  .input-dark { width: 58px; text-align: center; }
 
   /* 하단 탭바 */
   .bottom-nav {
@@ -810,6 +890,7 @@
 
 <div id="app">
   <div id="screen-flash"></div>
+  <div id="toast-container"></div>
 
   <!-- 상단 상태바 -->
   <header class="top-hud">
@@ -819,7 +900,7 @@
         <span id="hud-lv">Lv.1</span>
         <span id="hud-title">강철의 검투사</span>
         <span class="tier-pill" id="hud-tier">1차</span>
-        <span class="cp-pill" id="hud-cp">전투력 0</span>
+        <span class="cp-pill" id="hud-cp">⚡ 0</span>
       </div>
       <div class="depth-badge" id="hud-depth">심연 1층</div>
     </div>
@@ -850,27 +931,27 @@
     </div>
   </header>
 
-  <!-- [A-1] 어느 탭에서든 항상 표시되는 자동 진행 미니 스트립 -->
+  <!-- [A-1 & 1-1] 전 탭 상시 표시 자동 진행 미니 스트립 + 원클릭 정비 -->
   <div class="auto-mini-strip" id="auto-mini-strip" onclick="jumpToAdventureTab()">
     <div class="strip-info">
       <div class="strip-top-line">
-        <span id="strip-status-txt">⏸️ 수동 탐색 중</span>
+        <span id="strip-status-txt">⏸️ 수동 진행</span>
         <span>|</span>
         <span id="strip-floor-txt" style="color:var(--border-bright);">심연 1층 1/10</span>
       </div>
       <div class="strip-sub-line" id="strip-recent-txt">방금: 심연 원정을 시작했습니다.</div>
     </div>
     <div class="strip-actions" onclick="event.stopPropagation();">
-      <button class="strip-btn" id="strip-btn-equip" onclick="batchEquipBest(true)">⬆️ 일괄장착</button>
-      <button class="strip-btn" id="strip-btn-pause" onclick="toggleAutoPlay()">▶️ 자동시작</button>
+      <button class="strip-btn maint-btn" onclick="runOneClickMaintenance(true)">🧰 정비</button>
+      <button class="strip-btn" id="strip-btn-equip" onclick="batchEquipBest(true)">⬆️ 장착</button>
+      <button class="strip-btn" id="strip-btn-pause" onclick="toggleAutoPlay()">▶️ 자동</button>
     </div>
   </div>
 
   <!-- 메인 컨텐츠 뷰 -->
   <main class="main-view">
-    <!-- 1. 모험 탭 (미니맵 + 오토바 + 전투씬 + 선택지) -->
+    <!-- 1. 모험 탭 -->
     <section id="tab-adventure" class="tab-panel active">
-      <!-- 미니맵 & 자동 진행 컨트롤 -->
       <div class="minimap-card">
         <div class="minimap-top">
           <span style="font-weight:700; color:var(--border-bright);" id="map-floor-label">🗺️ 심연 1층 탐사 경로 (1/10)</span>
@@ -879,9 +960,10 @@
         <div class="node-track" id="node-track"></div>
         <div class="auto-bar">
           <button class="auto-btn" id="btn-auto-toggle" onclick="toggleAutoPlay()">🤖 자동: OFF</button>
-          <button class="auto-btn" id="btn-auto-speed" onclick="cycleAutoSpeed()" style="flex:0.45;">⚡ 1x</button>
-          <button class="auto-btn" id="btn-auto-mode" onclick="cycleAutoMode()" style="flex:0.75;">🎯 균형</button>
-          <button class="auto-btn" id="btn-map-equip" onclick="batchEquipBest(true)" style="flex:0.95; border-color:var(--border-bright); color:var(--accent-gold);">⬆️ 일괄장착</button>
+          <button class="auto-btn" id="btn-auto-speed" onclick="cycleAutoSpeed()" style="flex:0.42;">⚡ 1x</button>
+          <button class="auto-btn" id="btn-auto-mode" onclick="cycleAutoMode()" style="flex:0.62;">🎯 균형</button>
+          <button class="auto-btn" id="btn-manual-advance" onclick="toggleManualAutoAdvance()" style="flex:0.78;">⏩ 자동전진:OFF</button>
+          <button class="auto-btn" style="flex:0.88; border-color:#5ca4ff; color:#bfe0ff;" onclick="runOneClickMaintenance(true)">🧰 원클릭 정비</button>
         </div>
       </div>
 
@@ -890,7 +972,6 @@
         <div class="stage-bg-deco" id="stage-bg-deco"><span>🏛️</span><span>🕯️</span><span>🕸️</span></div>
         <div class="stage-floor"></div>
 
-        <!-- 아군 유닛 -->
         <div class="unit-box" id="hero-unit">
           <div class="unit-sprite-wrap">
             <div class="aura-ring" id="hero-aura"></div>
@@ -902,7 +983,6 @@
           <div class="unit-mini-hp"><div class="bar-fill bar-hp" id="hero-stage-hp" style="width:100%"></div></div>
         </div>
 
-        <!-- 적군 또는 이벤트 오브젝트 유닛 -->
         <div class="unit-box" id="target-unit">
           <div class="intent-bubble" id="stage-intent" style="display:none;">⚠️ 공격 준비</div>
           <div class="unit-sprite-wrap">
@@ -915,7 +995,6 @@
         </div>
       </div>
 
-      <!-- 상황 및 결과 카드 -->
       <div class="story-card">
         <div class="event-header">
           <div style="font-size:13px; font-weight:700;" id="ev-title">모험의 시작</div>
@@ -925,14 +1004,11 @@
         <div class="result-box" id="result-box"></div>
       </div>
 
-      <!-- 선택지 버튼 영역 -->
       <div class="choices-wrap" id="choices-wrap"></div>
-
-      <!-- 로그 창 -->
       <div class="log-box" id="log-box"></div>
     </section>
 
-    <!-- 2. 캐릭터 & 전직 탭 -->
+    <!-- 2. 캐릭터 & 스탯 배분 & 전체 일괄 강화 탭 -->
     <section id="tab-char" class="tab-panel">
       <div class="card">
         <div class="section-title">
@@ -942,40 +1018,57 @@
         <div id="promotion-box"></div>
       </div>
 
+      <!-- [1-3] 스탯 자동 배분 & 길게 누르기 카드 -->
       <div class="card">
         <div class="section-title">
-          <span>기본 능력치 배분</span>
-          <span>남은 포인트: <strong style="color:var(--accent-gold)" id="stat-pts">0</strong></span>
+          <span>📊 능력치 배분 (길게 눌러 연속 투자)</span>
+          <span>포인트: <strong style="color:var(--accent-gold)" id="stat-pts">0</strong></span>
         </div>
-        <div class="stat-grid" id="stat-grid"></div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:7px; align-items:center;">
+          <button class="btn-sm" style="background:#1f3829; border-color:#4cd964;" onclick="applyStatPreset(false)">🎯 비율 즉시배분</button>
+          <button class="btn-sm" onclick="openStatRatioModal()">⚙️ 프리셋/비율 설정</button>
+          <button class="btn-sm" id="btn-auto-stat" onclick="toggleSetting('autoStatOnLvUp')">레벨업 자동배분: OFF</button>
+          <button class="btn-sm" id="btn-reset-stats" style="border-color:#c93b3b; color:#ff9999;" onclick="resetStatsWithConfirm()">🔄 초기화</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px;" id="stat-grid"></div>
       </div>
 
       <div class="card">
-        <div class="section-title">전투 상세 스탯 & 세트 효과</div>
+        <div class="section-title">전투 상세 스탯 &amp; 세트 효과</div>
         <div class="stat-grid" id="combat-stat-grid"></div>
         <div id="active-sets-box" style="margin-top:6px; font-size:11.5px; color:#82e0aa;"></div>
       </div>
 
+      <!-- [1-4] 장착 장비 & 전체 장비 일괄 강화 -->
       <div class="card">
         <div class="section-title">
-          <span>장착 중인 장비 (🔺표시는 인벤에 상위 장비 보유)</span>
-          <button class="btn-sm" onclick="batchEquipBest(true)">⬆️ 일괄 장착</button>
+          <span>🛡️ 장착 장비</span>
+          <div class="btn-group-mini">
+            <button class="btn-sm" style="background:#3d2b18; border-color:var(--accent-gold);" onclick="batchEnhanceEquipped()">🔨 전체 일괄강화</button>
+            <button class="btn-sm" onclick="batchEquipBest(true)">⬆️ 일괄장착</button>
+          </div>
         </div>
         <div class="equip-grid" id="equipped-grid"></div>
       </div>
     </section>
 
-    <!-- 3. 인벤토리 & 합성 탭 -->
+    <!-- 3. 인벤토리 & 스마트 분해 규칙 탭 -->
     <section id="tab-inv" class="tab-panel">
       <div class="card" style="display:flex; flex-direction:column; gap:6px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:12px; font-weight:700;">보유 장비 (<span id="inv-count">0</span>/35)</span>
-          <button class="btn-sm" id="btn-inv-equip" style="background:linear-gradient(90deg,#4a3319,#2e1f0f); border-color:var(--accent-gold); color:#ffe28a;" onclick="batchEquipBest(true)">⬆️ 더 좋은 장비 일괄 장착</button>
+          <div class="btn-group-mini">
+            <button class="btn-sm" style="background:#273c4d; border-color:#5ca4ff; color:#bfe0ff;" onclick="runOneClickMaintenance(true)">🧰 원클릭 정비</button>
+            <button class="btn-sm" id="btn-inv-equip" style="background:linear-gradient(90deg,#4a3319,#2e1f0f); border-color:var(--accent-gold); color:#ffe28a;" onclick="batchEquipBest(true)">⬆️ 일괄장착</button>
+          </div>
         </div>
-        <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
-          <button class="btn-sm" style="background:#263849; border-color:#5ca4ff;" onclick="synthesizeAll()">⚗️ 동일등급 3개 합성</button>
-          <button class="btn-sm" onclick="salvageBelow('rare')">희귀↓ 분해</button>
-          <button class="btn-sm" onclick="salvageBelow('epic')">영웅↓ 분해</button>
+        <!-- [1-2] 스마트 분해 미리보기 & 합성 컨트롤 -->
+        <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:space-between; align-items:center;">
+          <button class="btn-sm" onclick="openSalvageRulesModal()">⚙️ 스마트 분해 규칙</button>
+          <div class="btn-group-mini">
+            <button class="btn-sm" style="background:#263849; border-color:#5ca4ff;" onclick="synthesizeAll()">⚗️ 3개 합성</button>
+            <button class="btn-sm" id="btn-smart-salvage" style="border-color:#e67e22; color:#ffd180;" onclick="executeSmartSalvageWithConfirm()">♻️ 스마트 분해 (0개)</button>
+          </div>
         </div>
       </div>
       <div id="inv-list" style="display:flex; flex-direction:column; gap:5px; overflow-y:auto;"></div>
@@ -984,17 +1077,28 @@
     <!-- 4. 스킬 트리 & 환생(프레스티지) 탭 -->
     <section id="tab-skill" class="tab-panel">
       <div class="card">
-        <div class="section-title">📘 직업 스킬 트리 (4단계 해금)</div>
+        <div class="section-title">
+          <span>📘 직업 스킬 트리 (+1/+5/MAX)</span>
+          <button class="btn-sm" id="btn-auto-skill" onclick="toggleSetting('autoSkillUp')">자동 스킬업: OFF</button>
+        </div>
         <div id="skill-tree-list" style="display:flex; flex-direction:column; gap:6px;"></div>
       </div>
 
       <div class="card" style="border-color:#00a8cc;">
         <div class="section-title">
-          <span style="color:var(--accent-soul)">🌌 차원 환생 (프레스티지 NG+<span id="ng-plus-txt">0</span>)</span>
+          <span style="color:var(--accent-soul)">🌌 차원 환생 (NG+<span id="ng-plus-txt">0</span>)</span>
           <span class="soul-txt">보유 영혼석: 💎<span id="soul-stone-txt">0</span></span>
         </div>
+        <!-- [1-5] N층 도달 시 자동 환생 설정 -->
+        <div class="setting-row" style="margin-bottom:6px; background:#121820; padding:5px 7px; border-radius:5px;">
+          <span>🔄 자동 환생 목표 층수 (0=해제)</span>
+          <div class="btn-group-mini">
+            <input type="number" class="input-dark" id="inp-auto-prestige-depth" min="0" max="9999" value="0" onchange="updateAutoPrestigeDepth(this.value)">
+            <span style="font-size:11px; color:var(--text-muted);">층 도달 시</span>
+          </div>
+        </div>
         <div id="prestige-action-box" style="margin-bottom:8px;"></div>
-        <div style="font-size:11.5px; font-weight:700; color:var(--border-bright); margin-bottom:5px;">🏛️ 고대 영혼 유물 (환생 시에도 영구 유지)</div>
+        <div style="font-size:11.5px; font-weight:700; color:var(--border-bright); margin-bottom:5px;">🏛️ 고대 영혼 유물 (+1/+5/MAX 강화)</div>
         <div id="relic-list" style="display:flex; flex-direction:column; gap:5px;"></div>
       </div>
     </section>
@@ -1004,13 +1108,24 @@
       <div class="card">
         <div class="section-title">
           <span>🏰 심연 특수 비경 (즉시 토벌)</span>
-          <span style="font-size:11px; color:#ffd180;">남은 입장권: <strong id="dungeon-tickets">3</strong>장</span>
+          <div class="btn-group-mini">
+            <select class="select-dark" id="sel-auto-dungeon-type" onchange="changeAutoDungeonType(this.value)" title="자동 토벌 대상">
+              <option value="gear">자동: 장비</option>
+              <option value="gold">자동: 골드</option>
+              <option value="dust">자동: 가루</option>
+            </select>
+            <button class="btn-sm" id="btn-auto-dungeon" onclick="toggleSetting('autoSpecialDungeon')">자동토벌:OFF</button>
+          </div>
         </div>
+        <div style="font-size:11px; color:#ffd180; margin-bottom:5px;">🎟️ 남은 입장권: <strong id="dungeon-tickets">3</strong>장 (보스 처치 시 자동 보충)</div>
         <div id="special-dungeon-list" style="display:flex; flex-direction:column; gap:6px;"></div>
       </div>
 
       <div class="card">
-        <div class="section-title">📜 일일 현상금 퀘스트</div>
+        <div class="section-title">
+          <span>📜 일일 현상금 퀘스트</span>
+          <button class="btn-sm" id="btn-auto-quest" onclick="toggleSetting('autoClaimQuest')">자동 수령: OFF</button>
+        </div>
         <div id="daily-quest-list" style="display:flex; flex-direction:column; gap:5px;"></div>
       </div>
 
@@ -1020,24 +1135,44 @@
       </div>
     </section>
 
-    <!-- 6. 도감 / 업적 / 설정 탭 -->
+    <!-- 6. 도감 / 업적 / 정비·자동화 설정 탭 -->
     <section id="tab-codex" class="tab-panel">
-      <!-- [A-1 & A-2] 자동화 및 편의성 설정 카드 -->
+      <!-- [1-1] 원클릭 정비 항목별 개별 ON/OFF 설정 -->
+      <div class="card" style="border-color:#5ca4ff;">
+        <div class="section-title">
+          <span style="color:#bfe0ff;">🧰 원클릭 정비 실행 항목 설정</span>
+          <button class="btn-sm" style="border-color:#5ca4ff;" onclick="runOneClickMaintenance(true)">지금 정비 실행</button>
+        </div>
+        <div class="setting-row"><span>1️⃣ 미감정 장비 전부 자동 감정</span><button class="btn-sm" id="maint-opt-id" onclick="toggleMaintOption('identify')">ON</button></div>
+        <div class="setting-row"><span>2️⃣ 상위 장비 일괄 장착</span><button class="btn-sm" id="maint-opt-eq" onclick="toggleMaintOption('equip')">ON</button></div>
+        <div class="setting-row"><span>3️⃣ 스마트 분해 규칙 일괄 실행</span><button class="btn-sm" id="maint-opt-sal" onclick="toggleMaintOption('salvage')">ON</button></div>
+        <div class="setting-row"><span>4️⃣ 남은 스탯 포인트 자동 배분</span><button class="btn-sm" id="maint-opt-stat" onclick="toggleMaintOption('stat')">ON</button></div>
+        <div class="setting-row"><span>5️⃣ 골드로 가능한 스킬 일괄 강화</span><button class="btn-sm" id="maint-opt-skill" onclick="toggleMaintOption('skill')">ON</button></div>
+        <div class="setting-row"><span>6️⃣ 완료된 일일 퀘스트 보상 수령</span><button class="btn-sm" id="maint-opt-quest" onclick="toggleMaintOption('quest')">ON</button></div>
+      </div>
+
+      <!-- 스마트 자동화 & 강화 안전 설정 -->
       <div class="card" style="border-color:var(--border-bright);">
-        <div class="section-title">⚙️ 스마트 자동화 & 편의성 설정</div>
+        <div class="section-title">⚙️ 자동 진행 &amp; 목표 강화 안전 설정</div>
         <div class="setting-row">
           <span>⬆️ 획득 즉시 상위 장비 자동 장착</span>
           <button class="btn-sm" id="set-auto-equip" onclick="toggleSetting('autoEquipOnDrop')">OFF</button>
         </div>
         <div class="setting-row">
-          <span>♻️ 하위 장비 획득 즉시 자동 분해</span>
-          <select class="select-dark" id="set-auto-salvage" onchange="changeAutoSalvage(this.value)">
-            <option value="-1">사용 안 함 (OFF)</option>
-            <option value="0">일반 등급 분해</option>
-            <option value="1">고급 이하 분해</option>
-            <option value="2">희귀 이하 분해</option>
-            <option value="3">영웅 이하 분해</option>
-          </select>
+          <span>♻️ 획득 즉시 스마트 규칙 자동 분해</span>
+          <button class="btn-sm" id="set-auto-salvage" onclick="toggleSetting('autoSalvageOnDrop')">OFF</button>
+        </div>
+        <div class="setting-row">
+          <span>🔨 목표 강화 목표치 (+N강까지)</span>
+          <input type="number" class="input-dark" id="set-enh-target" min="1" max="20" value="10" onchange="updateEnhanceSafeConfig('targetLv', this.value)">
+        </div>
+        <div class="setting-row">
+          <span>🪙 강화 시 최소 보유 골드 유지</span>
+          <input type="number" class="input-dark" id="set-enh-mingold" min="0" max="9999999" step="100" value="500" onchange="updateEnhanceSafeConfig('minGold', this.value)">
+        </div>
+        <div class="setting-row">
+          <span>🛡️ 목표/일괄 강화 중 수치 하락 시 중단</span>
+          <button class="btn-sm" id="set-enh-stopdrop" onclick="toggleEnhanceSafeFlag('stopOnDrop')">ON</button>
         </div>
         <div class="setting-row">
           <span>⏸️ 레벨업 달성 시 자동진행 일시정지</span>
@@ -1055,7 +1190,7 @@
 
       <div class="card">
         <div class="section-title">
-          <span>🏆 영구 업적 (달성 시 능력치 영구 상승)</span>
+          <span>🏆 영구 업적</span>
           <span id="ach-bonus-txt" style="color:#4cd964; font-size:11px;">공격력 +0%</span>
         </div>
         <div id="achievement-list" style="display:flex; flex-direction:column; gap:5px;"></div>
@@ -1070,11 +1205,11 @@
       </div>
 
       <div class="card">
-        <div class="section-title">💾 사운드 & 세이브 데이터 관리</div>
+        <div class="section-title">💾 사운드 &amp; 세이브 데이터 관리</div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="btn-sm" onclick="toggleSound()" id="btn-sound">🔊 효과음: 켜짐</button>
           <button class="btn-sm" onclick="exportSave()">💾 세이브 복사</button>
-          <button class="btn-sm" style="border-color:#c93b3b; color:#ff9999;" onclick="resetGame()">🗑️ 전체 초기화</button>
+          <button class="btn-sm" id="btn-hard-reset" style="border-color:#c93b3b; color:#ff9999;" onclick="resetGameWithConfirm()">🗑️ 전체 초기화</button>
         </div>
       </div>
     </section>
@@ -1107,35 +1242,44 @@
 
 <script>
 /* =========================================================================
- * [심연의 연대기 v3.0 (Stage 1: Part A) - 밸런스 공식 및 장비 점수 표]
+ * [심연의 연대기 v4.0 (1단계: 1-1 ~ 1-5) - 밸런스 및 자동화 규칙 표]
  * -------------------------------------------------------------------------
- * 1. 레벨 경험치 및 몬스터 스케일링 공식:
- *    - ReqEXP(lv) = floor( 48 * (lv ^ 1.62) )
- *    - NG_Mult = 1 + (ngPlus * 0.35)
- *    - MonsterScale = (1 + depth * 0.18) * (1 + lv * 0.07) * NG_Mult * (보스 2.8 / 정예 1.6 / 일반 1.0)
- *
- * 2. [A-2] 장비 점수(Item Score) 계산 공식:
- *    Score = (기본스탯 × 강화배율(1 + enh*0.12) × 직업기본가중치)
- *          + Σ(옵션수치 × 직업별옵션가중치[classKey][optId])
- *          + 세트진행보너스(2세트 완성 시 +180, 4세트 완성 시 +360, 단일 보유 +35)
- *          + 고유등급보너스(유니크 +120 + 등급Idx*35, 일반 등급Idx*15)
- *
- * 3. 직업별 옵션 가중치 표 (CLASS_WEIGHTS):
+ * 1. [1-1] 원클릭 정비(One-Click Maintenance) 고정 실행 순서:
  *    -----------------------------------------------------------------------
- *    직업   | baseAtk | baseHp | atkPct | hpPct | crit | critDmg | vamp | 주스탯(STR/DEX/INT/LUK)
+ *    순서 | 항목               | 세부 동작 및 안전 조건
  *    -----------------------------------------------------------------------
- *    전사   |  2.6    |  0.50  |   19   |  14   |  10  |    7    |  15  | STR:16, DEX:5,  INT:2,  LUK:6
- *    도적   |  2.5    |  0.32  |   15   |   6   |  22  |   15    |  12  | DEX:17, LUK:15, STR:5,  INT:2
- *    마법사 |  2.7    |  0.32  |   21   |   7   |  14  |   14    |  10  | INT:19, LUK:8,  DEX:5,  STR:2
- *    성직자 |  2.1    |  0.60  |   14   |  19   |   9  |    7    |  22  | INT:16, STR:13, LUK:8,  DEX:4
+ *     1   | 미감정 장비 감정    | 낮은 레벨부터 보유 골드 허용 범위 내 전부 감정
+ *     2   | 상위 장비 장착      | 직업 가중치 점수 기준 2패스(세트 포함) 최적 교체
+ *     3   | 스마트 분해 규칙    | 잠금/보호 규칙 통과한 하위 장비 일괄 분해
+ *     4   | 스탯 자동 배분      | 저장된 비율(statRatio)대로 잔여 포인트 배분
+ *     5   | 스킬 일괄 강화      | 해금 스킬 중 최저가부터(최소 100G 유보) 강화
+ *     6   | 퀘스트 보상 수령    | 목표 달성 퀘스트 골드/영혼석 즉시 수령
  *    -----------------------------------------------------------------------
  *
- * 4. [A-1] 백그라운드 드리프트 보정 공식:
- *    - 탭 비활성화 등으로 인해 경과시간(Date.now() - lastTickTime)이 설정 틱 주기의 3.5배 이상 벌어지면
- *      놓친 턴 수(최대 300턴)를 일괄 시뮬레이션하여 골드, 경험치, 장비 드롭(자동장착/분해 적용), 층수 진행을 즉시 반영.
+ * 2. [1-2] 스마트 분해 규칙(Smart Salvage) 판정표:
+ *    - 절대 보호(항상 제외): locked === true OR unidentified === true
+ *    - 옵션 보호: protectSet(세트 보호), protectUnique(유니크 보호),
+ *                 protectUncodexedUnique(도감 미등록 유니크 보호)
+ *    - 분해 조건(OR): (gradeIdx <= maxGradeIdx) OR
+ *                     (belowEquippedScore && 장착품 존재 && 내점수 <= 장착품점수)
+ *    - 획득 즉시 자동 분해 토글(autoSalvageOnDrop) 켜짐 시 동일 규칙 즉시 적용.
+ *
+ * 3. [1-3] 직업별 스탯 추천 프리셋 & 초기화 비용:
+ *    - 전사: STR 60 / DEX 10 / INT 0  / CHA 10 / LUK 20
+ *    - 도적: STR 10 / DEX 55 / INT 0  / CHA 10 / LUK 25
+ *    - 마법사: STR 5 / DEX 10 / INT 60 / CHA 5  / LUK 20
+ *    - 성직자: STR 20 / DEX 5 / INT 45 / CHA 15 / LUK 15
+ *    - 스탯 초기화 비용: 200 + (누적 투자 포인트 × 15) 골드
+ *
+ * 4. [1-4] 강화 확률 및 안전 옵션:
+ *    - 확률: +0~4 (90~70%), +5~9 (60~44%, 실패 시 30% 하락), +10~ (32~15%, 실패 시 30% 하락)
+ *    - 안전 옵션: targetLv(기본 +10), minGold(기본 500G 유지), stopOnDrop(하락 시 중단)
+ *
+ * 5. [예정: 2~3단계 밸런스 기준]
+ *    - 연속 처치 콤보 배율: 1승당 +5% (최대 20콤보 +100% 골드/경험치)
+ *    - 리듬 타이밍 링 출현 확률: 전투 턴당 25% (자동 80% 성공, 크리티컬 확정 + 추가 보상)
  * ========================================================================= */
 
-// 확장된 숫자 단위 포맷터 (K ~ Dc)
 function fmt(n) {
   if (n === undefined || n === null || isNaN(n)) return '0';
   const sign = n < 0 ? '-' : '';
@@ -1147,7 +1291,49 @@ function fmt(n) {
   return sign + val.toFixed(val >= 100 ? 0 : val >= 10 ? 1 : 2) + units[u];
 }
 
-// Web Audio API 사운드 엔진
+// [1-5] 하단 토스트 알림 (alert 완전 대체)
+function showToast(msg, type = 'normal', duration = 2200) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className = 'toast-item' + (type === 'warn' ? ' warn' : type === 'good' ? ' good' : '');
+  el.textContent = msg;
+  container.appendChild(el);
+  while (container.children.length > 3) container.removeChild(container.firstChild);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.25s';
+    setTimeout(() => el.remove(), 250);
+  }, duration);
+}
+
+// [1-5] 인라인 2회 탭 확인 (confirm 완전 대체)
+const armedActions = {};
+function checkInlineConfirm(key, btnEl, armedLabel, timeoutMs = 3000) {
+  const now = Date.now();
+  if (armedActions[key] && armedActions[key].expires > now) {
+    clearTimeout(armedActions[key].timer);
+    delete armedActions[key];
+    return true;
+  }
+  if (armedActions[key]) clearTimeout(armedActions[key].timer);
+  const origHtml = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.classList.add('confirm-armed');
+    btnEl.innerHTML = armedLabel;
+  }
+  showToast(`한 번 더 탭하면 실행됩니다 (${Math.round(timeoutMs / 1000)}초 내 확인)`, 'warn', 2000);
+  const timer = setTimeout(() => {
+    delete armedActions[key];
+    if (btnEl) {
+      btnEl.classList.remove('confirm-armed');
+      btnEl.innerHTML = origHtml;
+    }
+  }, timeoutMs);
+  armedActions[key] = { expires: now + timeoutMs, timer, origHtml };
+  return false;
+}
+
 const SFX = {
   ctx: null,
   enabled: true,
@@ -1167,7 +1353,6 @@ const SFX = {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.connect(gain); gain.connect(this.ctx.destination);
-
       if (type === 'click') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(340, now);
@@ -1212,7 +1397,6 @@ const SFX = {
   }
 };
 
-// 직업별 장비 점수 가중치 테이블
 const CLASS_WEIGHTS = {
   warrior: { baseAtk: 2.6, baseHp: 0.50, atkPct: 19, str: 16, hpPct: 14, vamp: 15, crit: 10, critDmg: 7, luk: 6, dex: 5, int: 2, goldPct: 3 },
   rogue:   { baseAtk: 2.5, baseHp: 0.32, crit: 22, critDmg: 15, dex: 17, luk: 15, atkPct: 15, vamp: 12, hpPct: 6, str: 5, int: 2, goldPct: 5 },
@@ -1220,7 +1404,13 @@ const CLASS_WEIGHTS = {
   cleric:  { baseAtk: 2.1, baseHp: 0.60, vamp: 22, hpPct: 19, int: 16, atkPct: 14, str: 13, crit: 9, luk: 8, critDmg: 7, dex: 4, goldPct: 4 }
 };
 
-// 4대 직업 & 전직 트리(1차~5차) & 4단계 스킬 트리
+const STAT_PRESETS = {
+  warrior: { str: 60, dex: 10, int: 0,  cha: 10, luk: 20 },
+  rogue:   { str: 10, dex: 55, int: 0,  cha: 10, luk: 25 },
+  mage:    { str: 5,  dex: 10, int: 60, cha: 5,  luk: 20 },
+  cleric:  { str: 20, dex: 5,  int: 45, cha: 15, luk: 15 }
+};
+
 const CLASSES = {
   warrior: {
     name: '전사', icon: '⚔️', sprite: '🤺',
@@ -1292,234 +1482,12 @@ const CLASSES = {
   }
 };
 
-// 영혼 유물 5종
 const RELICS = [
   { id: 'grail',   name: '🍷 심연의 성배', desc: '최종 공격력 영구 +25% / Lv', baseCost: 5 },
   { id: 'heart',   name: '❤️ 불멸자의 심장', desc: '최대 생명력 영구 +30% / Lv', baseCost: 5 },
   { id: 'compass', name: '🧭 황금 나침반', desc: '골드 및 경험치 획득 +30% / Lv', baseCost: 6 },
-  { id: 'dice',    name: '🎲 운명의 주사위', desc: '모든 선택지 성공률 +3%p & 행운 +5 / Lv', baseCost: 8 },
-  { id: 'hammer',  name: '🔨 창조주의 망치', desc: '고등급 드롭 보정 & 강화 비용 -5% / Lv', baseCost: 10 }
-];
-
-// 영구 업적
-const ACHIEVEMENTS = [
-  { id: 'kill50',   name: '심연의 사냥꾼', desc: '몬스터 30마리 처치', goal: 30, key: 'kills', bonusTxt: '공격력 +10%' },
-  { id: 'depth20',  name: '심층 탐사자', desc: '심연 20층 도달', goal: 20, key: 'maxDepth', bonusTxt: '공격력 +15%' },
-  { id: 'enh10',    name: '전설의 대장장이', desc: '+7강 이상 장비 달성', goal: 7, key: 'maxEnh', bonusTxt: '공격력 +15%' },
-  { id: 'legend1',  name: '선택받은 자', desc: '전설 등급 이상 장비 획득', goal: 1, key: 'legendCnt', bonusTxt: '공격력 +20%' }
-];
-
-// 7등급, 7슬롯, 세트, 옵션 풀
-const GRADES = [
-  { id: 'common',   name: '일반', cls: 'g-common',   color: '#a0a0a0', weight: 430, mult: 1.0, optCnt: 2 },
-  { id: 'uncommon', name: '고급', cls: 'g-uncommon', color: '#4cd964', weight: 280, mult: 1.35, optCnt: 2 },
-  { id: 'rare',     name: '희귀', cls: 'g-rare',     color: '#38a1ff', weight: 155, mult: 1.85, optCnt: 3 },
-  { id: 'epic',     name: '영웅', cls: 'g-epic',     color: '#b85cff', weight: 82,  mult: 2.65, optCnt: 4 },
-  { id: 'legend',   name: '전설', cls: 'g-legend',   color: '#ff9f1a', weight: 36,  mult: 3.9,  optCnt: 5 },
-  { id: 'mythic',   name: '신화', cls: 'g-mythic',   color: '#ff3838', weight: 13,  mult: 5.7,  optCnt: 5 },
-  { id: 'genesis',  name: '창조', cls: 'g-genesis',  color: '#00f5d4', weight: 4,   mult: 9.0,  optCnt: 6 }
-];
-
-const SLOTS = [
-  { id: 'weapon', name: '무기', icon: '⚔️', baseStat: 'atk', baseVal: 9 },
-  { id: 'armor',  name: '갑옷', icon: '🛡️', baseStat: 'hp',  baseVal: 38 },
-  { id: 'helmet', name: '투구', icon: '🪖', baseStat: 'hp',  baseVal: 22 },
-  { id: 'gloves', name: '장갑', icon: '🧤', baseStat: 'atk', baseVal: 5 },
-  { id: 'boots',  name: '신발', icon: '🥾', baseStat: 'dex', baseVal: 3 },
-  { id: 'ring',   name: '반지', icon: '💍', baseStat: 'crit',baseVal: 3 },
-  { id: 'amulet', name: '목걸이',icon: '📿', baseStat: 'luk', baseVal: 3 }
-];
-
-const SETS = [
-  { id: 'abyss',  name: '심연의 지배자', bonus2: '공격력 +18%', bonus4: '치명타 피해 +45%' },
-  { id: 'solar',  name: '태양왕의 유산', bonus2: '최대 HP +22%', bonus4: '매 턴 HP 7% 재생' },
-  { id: 'shadow', name: '그림자 군주',   bonus2: '치명타 확률 +12%', bonus4: '민첩/행운 +18' }
-];
-
-const OPT_POOL = [
-  { id: 'atkPct',  name: '공격력 증가', unit: '%', min: 5, max: 28 },
-  { id: 'hpPct',   name: '최대 생명력', unit: '%', min: 6, max: 32 },
-  { id: 'crit',    name: '치명타 확률', unit: '%', min: 2, max: 13 },
-  { id: 'critDmg', name: '치명타 피해', unit: '%', min: 10, max: 50 },
-  { id: 'vamp',    name: '생명력 흡수', unit: '%', min: 2, max: 11 },
-  { id: 'goldPct', name: '골드 획득량', unit: '%', min: 6, max: 40 },
-  { id: 'str',     name: '힘(STR)',    unit: '',  min: 3, max: 22 },
-  { id: 'dex',     name: '민첩(DEX)',  unit: '',  min: 3, max: 22 },
-  { id: 'int',     name: '지능(INT)',  unit: '',  min: 3, max: 22 },
-  { id: 'luk',     name: '행운(LUK)',  unit: '',  min: 3, max: 22 }
-];
-
-const UNIQUE_NAMES = {
-  weapon: ['심연가르기', '천둥벼락 대검', '피의 속삭임', '태양삼킴 마검', '창조주의 단죄', '운명파괴자'],
-  armor:  ['불멸자의 성갑', '용비늘 흉갑', '공허의 외투', '성기사단장의 갑주', '별빛 수호갑'],
-  helmet: ['광기의 왕관', '통찰의 비전투구', '고대 군주의 투구', '심판자의 면류관'],
-  gloves: ['거인학살자의 건틀릿', '그림자 손아귀', '마력 증폭 장갑', '파멸의 주먹'],
-  boots:  ['바람걸음 경갑', '차원도약 장화', '침묵의 발걸음', '유성우 부츠'],
-  ring:   ['영원한 윤회의 반지', '탐욕의 군주 반지', '핏빛 맹세', '심연핵 반지'],
-  amulet: ['타락한 성배의 목걸이', '별빛의 눈물', '운명조작의 펜던트', '창세의 심장']
-};
-
-const PLACES = [
-  { name: '안개 낀 고대 묘지', decos: ['🪦','🕯️','🕸️'] },
-  { name: '무너진 지하 대성당', decos: ['⛪','🕯️','✝️'] },
-  { name: '독기가 피어오르는 늪', decos: ['🍄','🌿','🐍'] },
-  { name: '버려진 드워프 용광로', decos: ['⚒️','🔥','⚙️'] },
-  { name: '얼어붙은 심연의 회랑', decos: ['❄️','🧊','🏛️'] },
-  { name: '차원이 뒤틀린 마탑', decos: ['🔮','📚','✨'] }
-];
-
-const MONSTERS = [
-  { name: '해골 수호병', icon: '💀' },
-  { name: '심연의 가고일', icon: '🦇' },
-  { name: '타락한 성전사', icon: '🩸' },
-  { name: '맹독 아라크네', icon: '🕷️' },
-  { name: '지옥불 집행자', icon: '👹' },
-  { name: '공허의 사신', icon: '👻' },
-  { name: '암흑 마룡의 화신', icon: '🐉' }
-];
-
-// 전역 상태 변수
-let state = null;
-let currentEnemy = null;
-
-// 오토 플레이 상태 (드리프트 보정용 lastTickTime 포함)
-let autoPlay = {
-  enabled: false,
-  speedIdx: 0,
-  speeds: [
-    { label: '1x', ms: 1000 },
-    { label: '2x', ms: 500 },
-    { label: '4x', ms: 240 }
-  ],
-  modeIdx: 0,
-  modes: ['균형', '파밍', '안전'],
-  timer: null,
-  lastTickTime: 0
-};
-
-// 신규 세이브 생성 (v3.0 신규 필드 포함)
-function createNewState(classKey) {
-  const c = CLASSES[classKey];
-  return {
-    version: 3.0,
-    classKey,
-    jobTier: 1,
-    lv: 1,
-    exp: 0,
-    reqExp: 48,
-    statPts: 0,
-    depth: 1,
-    maxDepth: 1,
-    nodeIdx: 0,
-    floorNodes: [],
-    ngPlus: 0,
-    soulStones: 0,
-    gold: 150,
-    dust: 15,
-    rep: 0,
-    hp: 130,
-    maxHp: 130,
-    mp: 60,
-    maxMp: 60,
-    stats: { ...c.stats },
-    skills: { s1: 1, s2: 1, s3: 1, s4: 1 },
-    relics: { grail: 0, heart: 0, compass: 0, dice: 0, hammer: 0 },
-    flags: { cursed: 0, blessed: 0, companion: false },
-    equipped: { weapon: null, armor: null, helmet: null, gloves: null, boots: null, ring: null, amulet: null },
-    inventory: [],
-    codexGrades: {},
-    codexUniques: [],
-    records: { kills: 0, maxDepth: 1, maxEnh: 0, legendCnt: 0 },
-    dungeonTickets: 3,
-    quests: [
-      { id: 'q_kill', name: '심연 몬스터 5마리 처치', prog: 0, goal: 5, rewardGold: 250, rewardSoul: 2 },
-      { id: 'q_node', name: '탐사 방(노드) 10회 돌파', prog: 0, goal: 10, rewardGold: 300, rewardSoul: 2 }
-    ],
-    settings: {
-      autoEquipOnDrop: false,
-      autoSalvageGradeIdx: -1,
-      pauseOnLvUp: false,
-      pauseOnPromo: false,
-      pauseOnUnique: false,
-      sound: true
-    },
-    lastActionSummary: '심연 원정을 시작했습니다.',
-    lastSaveTime: Date.now()
-  };
-}
-
-// 기존 ABYSS_RPG_SAVE_V2 및 V1 완벽 호환 마이그레이션
-function loadGame() {
-  const raw = localStorage.getItem('ABYSS_RPG_SAVE_V2') || localStorage.getItem('ABYSS_RPG_SAVE_V1');
-  if (!raw) return false;
-  try {
-    const parsed = JSON.parse(raw);
-    const def = createNewState(parsed.classKey || 'warrior');
-    state = { ...def, ...parsed, version: 3.0 };
-    state.stats    = { ...def.stats, ...(parsed.stats || {}) };
-    state.skills   = { ...def.skills, ...(parsed.skills || {}) };
-    state.relics   = { ...def.relics, ...(parsed.relics || {}) };
-    state.flags    = { ...def.flags, ...(parsed.flags || {}) };
-    state.equipped = { ...def.equipped, ...(parsed.equipped || {}) };
-    state.records  = { ...def.records, ...(parsed.records || {}) };
-    state.settings = { ...def.settings, ...(parsed.settings || {}) };
-    SFX.enabled = state.settings.sound !== false;
-    if (!state.floorNodes || state.floorNodes.length !== 10) {
-      generateFloorNodes();
-    }
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-function saveGame() {
-  if (!state) return;
-  state.lastSaveTime = Date.now();
-  localStorage.setItem('ABYSS_RPG_SAVE_V2', JSON.stringify(state));
-}
-
-// 최근 사건 1줄 요약 업데이트 및 상단 미니 스트립 갱신
-function setRecentSummary(plainText) {
-  if (!state) return;
-  state.lastActionSummary = plainText;
-  updateAutoStrip();
-}
-
-function updateAutoStrip() {
-  if (!state) return;
-  const strip = document.getElementById('auto-mini-strip');
-  const statusEl = document.getElementById('strip-status-txt');
-  const floorEl = document.getElementById('strip-floor-txt');
-  const recentEl = document.getElementById('strip-recent-txt');
-  const pauseBtn = document.getElementById('strip-btn-pause');
-
-  strip.classList.toggle('running', autoPlay.enabled);
-  const spd = autoPlay.speeds[autoPlay.speedIdx].label;
-  const mode = autoPlay.modes[autoPlay.modeIdx];
-
-  if (autoPlay.enabled) {
-    statusEl.textContent = `🤖 자동 진행 중 (${spd}·${mode})`;
-    statusEl.style.color = '#4cd964';
-    pauseBtn.textContent = '⏸️ 일시정지';
-    pauseBtn.classList.add('active');
-  } else {
-    statusEl.textContent = `⏸️ 수동 진행 (${mode})`;
-    statusEl.style.color = '#d4a959';
-    pauseBtn.textContent = '▶️ 자동시작';
-    pauseBtn.classList.remove('active');
-  }
-
-  floorEl.textContent = `심연 ${state.depth}층 ${(state.nodeIdx || 0) + 1}/10`;
-  recentEl.textContent = `방금: ${state.lastActionSummary || '탐색 중...'}`;
-}
-
-function jumpToAdventureTab() {
-  const advNavBtn = document.getElementById('nav-adventure');
-  switchTab('adventure', advNavBtn);
-}
-
-// =========================================================================
+  { id: 'dice',    name: '🎲 운명의 주사위', desc: '모든 선택지 성공률 +3%p & 행운 +5 / Lv', base
+   // =========================================================================
 // [A-2] 장비 점수(Equipment Score) 계산기 & 일괄 장착 시스템
 // =========================================================================
 function calcItemScore(item, customEquippedMap = null) {
@@ -1531,11 +1499,11 @@ function calcItemScore(item, customEquippedMap = null) {
   const effBase = Math.floor(item.baseVal * enhMult);
 
   let baseScore = 0;
-  if (item.baseStat === 'atk')  baseScore = effBase * w.baseAtk;
-  else if (item.baseStat === 'hp') baseScore = effBase * w.baseHp;
-  else if (item.baseStat === 'dex') baseScore = effBase * (w.dex || 10);
+  if (item.baseStat === 'atk')       baseScore = effBase * w.baseAtk;
+  else if (item.baseStat === 'hp')   baseScore = effBase * w.baseHp;
+  else if (item.baseStat === 'dex')  baseScore = effBase * (w.dex || 10);
   else if (item.baseStat === 'crit') baseScore = effBase * (w.crit || 15);
-  else if (item.baseStat === 'luk') baseScore = effBase * (w.luk || 10);
+  else if (item.baseStat === 'luk')  baseScore = effBase * (w.luk || 10);
 
   let optScore = 0;
   (item.options || []).forEach(opt => {
@@ -1543,7 +1511,6 @@ function calcItemScore(item, customEquippedMap = null) {
     optScore += opt.val * weight;
   });
 
-  // 세트 진행 보너스 계산 (자신의 슬롯을 제외한 동일 세트 장착 개수 확인)
   let setBonus = 0;
   if (item.setId) {
     let otherSetPieces = 0;
@@ -1552,19 +1519,16 @@ function calcItemScore(item, customEquippedMap = null) {
         otherSetPieces++;
       }
     });
-    if (otherSetPieces >= 3) setBonus = 360;      // 4세트 완성!
-    else if (otherSetPieces === 2) setBonus = 95; // 3피스
-    else if (otherSetPieces === 1) setBonus = 180;// 2세트 완성!
-    else setBonus = 35;                           // 세트 잠재력
+    if (otherSetPieces >= 3) setBonus = 360;
+    else if (otherSetPieces === 2) setBonus = 95;
+    else if (otherSetPieces === 1) setBonus = 180;
+    else setBonus = 35;
   }
 
-  // 고유 효과 및 등급 보너스
   const uniqueBonus = (item.isUnique ? 120 + item.gradeIdx * 35 : item.gradeIdx * 15);
-
   return Math.round(baseScore + optScore + setBonus + uniqueBonus);
 }
 
-// 현재 장착 장비 대비 점수 차이 반환
 function getItemScoreDiff(item) {
   if (!item || item.unidentified) return null;
   const myScore = calcItemScore(item);
@@ -1573,7 +1537,6 @@ function getItemScoreDiff(item) {
   return { myScore, eqScore, diff: myScore - eqScore };
 }
 
-// 슬롯별 업그레이드 가능한 최고 장비 탐색
 function getUpgradeableSlots() {
   if (!state) return [];
   const upgrades = [];
@@ -1607,7 +1570,6 @@ function getUpgradeableSlots() {
   return upgrades;
 }
 
-// 종합 전투력 계산
 function calcCombatPower() {
   const { stats } = getTotalStats();
   const critFactor = 1 + (stats.crit / 100) * ((stats.critDmg - 100) / 100);
@@ -1616,14 +1578,12 @@ function calcCombatPower() {
   return Math.floor(offPower + defPower);
 }
 
-// [A-2] 더 좋은 장비 일괄 장착 실행
 function batchEquipBest(showModalSummary = true) {
-  if (!state) return;
+  if (!state) return { changedList: [], cpDiff: 0, beforeCP: 0, afterCP: 0 };
   const beforeCP = calcCombatPower();
   const beforeStats = getTotalStats().stats;
   const changes = {};
 
-  // 세트 시너지 재평가를 위해 2패스 탐색
   for (let pass = 0; pass < 2; pass++) {
     SLOTS.forEach(sl => {
       const curEq = state.equipped[sl.id];
@@ -1648,45 +1608,36 @@ function batchEquipBest(showModalSummary = true) {
         if (curEq) state.inventory.push(curEq);
         state.equipped[sl.id] = picked;
 
+        const newSc = calcItemScore(picked);
         changes[sl.id] = {
           slotName: sl.name,
           slotIcon: sl.icon,
           newItem: picked,
           oldScore: firstOldScore,
-          newScore: calcItemScore(picked),
-          diff: calcItemScore(picked) - firstOldScore
+          newScore: newSc,
+          diff: newSc - firstOldScore
         };
       }
     });
   }
 
   const changedList = Object.values(changes).filter(c => c.diff > 0);
-  if (changedList.length === 0) {
-    SFX.play('click');
-    if (showModalSummary) {
-      const overlay = document.getElementById('modal-overlay');
-      const content = document.getElementById('modal-content');
-      overlay.classList.add('show');
-      content.innerHTML = `
-        <div style="text-align:center;">
-          <div style="font-size:32px;">🛡️</div>
-          <div style="font-size:15px; font-weight:800; color:var(--border-bright); margin-top:4px;">이미 최상의 장비를 착용 중입니다</div>
-          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">인벤토리에 현재 장착품보다 점수가 높은 감정된 장비가 없습니다.</div>
-        </div>
-        <button class="choice-btn" data-autoclose="true" style="justify-content:center;" onclick="closeModal()">확인</button>
-      `;
-    }
-    return;
-  }
-
-  SFX.play('legend');
   const afterCP = calcCombatPower();
   const afterStats = getTotalStats().stats;
   const cpDiff = afterCP - beforeCP;
 
+  if (changedList.length === 0) {
+    if (showModalSummary) {
+      SFX.play('click');
+      showToast('이미 최상의 장비를 착용 중입니다.', 'normal');
+    }
+    return { changedList: [], cpDiff: 0, beforeCP, afterCP };
+  }
+
+  SFX.play('legend');
   const summaryShort = changedList.map(c => `${c.slotName} ▲+${fmt(c.diff)}`).join(', ');
   addLog(`⬆️ [일괄장착] ${summaryShort} (전투력 ▲+${fmt(Math.max(0, cpDiff))})`);
-  setRecentSummary(`일괄 장착 완료! (${summaryShort})`);
+  setRecentSummary(`일괄 장착: ${summaryShort}`);
 
   updateHUD();
   refreshActiveTab();
@@ -1712,9 +1663,7 @@ function batchEquipBest(showModalSummary = true) {
         <div style="font-size:16px; font-weight:800; color:var(--border-bright);">⬆️ 상위 장비 일괄 장착 완료!</div>
         <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">직업(${CLASSES[state.classKey].name}) 맞춤 가중치로 최적 장비를 착용했습니다.</div>
       </div>
-      <div style="display:flex; flex-direction:column; gap:5px; max-height:210px; overflow-y:auto;">
-        ${rowsHtml}
-      </div>
+      <div style="display:flex; flex-direction:column; gap:5px; max-height:210px; overflow-y:auto;">${rowsHtml}</div>
       <div class="card" style="text-align:center; font-size:12.5px; line-height:1.6;">
         <div>⚡ 총 전투력: <strong>${fmt(beforeCP)}</strong> ➔ <strong style="color:#4cd964">${fmt(afterCP)} (${cpDiff >= 0 ? '▲+' : '▼'}${fmt(cpDiff)})</strong></div>
         <div style="font-size:11.5px; color:var(--text-muted);">
@@ -1724,10 +1673,697 @@ function batchEquipBest(showModalSummary = true) {
       <button class="choice-btn" data-autoclose="true" style="justify-content:center; font-weight:700;" onclick="closeModal()">확인</button>
     `;
   }
+
+  return { changedList, cpDiff, beforeCP, afterCP };
 }
 
 // =========================================================================
-// 미니맵 층별 10노드 생성 및 렌더링
+// [1-2] 스마트 분해 규칙 & 장비 잠금(🔒) 시스템
+// =========================================================================
+function shouldSalvageItem(item) {
+  if (!item || item.locked || item.unidentified) return false;
+  const r = state.salvageRules;
+  if (!r) return false;
+
+  if (r.protectSet && item.setId) return false;
+  if (r.protectUnique && item.isUnique) return false;
+  if (r.protectUncodexedUnique && item.isUnique && !state.codexUniques.includes(item.name)) return false;
+
+  if (r.maxGradeIdx >= 0 && item.gradeIdx <= r.maxGradeIdx) return true;
+  if (r.belowEquippedScore) {
+    const eq = state.equipped[item.slotId];
+    if (eq && calcItemScore(item) <= calcItemScore(eq)) return true;
+  }
+  return false;
+}
+
+function getSmartSalvageCandidates() {
+  if (!state) return [];
+  return state.inventory.filter(itm => shouldSalvageItem(itm));
+}
+
+function executeSmartSalvage(silent = false) {
+  const targets = getSmartSalvageCandidates();
+  if (targets.length === 0) {
+    if (!silent) showToast('분해 규칙에 해당하는 장비가 없습니다.', 'normal');
+    return { count: 0, dustGain: 0, goldGain: 0 };
+  }
+
+  const uidSet = new Set(targets.map(t => t.uid));
+  let dustGain = 0;
+  let goldGain = 0;
+  targets.forEach(itm => {
+    dustGain += (itm.gradeIdx + 1) * 4;
+    goldGain += itm.lv * 10;
+  });
+
+  state.inventory = state.inventory.filter(itm => !uidSet.has(itm.uid));
+  state.dust += dustGain;
+  state.gold += goldGain;
+
+  if (!silent) {
+    SFX.play('success');
+    addLog(`♻️ [스마트 분해] 장비 ${targets.length}개 분해 완료 (가루 +${fmt(dustGain)}, +${fmt(goldGain)}G)`);
+    showToast(`♻️ 장비 ${targets.length}개 분해! 가루 +${fmt(dustGain)}, +${fmt(goldGain)}G`, 'good');
+    updateHUD();
+    refreshActiveTab();
+    saveGame();
+  }
+  return { count: targets.length, dustGain, goldGain };
+}
+
+function executeSmartSalvageWithConfirm() {
+  const targets = getSmartSalvageCandidates();
+  if (targets.length === 0) {
+    SFX.play('click');
+    showToast('현재 규칙으로 분해될 장비가 0개입니다.', 'normal');
+    return;
+  }
+  const btn = document.getElementById('btn-smart-salvage');
+  if (!checkInlineConfirm('smart_salvage', btn, `⚠️ ${targets.length}개 분해 확인!`)) return;
+  executeSmartSalvage(false);
+}
+
+function openSalvageRulesModal() {
+  SFX.play('click');
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  overlay.classList.add('show');
+
+  const r = state.salvageRules;
+  const previewCnt = getSmartSalvageCandidates().length;
+  const gradeOpts = [
+    { val: -1, label: '등급 기준 사용 안 함' },
+    { val: 0, label: '일반 이하 분해' },
+    { val: 1, label: '고급 이하 분해' },
+    { val: 2, label: '희귀 이하 분해' },
+    { val: 3, label: '영웅 이하 분해' },
+    { val: 4, label: '전설 이하 분해' }
+  ];
+
+  const mkToggle = (key, label) => `
+    <div class="setting-row">
+      <span>${label}</span>
+      <button class="btn-sm" style="${r[key] ? 'border-color:#4cd964; color:#69f0ae;' : ''}" onclick="toggleSalvageRule('${key}')">${r[key] ? 'ON' : 'OFF'}</button>
+    </div>
+  `;
+
+  content.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size:15px; font-weight:800; color:var(--border-bright);">♻️ 스마트 분해 규칙 설정</div>
+      <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">잠금(🔒) 장비와 미감정 장비는 항상 보호됩니다.</div>
+    </div>
+    <div class="card">
+      <div class="setting-row">
+        <span>📉 등급 이하 자동 대상</span>
+        <select class="select-dark" onchange="setSalvageGradeRule(this.value)">
+          ${gradeOpts.map(o => `<option value="${o.val}" ${r.maxGradeIdx === o.val ? 'selected' : ''}>${o.label}</option>`).join('')}
+        </select>
+      </div>
+      ${mkToggle('belowEquippedScore', '⚖️ 현재 장착품 점수 이하 장비 분해')}
+      ${mkToggle('protectSet', '🛡️ 세트(Set) 장비 보호')}
+      ${mkToggle('protectUnique', '🌟 모든 유니크 장비 보호')}
+      ${mkToggle('protectUncodexedUnique', '📖 도감 미등록 유니크 보호')}
+    </div>
+    <div class="card" style="text-align:center; font-size:12px; color:#ffd180;">
+      🔍 현재 규칙으로 분해될 인벤토리 장비: <strong>${previewCnt}개</strong>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+      <button class="choice-btn" style="justify-content:center; border-color:#e67e22;" onclick="closeModal(); executeSmartSalvage(false);">♻️ 지금 ${previewCnt}개 분해</button>
+      <button class="choice-btn" data-autoclose="true" style="justify-content:center;" onclick="closeModal()">닫기</button>
+    </div>
+  `;
+}
+
+function toggleSalvageRule(key) {
+  SFX.play('click');
+  state.salvageRules[key] = !state.salvageRules[key];
+  saveGame();
+  openSalvageRulesModal();
+  refreshActiveTab();
+}
+
+function setSalvageGradeRule(val) {
+  SFX.play('click');
+  state.salvageRules.maxGradeIdx = parseInt(val, 10);
+  saveGame();
+  openSalvageRulesModal();
+  refreshActiveTab();
+}
+
+function toggleItemLock(uid, isEquipped) {
+  SFX.play('click');
+  const item = isEquipped
+    ? Object.values(state.equipped).find(x => x && x.uid === uid)
+    : state.inventory.find(x => x.uid === uid);
+  if (!item) return;
+  item.locked = !item.locked;
+  showToast(item.locked ? `🔒 [${item.name}] 잠금 설정 (분해/합성 제외)` : `🔓 [${item.name}] 잠금 해제`, 'normal', 1600);
+  saveGame();
+  refreshActiveTab();
+  openItemDetail(uid, isEquipped);
+}
+
+// =========================================================================
+// [1-1] 원클릭 정비 (감정 ➔ 장착 ➔ 분해 ➔ 스탯 ➔ 스킬 ➔ 퀘스트)
+// =========================================================================
+function runOneClickMaintenance(showModal = true) {
+  if (!state) return;
+  const opt = state.maintOptions || {};
+  const rep = {
+    identified: 0,
+    equippedCnt: 0,
+    cpDiff: 0,
+    salvagedCnt: 0,
+    dustGain: 0,
+    statSpent: 0,
+    skillUpCnt: 0,
+    questClaimed: 0
+  };
+
+  // Step 1: 미감정 장비 전부 감정
+  if (opt.identify) {
+    const unids = state.inventory.filter(x => x.unidentified).sort((a, b) => a.lv - b.lv);
+    unids.forEach(item => {
+      const cost = 25 + item.lv * 8;
+      if (state.gold >= cost) {
+        state.gold -= cost;
+        item.unidentified = false;
+        rep.identified++;
+        if (item.gradeIdx >= 4) state.records.legendCnt = (state.records.legendCnt || 0) + 1;
+        if (item.isUnique && !state.codexUniques.includes(item.name)) {
+          state.codexUniques.push(item.name);
+        }
+      }
+    });
+  }
+
+  // Step 2: 상위 장비 일괄 장착
+  if (opt.equip) {
+    const eqRes = batchEquipBest(false);
+    rep.equippedCnt = eqRes.changedList.length;
+    rep.cpDiff = eqRes.cpDiff;
+  }
+
+  // Step 3: 스마트 분해 규칙 적용
+  if (opt.salvage) {
+    const salRes = executeSmartSalvage(true);
+    rep.salvagedCnt = salRes.count;
+    rep.dustGain = salRes.dustGain;
+  }
+
+  // Step 4: 스탯 자동 배분
+  if (opt.stat && state.statPts > 0) {
+    rep.statSpent = applyStatPreset(true);
+  }
+
+  // Step 5: 스킬 자동 강화
+  if (opt.skill) {
+    rep.skillUpCnt = autoUpgradeSkillsLoop(true);
+  }
+
+  // Step 6: 완료된 퀘스트 일괄 수령
+  if (opt.quest) {
+    rep.questClaimed = claimAllCompletedQuests(true);
+  }
+
+  const parts = [];
+  if (rep.identified > 0)   parts.push(`감정 ${rep.identified}개`);
+  if (rep.equippedCnt > 0)  parts.push(`장착 ${rep.equippedCnt}부위(⚡${rep.cpDiff >= 0 ? '▲+' : ''}${fmt(rep.cpDiff)})`);
+  if (rep.salvagedCnt > 0)  parts.push(`분해 ${rep.salvagedCnt}개(✨+${fmt(rep.dustGain)})`);
+  if (rep.statSpent > 0)    parts.push(`스탯 +${rep.statSpent}`);
+  if (rep.skillUpCnt > 0)   parts.push(`스킬 +${rep.skillUpCnt}`);
+  if (rep.questClaimed > 0) parts.push(`퀘스트 ${rep.questClaimed}개 수령`);
+
+  updateHUD();
+  refreshActiveTab();
+  saveGame();
+
+  if (parts.length === 0) {
+    SFX.play('click');
+    if (showModal) showToast('정비할 항목이 없습니다. 모든 상태가 최신입니다!', 'normal');
+    return;
+  }
+
+  SFX.play('legend');
+  const summaryLine = parts.join(', ');
+  addLog(`🧰 [원클릭 정비] ${summaryLine}`);
+  setRecentSummary(`정비 완료: ${summaryLine}`);
+
+  if (showModal) {
+    const overlay = document.getElementById('modal-overlay');
+    const content = document.getElementById('modal-content');
+    overlay.classList.add('show');
+    content.innerHTML = `
+      <div style="text-align:center;">
+        <div style="font-size:36px;">🧰</div>
+        <div style="font-size:16px; font-weight:800; color:#bfe0ff;">원클릭 정비 완료!</div>
+      </div>
+      <div class="card" style="font-size:12.5px; line-height:1.7;">
+        <div>🔍 미감정 감정: <strong>${rep.identified}개</strong></div>
+        <div>⬆️ 상위 장비 장착: <strong>${rep.equippedCnt}부위</strong> ${rep.cpDiff > 0 ? `<span style="color:#4cd964">(전투력 ▲+${fmt(rep.cpDiff)})</span>` : ''}</div>
+        <div>♻️ 스마트 분해: <strong>${rep.salvagedCnt}개</strong> ${rep.dustGain > 0 ? `<span style="color:#c08cff">(가루 +${fmt(rep.dustGain)})</span>` : ''}</div>
+        <div>📊 스탯 자동 배분: <strong>+${rep.statSpent} Pt</strong></div>
+        <div>📘 스킬 강화: <strong>+${rep.skillUpCnt} Lv</strong></div>
+        <div>📜 퀘스트 수령: <strong>${rep.questClaimed}개</strong></div>
+      </div>
+      <button class="choice-btn" data-autoclose="true" style="justify-content:center; font-weight:700;" onclick="closeModal()">확인</button>
+    `;
+  }
+}
+
+// =========================================================================
+// [1-3] 스탯 배분 (+1/+5/+10/MAX, 길게 누르기, 추천 프리셋, 골드 초기화)
+// =========================================================================
+let statHoldTimer = null;
+let statHoldInterval = null;
+
+function startStatHold(statKey, amount) {
+  stopStatHold();
+  investStat(statKey, amount);
+  statHoldTimer = setTimeout(() => {
+    statHoldInterval = setInterval(() => {
+      if (!state || state.statPts <= 0) { stopStatHold(); return; }
+      investStat(statKey, amount);
+    }, 85);
+  }, 340);
+}
+
+function stopStatHold() {
+  if (statHoldTimer) { clearTimeout(statHoldTimer); statHoldTimer = null; }
+  if (statHoldInterval) { clearInterval(statHoldInterval); statHoldInterval = null; }
+}
+
+function investStat(k, amount = 1) {
+  if (!state || state.statPts <= 0) return;
+  const spend = amount === 'MAX' ? state.statPts : Math.min(state.statPts, amount);
+  if (spend <= 0) return;
+  SFX.play('click');
+  state.statPts -= spend;
+  state.stats[k] += spend;
+  state.investedStats[k] = (state.investedStats[k] || 0) + spend;
+  updateHUD();
+  renderCharTab();
+  saveGame();
+}
+
+function applyStatPreset(silent = false) {
+  if (!state || state.statPts <= 0) {
+    if (!silent) showToast('배분할 스탯 포인트가 없습니다.', 'normal');
+    return 0;
+  }
+  const ratio = state.statRatio || STAT_PRESETS[state.classKey] || STAT_PRESETS.warrior;
+  const keys = ['str', 'dex', 'int', 'cha', 'luk'];
+  const totalWeight = keys.reduce((acc, k) => acc + (Number(ratio[k]) || 0), 0);
+  if (totalWeight <= 0) {
+    if (!silent) showToast('비율 합계가 0입니다. 비율을 설정해주세요.', 'warn');
+    return 0;
+  }
+
+  const totalToSpend = state.statPts;
+  let spent = 0;
+  let maxKey = keys[0];
+  let maxW = -1;
+
+  keys.forEach(k => {
+    const w = Number(ratio[k]) || 0;
+    if (w > maxW) { maxW = w; maxKey = k; }
+    const add = Math.floor((totalToSpend * w) / totalWeight);
+    if (add > 0) {
+      state.stats[k] += add;
+      state.investedStats[k] = (state.investedStats[k] || 0) + add;
+      spent += add;
+    }
+  });
+
+  // 소수점 나머지 포인트는 최우선 스탯에 몰아주기
+  const rem = totalToSpend - spent;
+  if (rem > 0) {
+    state.stats[maxKey] += rem;
+    state.investedStats[maxKey] = (state.investedStats[maxKey] || 0) + rem;
+    spent += rem;
+  }
+  state.statPts -= spent;
+
+  if (!silent) {
+    SFX.play('success');
+    showToast(`📊 스탯 포인트 +${spent} 비율 배분 완료!`, 'good');
+    updateHUD();
+    renderCharTab();
+    saveGame();
+  }
+  return spent;
+}
+
+function openStatRatioModal() {
+  SFX.play('click');
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  overlay.classList.add('show');
+
+  const r = state.statRatio || STAT_PRESETS[state.classKey];
+  const labels = [
+    { k: 'str', n: '💪 힘 (STR)' },
+    { k: 'dex', n: '🏃 민첩 (DEX)' },
+    { k: 'int', n: '📘 지능 (INT)' },
+    { k: 'cha', n: '👑 매력 (CHA)' },
+    { k: 'luk', n: '🍀 행운 (LUK)' }
+  ];
+
+  content.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size:15px; font-weight:800; color:var(--border-bright);">🎯 스탯 자동 배분 비율 설정</div>
+      <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">입력한 비중대로 남은 포인트와 레벨업 포인트가 자동 배분됩니다.</div>
+    </div>
+    <div class="card">
+      ${labels.map(l => `
+        <div class="setting-row">
+          <span>${l.n}</span>
+          <input type="number" class="input-dark" id="ratio-inp-${l.k}" min="0" max="100" value="${r[l.k] || 0}">
+        </div>
+      `).join('')}
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+      <button class="choice-btn" style="justify-content:center;" onclick="loadClassDefaultRatio()">✨ 직업 추천값 불러오기</button>
+      <button class="choice-btn" style="justify-content:center; border-color:#4cd964;" onclick="saveCustomStatRatio()">💾 내 비율 저장</button>
+    </div>
+    <button class="btn-sm" style="padding:7px;" onclick="closeModal()">닫기</button>
+  `;
+}
+
+function loadClassDefaultRatio() {
+  const preset = STAT_PRESETS[state.classKey] || STAT_PRESETS.warrior;
+  ['str', 'dex', 'int', 'cha', 'luk'].forEach(k => {
+    const inp = document.getElementById(`ratio-inp-${k}`);
+    if (inp) inp.value = preset[k];
+  });
+  showToast(`${CLASSES[state.classKey].name} 추천 비율을 불러왔습니다.`, 'normal', 1500);
+}
+
+function saveCustomStatRatio() {
+  const nextRatio = {};
+  let sum = 0;
+  ['str', 'dex', 'int', 'cha', 'luk'].forEach(k => {
+    const val = Math.max(0, parseInt(document.getElementById(`ratio-inp-${k}`)?.value || '0', 10) || 0);
+    nextRatio[k] = val;
+    sum += val;
+  });
+  if (sum <= 0) {
+    showToast('최소 하나 이상의 스탯 비율을 1 이상 입력하세요.', 'warn');
+    return;
+  }
+  state.statRatio = nextRatio;
+  saveGame();
+  closeModal();
+  SFX.play('success');
+  showToast('내 스탯 자동 배분 비율이 저장되었습니다!', 'good');
+}
+
+function resetStatsWithConfirm() {
+  const keys = ['str', 'dex', 'int', 'cha', 'luk'];
+  const totalInv = keys.reduce((acc, k) => acc + (state.investedStats[k] || 0), 0);
+  if (totalInv <= 0) {
+    showToast('초기화할 투자 스탯이 없습니다.', 'normal');
+    return;
+  }
+  const cost = 200 + totalInv * 15;
+  if (state.gold < cost) {
+    SFX.play('fail');
+    showToast(`스탯 초기화 골드가 부족합니다! (필요: ${fmt(cost)} G)`, 'warn');
+    return;
+  }
+  const btn = document.getElementById('btn-reset-stats');
+  if (!checkInlineConfirm('reset_stats', btn, `⚠️ ${fmt(cost)}G 초기화 확인`)) return;
+
+  state.gold -= cost;
+  keys.forEach(k => {
+    const inv = state.investedStats[k] || 0;
+    state.stats[k] = Math.max(1, state.stats[k] - inv);
+    state.investedStats[k] = 0;
+  });
+  state.statPts += totalInv;
+  SFX.play('success');
+  showToast(`🔄 스탯 초기화 완료! (+${totalInv} 포인트 환급, -${fmt(cost)}G)`, 'good');
+  updateHUD();
+  renderCharTab();
+  saveGame();
+}
+
+// =========================================================================
+// [1-4] 강화 편의 (+1/+5/목표+N/MAX & 모달 유지 & 전체 장비 일괄 강화)
+// =========================================================================
+function getEnhanceParams(item) {
+  const enh = item.enhance || 0;
+  const discount = Math.max(0.4, 1 - (state.relics.hammer || 0) * 0.05);
+  const cost = Math.floor((35 + item.lv * 12) * Math.pow(1.35, enh) * discount);
+  const prob = enh < 5 ? 90 - enh * 5 : enh < 10 ? 60 - (enh - 5) * 4 : Math.max(15, 32 - (enh - 10) * 3);
+  return { enh, cost, prob };
+}
+
+function runEnhanceSequence(uid, isEquipped, mode) {
+  const item = isEquipped
+    ? Object.values(state.equipped).find(x => x && x.uid === uid)
+    : state.inventory.find(x => x.uid === uid);
+  if (!item) return;
+
+  const safe = state.enhanceSafe || { targetLv: 10, minGold: 500, stopOnDrop: true };
+  const targetLv = Math.min(20, Math.max(1, safe.targetLv || 10));
+  const minGold = mode === 'target' ? (safe.minGold || 0) : 0;
+  const stopOnDrop = mode === 'target' ? !!safe.stopOnDrop : false;
+
+  let maxAttempts = 1;
+  if (mode === '5') maxAttempts = 5;
+  else if (mode === 'target' || mode === 'max') maxAttempts = 60;
+
+  let succ = 0, fail = 0, drop = 0, spentGold = 0;
+  let stopReason = '';
+
+  for (let i = 0; i < maxAttempts; i++) {
+    const { enh, cost, prob } = getEnhanceParams(item);
+    if (enh >= 20) { stopReason = '최대(+20) 도달'; break; }
+    if (mode === 'target' && enh >= targetLv) { stopReason = `목표 +${targetLv} 달성`; break; }
+    if (state.gold - cost < minGold) {
+      stopReason = minGold > 0 ? `최소 골드(${fmt(minGold)}G) 보호` : '골드 부족';
+      break;
+    }
+
+    state.gold -= cost;
+    spentGold += cost;
+
+    if (Math.random() * 100 < prob) {
+      item.enhance = enh + 1;
+      if (item.enhance > (state.records.maxEnh || 0)) state.records.maxEnh = item.enhance;
+      succ++;
+    } else {
+      fail++;
+      if (enh >= 6 && Math.random() < 0.3) {
+        item.enhance = enh - 1;
+        drop++;
+        if (stopOnDrop) { stopReason = '하락 중단'; break; }
+      }
+    }
+  }
+
+  if (succ + fail === 0) {
+    SFX.play('fail');
+    showToast(`강화 불가: ${stopReason || '골드가 부족합니다.'}`, 'warn');
+    return;
+  }
+
+  SFX.play(succ > 0 ? 'success' : 'fail');
+  const summary = `🔨 [${item.name} +${item.enhance}] 성공 ${succ} / 실패 ${fail} / 하락 ${drop}${stopReason ? ` (${stopReason})` : ''}`;
+  showToast(summary, succ > 0 ? 'good' : 'warn', 2600);
+  addLog(`${summary} (-${fmt(spentGold)}G)`);
+
+  updateHUD();
+  refreshActiveTab();
+  saveGame();
+  openItemDetail(uid, isEquipped); // 모달 닫히지 않고 즉시 갱신!
+}
+
+function batchEnhanceEquipped() {
+  const safe = state.enhanceSafe || { targetLv: 10, minGold: 500, stopOnDrop: true };
+  const targetLv = Math.min(20, Math.max(1, safe.targetLv || 10));
+  const minGold = safe.minGold || 0;
+
+  let succ = 0, fail = 0, drop = 0, spentGold = 0;
+  let stopReason = '';
+
+  for (let step = 0; step < 120; step++) {
+    const eqItems = Object.values(state.equipped).filter(x => x && (x.enhance || 0) < targetLv && (x.enhance || 0) < 20);
+    if (eqItems.length === 0) { stopReason = `전체 +${targetLv} 달성`; break; }
+
+    // 강화 수치가 가장 낮은 장비부터 우선 강화
+    eqItems.sort((a, b) => (a.enhance || 0) - (b.enhance || 0));
+    const item = eqItems[0];
+    const { enh, cost, prob } = getEnhanceParams(item);
+
+    if (state.gold - cost < minGold) {
+      stopReason = minGold > 0 ? `보유골드 ${fmt(minGold)}G 유지` : '골드 부족';
+      break;
+    }
+
+    state.gold -= cost;
+    spentGold += cost;
+
+    if (Math.random() * 100 < prob) {
+      item.enhance = enh + 1;
+      if (item.enhance > (state.records.maxEnh || 0)) state.records.maxEnh = item.enhance;
+      succ++;
+    } else {
+      fail++;
+      if (enh >= 6 && Math.random() < 0.3) {
+        item.enhance = enh - 1;
+        drop++;
+        if (safe.stopOnDrop) { stopReason = '하락 시 안전 중단'; break; }
+      }
+    }
+  }
+
+  if (succ + fail === 0) {
+    SFX.play('click');
+    showToast(`일괄 강화 불가: ${stopReason || '강화 대상 또는 골드 부족'}`, 'normal');
+    return;
+  }
+
+  SFX.play(succ > 0 ? 'legend' : 'fail');
+  const msg = `🔨 전체 일괄강화 완료! 성공 ${succ} / 실패 ${fail} / 하락 ${drop} (${stopReason})`;
+  showToast(msg, succ > 0 ? 'good' : 'warn', 2800);
+  addLog(`${msg} (-${fmt(spentGold)}G)`);
+  setRecentSummary(`전체 일괄강화: 성공 ${succ} / 실패 ${fail}`);
+  updateHUD();
+  renderCharTab();
+  saveGame();
+}
+
+// =========================================================================
+// [1-5] 스킬/유물 +1/+5/MAX 및 기타 자동화(자동 스킬업/퀘스트/던전/환생)
+// =========================================================================
+function upgradeSkillMulti(skId, mode) {
+  const c = CLASSES[state.classKey];
+  const sk = c.skills.find(x => x.id === skId);
+  if (!sk || state.lv < sk.reqLv) return;
+
+  const limit = mode === 'MAX' ? 100 : parseInt(mode, 10);
+  let ups = 0, spent = 0;
+
+  for (let i = 0; i < limit; i++) {
+    const sLv = state.skills[skId] || 1;
+    const cost = Math.floor(90 * Math.pow(1.5, sLv - 1));
+    if (state.gold < cost) break;
+    state.gold -= cost;
+    state.skills[skId] = sLv + 1;
+    ups++;
+    spent += cost;
+  }
+
+  if (ups === 0) {
+    SFX.play('fail');
+    showToast('스킬 강화 골드가 부족합니다!', 'warn');
+    return;
+  }
+  SFX.play('success');
+  showToast(`📘 [${sk.name}] +${ups}Lv 강화! (-${fmt(spent)}G)`, 'good', 1800);
+  updateHUD();
+  renderSkillTab();
+  saveGame();
+}
+
+function autoUpgradeSkillsLoop(silent = false) {
+  const c = CLASSES[state.classKey];
+  let totalUps = 0;
+  for (let iter = 0; iter < 40; iter++) {
+    const unlocked = c.skills.filter(sk => state.lv >= sk.reqLv);
+    if (unlocked.length === 0) break;
+    unlocked.sort((a, b) => (state.skills[a.id] || 1) - (state.skills[b.id] || 1));
+    const target = unlocked[0];
+    const sLv = state.skills[target.id] || 1;
+    const cost = Math.floor(90 * Math.pow(1.5, sLv - 1));
+    if (state.gold < cost) break;
+    state.gold -= cost;
+    state.skills[target.id] = sLv + 1;
+    totalUps++;
+  }
+  if (totalUps > 0 && !silent) {
+    addLog(`📘 [자동 스킬업] 스킬 레벨 총 +${totalUps} 강화!`);
+  }
+  return totalUps;
+}
+
+function upgradeRelicMulti(rId, mode) {
+  const r = RELICS.find(x => x.id === rId);
+  if (!r) return;
+  const limit = mode === 'MAX' ? 100 : parseInt(mode, 10);
+  let ups = 0, spent = 0;
+
+  for (let i = 0; i < limit; i++) {
+    const rLv = state.relics[rId] || 0;
+    const cost = r.baseCost + rLv * 4;
+    if (state.soulStones < cost) break;
+    state.soulStones -= cost;
+    state.relics[rId] = rLv + 1;
+    ups++;
+    spent += cost;
+  }
+
+  if (ups === 0) {
+    SFX.play('fail');
+    showToast('영혼석이 부족합니다! (보스 처치·환생으로 획득)', 'warn');
+    return;
+  }
+  SFX.play('legend');
+  showToast(`${r.name} +${ups}Lv 강화! (💎-${spent})`, 'good', 1800);
+  updateHUD();
+  renderSkillTab();
+  saveGame();
+}
+
+function claimAllCompletedQuests(silent = false) {
+  let claimed = 0;
+  let gSum = 0, sSum = 0;
+  (state.quests || []).forEach(q => {
+    while (q.prog >= q.goal) {
+      state.gold += q.rewardGold;
+      state.soulStones += q.rewardSoul;
+      gSum += q.rewardGold;
+      sSum += q.rewardSoul;
+      q.prog -= q.goal;
+      q.goal = Math.floor(q.goal * 1.4);
+      q.rewardGold = Math.floor(q.rewardGold * 1.5);
+      claimed++;
+    }
+  });
+  if (claimed > 0 && !silent) {
+    SFX.play('legend');
+    addLog(`📜 [퀘스트 자동수령] ${claimed}개 완료 (+${fmt(gSum)}G, 💎+${sSum})`);
+    showToast(`📜 퀘스트 ${claimed}개 보상 수령! (+${fmt(gSum)}G, 💎+${sSum})`, 'good');
+  }
+  return claimed;
+}
+
+function runAutoBackgroundAutomation() {
+  if (!state || !state.settings) return;
+  if (state.settings.autoClaimQuest) {
+    claimAllCompletedQuests(false);
+  }
+  if (state.settings.autoSkillUp) {
+    autoUpgradeSkillsLoop(false);
+  }
+  if (state.settings.autoSpecialDungeon && (state.dungeonTickets || 0) > 0) {
+    while ((state.dungeonTickets || 0) > 0) {
+      runSpecialDungeon('gear', true);
+    }
+  }
+  // N층 도달 시 자동 환생 체크
+  const targetDepth = state.settings.autoPrestigeDepth || 0;
+  if (targetDepth > 0 && state.depth >= targetDepth && (state.lv >= 20 || state.depth >= 15)) {
+    const estSoul = Math.max(5, Math.floor((state.depth * 1.5 + state.lv * 0.8) * (1 + (state.ngPlus || 0) * 0.25)));
+    executePrestigeCore(estSoul, true);
+  }
+}
+
+// =========================================================================
+// 미니맵, 총합 스탯, 전투씬 비주얼
 // =========================================================================
 const NODE_TYPES = [
   { type: 'combat', icon: '⚔️', name: '일반 전투' },
@@ -1745,10 +2381,9 @@ function generateFloorNodes() {
     if (i === 9) {
       nodes.push({ type: 'boss', icon: '👑', name: '계층 군주(보스)' });
     } else if (i === 4) {
-      const mid = Math.random() < 0.5
+      nodes.push(Math.random() < 0.5
         ? { type: 'chest', icon: '🧰', name: '보물상자' }
-        : { type: 'camp', icon: '🏕️', name: '화톳불 쉼터' };
-      nodes.push(mid);
+        : { type: 'camp', icon: '🏕️', name: '화톳불 쉼터' });
     } else {
       const r = Math.random();
       if (r < 0.36) nodes.push(NODE_TYPES[0]);
@@ -1781,9 +2416,6 @@ function renderMinimap() {
   }).join('');
 }
 
-// =========================================================================
-// 캐릭터 총합 능력치 계산
-// =========================================================================
 function getTotalStats() {
   const c = CLASSES[state.classKey];
   const promo = c.promotions[Math.min(c.promotions.length - 1, (state.jobTier || 1) - 1)];
@@ -1863,9 +2495,6 @@ function getTotalStats() {
   return { stats: s, setCounts, promo, codexBonus, achBonus };
 }
 
-// =========================================================================
-// 전투씬 비주얼 업데이트 및 애니메이션 연출
-// =========================================================================
 function updateBattleStage(targetIcon, targetName, isCombat = false) {
   const c = CLASSES[state.classKey];
   const { stats, promo } = getTotalStats();
@@ -1930,7 +2559,7 @@ function playCombatAnim(attacker, dmgText, color = '#fff', isCrit = false) {
 }
 
 // =========================================================================
-// [A-1] 전 탭 동작 스마트 자동선택 & 백그라운드 드리프트 보정 컨트롤러
+// 자동 진행(전 탭 유지) & 수동 자동전진(0.6초) & 백그라운드 드리프트 보정
 // =========================================================================
 function syncAutoButtonsUI() {
   const btn = document.getElementById('btn-auto-toggle');
@@ -1942,11 +2571,26 @@ function syncAutoButtonsUI() {
   if (spdBtn) spdBtn.textContent = `⚡ ${autoPlay.speeds[autoPlay.speedIdx].label}`;
   const modeBtn = document.getElementById('btn-auto-mode');
   if (modeBtn) modeBtn.textContent = `🎯 ${autoPlay.modes[autoPlay.modeIdx]}`;
+  const advBtn = document.getElementById('btn-manual-advance');
+  if (advBtn && state) {
+    const on = !!state.settings.manualAutoAdvance;
+    advBtn.textContent = `⏩ 자동전진:${on ? 'ON' : 'OFF'}`;
+    advBtn.classList.toggle('active', on);
+  }
   updateAutoStrip();
+}
+
+function toggleManualAutoAdvance() {
+  SFX.play('click');
+  state.settings.manualAutoAdvance = !state.settings.manualAutoAdvance;
+  syncAutoButtonsUI();
+  saveGame();
+  showToast(state.settings.manualAutoAdvance ? '⏩ 수동 모드에서도 보상 후 0.6초 뒤 자동 전진합니다.' : '⏩ 수동 자동 전진을 껐습니다.', 'normal', 1800);
 }
 
 function toggleAutoPlay() {
   SFX.play('click');
+  if (manualAdvanceTimer) { clearTimeout(manualAdvanceTimer); manualAdvanceTimer = null; }
   autoPlay.enabled = !autoPlay.enabled;
   autoPlay.lastTickTime = Date.now();
   syncAutoButtonsUI();
@@ -1969,6 +2613,7 @@ function pauseAutoPlay(reasonMsg) {
   SFX.play('legend');
   addLog(`⏸️ ${reasonMsg}`);
   setRecentSummary(reasonMsg);
+  showToast(`⏸️ ${reasonMsg}`, 'warn', 2600);
   syncAutoButtonsUI();
 }
 
@@ -1992,7 +2637,6 @@ function scheduleAutoTick() {
   autoPlay.timer = setTimeout(executeAutoStep, delay);
 }
 
-// 백그라운드 탭 복귀 및 타이머 드리프트 발생 시 밀린 턴 요약 처리
 function checkAndCompensateDrift() {
   if (!autoPlay.enabled || !state) return false;
   const now = Date.now();
@@ -2012,29 +2656,21 @@ function checkAndCompensateDrift() {
 
 function processDriftTurns(turns) {
   const { stats } = getTotalStats();
-  let totalGold = 0;
-  let totalExp = 0;
-  let kills = 0;
-  let drops = 0;
+  let totalGold = 0, totalExp = 0, drops = 0;
 
   for (let i = 0; i < turns; i++) {
-    const g = Math.floor((14 + state.depth * 5) * (1 + stats.goldPct / 100) * 0.65);
-    const ex = Math.floor((16 + state.depth * 6) * (1 + (state.relics.compass || 0) * 0.3) * 0.65);
-    totalGold += g;
-    totalExp += ex;
+    totalGold += Math.floor((14 + state.depth * 5) * (1 + stats.goldPct / 100) * 0.65);
+    totalExp  += Math.floor((16 + state.depth * 6) * (1 + (state.relics.compass || 0) * 0.3) * 0.65);
 
     if (Math.random() < 0.45) {
-      kills++;
       state.records.kills = (state.records.kills || 0) + 1;
       if (state.quests && state.quests[0]) state.quests[0].prog++;
     }
-
     if (Math.random() < 0.18) {
       const itm = generateItem(state.depth, 0, false);
       acquireItemWithChest(itm, false);
       drops++;
     }
-
     if (i % 2 === 0) {
       state.nodeIdx++;
       if (state.quests && state.quests[1]) state.quests[1].prog++;
@@ -2044,15 +2680,17 @@ function processDriftTurns(turns) {
         generateFloorNodes();
       }
     }
-    if (!autoPlay.enabled) break; // 자동 일시정지 조건 발동 시 중단
+    if (!autoPlay.enabled) break;
   }
 
   state.gold += totalGold;
   gainExp(totalExp);
+  runAutoBackgroundAutomation();
 
-  const msg = `⚡ 백그라운드 ${turns}턴 요약 정산: +${fmt(totalGold)}G, +${fmt(totalExp)}EXP, 장비 ${drops}개`;
+  const msg = `⚡ 백그라운드 ${turns}턴 정산: +${fmt(totalGold)}G, +${fmt(totalExp)}EXP, 장비 ${drops}개`;
   addLog(msg);
   setRecentSummary(msg);
+  showToast(msg, 'good', 2600);
   nextTurnEvent();
   refreshActiveTab();
 }
@@ -2064,18 +2702,14 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// [A-1] 어떤 탭에 있든 멈추지 않고 실행되는 자동 진행 핵심 루프
 function executeAutoStep() {
   if (!autoPlay.enabled) return;
-
-  // 드리프트 체크
   if (checkAndCompensateDrift()) {
     scheduleAutoTick();
     return;
   }
   autoPlay.lastTickTime = Date.now();
 
-  // 자동 닫기 대상 모달(보물상자/오프라인보상 등)이 떠 있으면 즉시 닫기
   const modal = document.getElementById('modal-overlay');
   if (modal.classList.contains('show')) {
     const closeBtn = modal.querySelector('button[data-autoclose="true"]');
@@ -2091,12 +2725,11 @@ function executeAutoStep() {
   const { stats } = getTotalStats();
   const hpRatio = state.hp / stats.maxHp;
 
-  // [A-1] 체력이 낮고 물약 골드(50G)가 없으면 자동으로 '안전' 성향 전환
   if (hpRatio < 0.38 && state.gold < 50 && autoPlay.modes[autoPlay.modeIdx] !== '안전') {
-    autoPlay.modeIdx = 2; // '안전'
+    autoPlay.modeIdx = 2;
     syncAutoButtonsUI();
-    addLog(`⚠️ 체력과 포션 골드가 부족하여 자동 성향이 [🎯 안전]으로 전환되었습니다.`);
-    setRecentSummary(`체력/골드 부족 ➔ [🎯 안전] 성향 자동 전환!`);
+    addLog(`⚠️ 체력과 포션 골드 부족으로 자동 성향이 [🎯 안전]으로 전환되었습니다.`);
+    setRecentSummary(`체력/골드 부족 ➔ [🎯 안전] 전환`);
   }
 
   const mode = autoPlay.modes[autoPlay.modeIdx];
@@ -2105,43 +2738,29 @@ function executeAutoStep() {
   if (btns.length === 1) {
     chosen = btns[0];
   } else if (currentEnemy) {
-    // 전투 중 스마트 판단
     const healBtn = btns.find(b => b.dataset.act === 'heal');
     const ultBtn  = btns.find(b => b.dataset.act === 's4');
     const s3Btn   = btns.find(b => b.dataset.act === 's3');
     const s1Btn   = btns.find(b => b.dataset.act === 's1');
     const atkBtn  = btns.find(b => b.dataset.act === 'attack');
 
-    if (hpRatio < 0.38 && state.gold >= 50 && healBtn) {
-      chosen = healBtn;
-    } else if (ultBtn && state.mp >= parseInt(ultBtn.dataset.mp || '999', 10)) {
-      chosen = ultBtn;
-    } else if (s3Btn && state.mp >= parseInt(s3Btn.dataset.mp || '999', 10)) {
-      chosen = s3Btn;
-    } else if (s1Btn && state.mp >= parseInt(s1Btn.dataset.mp || '999', 10)) {
-      chosen = s1Btn;
-    } else {
-      chosen = atkBtn || btns[0];
-    }
+    if (hpRatio < 0.38 && state.gold >= 50 && healBtn) chosen = healBtn;
+    else if (ultBtn && state.mp >= parseInt(ultBtn.dataset.mp || '999', 10)) chosen = ultBtn;
+    else if (s3Btn && state.mp >= parseInt(s3Btn.dataset.mp || '999', 10)) chosen = s3Btn;
+    else if (s1Btn && state.mp >= parseInt(s1Btn.dataset.mp || '999', 10)) chosen = s1Btn;
+    else chosen = atkBtn || btns[0];
   } else {
-    // 비전투 선택지 스마트 판단
     const specialBtn = btns.find(b => b.classList.contains('class-special'));
     const safeBtn = btns.find(b => (b.dataset.prob || '') === '100' && b.dataset.safe === 'true');
 
-    if (specialBtn) {
-      chosen = specialBtn;
-    } else if ((mode === '안전' || hpRatio < 0.38) && safeBtn) {
-      chosen = safeBtn;
-    } else if (mode === '파밍') {
-      chosen = btns[0];
-    } else {
+    if (specialBtn) chosen = specialBtn;
+    else if ((mode === '안전' || hpRatio < 0.38) && safeBtn) chosen = safeBtn;
+    else if (mode === '파밍') chosen = btns[0];
+    else {
       let bestProb = -1;
       btns.forEach(b => {
         const p = parseInt(b.dataset.prob || '60', 10);
-        if (b.dataset.safe !== 'true' && p > bestProb) {
-          bestProb = p;
-          chosen = b;
-        }
+        if (b.dataset.safe !== 'true' && p > bestProb) { bestProb = p; chosen = b; }
       });
     }
   }
@@ -2152,13 +2771,12 @@ function executeAutoStep() {
       if (chosen) chosen.click();
       refreshActiveTab();
       scheduleAutoTick();
-    }, 95);
+    }, 90);
   } else {
     scheduleAutoTick();
   }
 }
 
-// 모험 외 다른 탭이 열려 있을 때도 실시간으로 UI 갱신
 function refreshActiveTab() {
   if (document.getElementById('tab-char').classList.contains('active')) renderCharTab();
   else if (document.getElementById('tab-inv').classList.contains('active')) renderInvTab();
@@ -2168,7 +2786,7 @@ function refreshActiveTab() {
 }
 
 // =========================================================================
-// 아이템 생성, 획득(자동 장착/자동 분해/유니크 일시정지 연동), 상자 연출
+// 아이템 생성, 획득(자동 장착 + 스마트 분해 규칙 연동), 상자 모달
 // =========================================================================
 function generateItem(depth, forceMinGradeIdx = 0, isUnidentified = false) {
   const { stats } = getTotalStats();
@@ -2220,7 +2838,8 @@ function generateItem(depth, forceMinGradeIdx = 0, isUnidentified = false) {
     uid: 'itm_' + Date.now() + '_' + Math.floor(Math.random() * 99999),
     name, slotId: slot.id, slotName: slot.name, icon: slot.icon,
     lv: itemLv, gradeId: grade.id, gradeName: grade.name, gradeCls: grade.cls, gradeIdx: picked.idx,
-    baseStat: slot.baseStat, baseVal, enhance: 0, setId, setName, isUnique, unidentified: isUnidentified, options
+    baseStat: slot.baseStat, baseVal, enhance: 0, locked: false,
+    setId, setName, isUnique, unidentified: isUnidentified, options
   };
 }
 
@@ -2235,33 +2854,31 @@ function acquireItemWithChest(item, isChestModal = true) {
     addLog(`📖 신규 유니크 도감 등록: [${item.name}] (영구 공격력 +2%!)`);
   }
 
-  // [A-1] 신규 유니크 획득 시 자동 일시정지 옵션 체크
-  if (isNewUnique && state.settings && state.settings.pauseOnUnique && autoPlay.enabled) {
+  if (isNewUnique && state.settings.pauseOnUnique && autoPlay.enabled) {
     pauseAutoPlay(`신규 유니크 [${item.name}] 획득으로 일시정지!`);
   }
 
   let itemToStore = item;
 
-  // [A-2] 획득 즉시 상위 장비 자동 장착 토글 처리
-  if (!item.unidentified && state.settings && state.settings.autoEquipOnDrop) {
+  // 상위 장비 자동 장착
+  if (!item.unidentified && state.settings.autoEquipOnDrop) {
     const cmp = getItemScoreDiff(item);
     if (cmp && cmp.diff > 0) {
       const prevEquipped = state.equipped[item.slotId];
       state.equipped[item.slotId] = item;
-      itemToStore = prevEquipped; // 교체된 이전 장비를 인벤토리/분해 대상으로 전달
-      addLog(`⬆️ [자동장착] ${item.slotName}에 [${item.gradeName}] ${item.name} 착용 (점수 ▲+${fmt(cmp.diff)})`);
-      setRecentSummary(`자동장착: [${item.gradeName}] ${item.name} (▲+${fmt(cmp.diff)})`);
+      itemToStore = prevEquipped;
+      addLog(`⬆️ [자동장착] ${item.slotName}에 [${item.gradeName}] ${item.name} 착용 (▲+${fmt(cmp.diff)})`);
+      setRecentSummary(`자동장착: [${item.gradeName}] ${item.name}`);
     }
   }
 
-  // [A-2] 하위 장비 자동 분해 토글 처리
-  const autoSalvageMaxIdx = state.settings ? state.settings.autoSalvageGradeIdx : -1;
-  if (itemToStore && !itemToStore.unidentified && autoSalvageMaxIdx >= 0 && itemToStore.gradeIdx <= autoSalvageMaxIdx) {
+  // [1-2] 스마트 분해 규칙 즉시 적용
+  if (itemToStore && state.settings.autoSalvageOnDrop && shouldSalvageItem(itemToStore)) {
     const dustGain = (itemToStore.gradeIdx + 1) * 4;
     const goldGain = itemToStore.lv * 10;
     state.dust += dustGain;
     state.gold += goldGain;
-    addLog(`♻️ [자동분해] [${itemToStore.gradeName}] ${itemToStore.name} ➔ 가루 +${dustGain}, +${fmt(goldGain)}G`);
+    addLog(`♻️ [스마트 자동분해] [${itemToStore.gradeName}] ${itemToStore.name} ➔ ✨+${dustGain}, +${fmt(goldGain)}G`);
     updateHUD();
     saveGame();
     return;
@@ -2271,7 +2888,7 @@ function acquireItemWithChest(item, isChestModal = true) {
     if (state.inventory.length >= 35) {
       const dustGain = (itemToStore.gradeIdx + 1) * 5;
       state.dust += dustGain;
-      addLog(`🎒 가방이 가득 차 [${itemToStore.name}] 자동 분해 (가루 +${dustGain})`);
+      addLog(`🎒 가방 초과로 [${itemToStore.name}] 자동 분해 (✨+${dustGain})`);
       updateHUD();
       saveGame();
       return;
@@ -2286,7 +2903,6 @@ function acquireItemWithChest(item, isChestModal = true) {
     SFX.play('success');
   }
 
-  // [A-1] 자동 진행 중에는 상자 모달을 절대 띄우지 않고 로그로만 일관 처리
   if (isChestModal && !autoPlay.enabled) {
     showChestModal(item);
   } else {
@@ -2325,7 +2941,7 @@ function showChestModal(item) {
     const titleStr = item.unidentified ? `❓ 미감정 ${item.slotName}` : `${item.icon} [${item.gradeName}] ${item.name}`;
     const cmp = !item.unidentified ? getItemScoreDiff(item) : null;
     const cmpHtml = cmp
-      ? `<div style="margin-top:4px;"><span class="cmp-badge ${cmp.diff > 0 ? 'cmp-up' : cmp.diff < 0 ? 'cmp-down' : 'cmp-same'}">장비점수 ${fmt(cmp.myScore)} (${cmp.diff > 0 ? '🔺 ▲+' + fmt(cmp.diff) : cmp.diff < 0 ? '▼' + fmt(cmp.diff) : '━ 0'})</span></div>`
+      ? `<div style="margin-top:4px;"><span class="cmp-badge ${cmp.diff > 0 ? 'cmp-up' : cmp.diff < 0 ? 'cmp-down' : 'cmp-same'}">점수 ${fmt(cmp.myScore)} (${cmp.diff > 0 ? '🔺 ▲+' + fmt(cmp.diff) : cmp.diff < 0 ? '▼' + fmt(cmp.diff) : '━ 0'})</span></div>`
       : '';
     const optsHtml = item.unidentified
       ? `<div style="color:#ffd180; font-size:12px;">감정 시 숨겨진 등급과 옵션이 공개됩니다!</div>`
@@ -2352,7 +2968,7 @@ function closeModal() {
 }
 
 // =========================================================================
-// 메인 턴 루프 & 미니맵 노드 진행
+// 메인 턴 루프 & 비전투 이벤트 & 전투 루프
 // =========================================================================
 function calcStatProb(statKey, difficulty = 1.0) {
   const { stats } = getTotalStats();
@@ -2364,6 +2980,7 @@ function calcStatProb(statKey, difficulty = 1.0) {
 }
 
 function nextTurnEvent() {
+  if (manualAdvanceTimer) { clearTimeout(manualAdvanceTimer); manualAdvanceTimer = null; }
   if (state.flags.cursed > 0) state.flags.cursed--;
   if (state.flags.blessed > 0) state.flags.blessed--;
 
@@ -2373,30 +2990,20 @@ function nextTurnEvent() {
   }
 
   document.getElementById('result-box').classList.remove('show');
-
   const placeObj = PLACES[state.depth % PLACES.length];
   document.getElementById('stage-bg-deco').innerHTML = placeObj.decos.map(d => `<span>${d}</span>`).join('');
 
   renderMinimap();
   const node = state.floorNodes[state.nodeIdx] || { type: 'combat', icon: '⚔️', name: '일반 전투' };
 
-  if (node.type === 'boss') {
-    startCombat('boss', placeObj.name);
-  } else if (node.type === 'elite') {
-    startCombat('elite', placeObj.name);
-  } else if (node.type === 'combat') {
-    startCombat('normal', placeObj.name);
-  } else if (node.type === 'chest') {
-    evTreasureChest(placeObj.name);
-  } else if (node.type === 'trap') {
-    evTrap(placeObj.name);
-  } else if (node.type === 'npc') {
-    evSuspiciousNpc(placeObj.name);
-  } else if (node.type === 'shrine') {
-    evShrine(placeObj.name);
-  } else {
-    evCamp(placeObj.name);
-  }
+  if (node.type === 'boss') startCombat('boss', placeObj.name);
+  else if (node.type === 'elite') startCombat('elite', placeObj.name);
+  else if (node.type === 'combat') startCombat('normal', placeObj.name);
+  else if (node.type === 'chest') evTreasureChest(placeObj.name);
+  else if (node.type === 'trap') evTrap(placeObj.name);
+  else if (node.type === 'npc') evSuspiciousNpc(placeObj.name);
+  else if (node.type === 'shrine') evShrine(placeObj.name);
+  else evCamp(placeObj.name);
 
   updateHUD();
   saveGame();
@@ -2412,6 +3019,8 @@ function advanceNodeAndShowNext(resultHtml, plainSummary = '') {
     generateFloorNodes();
     addLog(`🔥 심연 ${state.depth}층으로 진입했습니다!`);
   }
+
+  runAutoBackgroundAutomation();
 
   if (plainSummary) {
     setRecentSummary(plainSummary);
@@ -2433,9 +3042,18 @@ function advanceNodeAndShowNext(resultHtml, plainSummary = '') {
   updateHUD();
   refreshActiveTab();
   saveGame();
+
+  // [1-5] 수동 모드에서도 자동 전진 토글 ON이면 0.6초 뒤 자동 전진
+  if (!autoPlay.enabled && state.settings.manualAutoAdvance) {
+    if (manualAdvanceTimer) clearTimeout(manualAdvanceTimer);
+    manualAdvanceTimer = setTimeout(() => {
+      if (!autoPlay.enabled && !currentEnemy && state.settings.manualAutoAdvance) {
+        nextTurnEvent();
+      }
+    }, 600);
+  }
 }
 
-// 비전투 이벤트 5종
 function evTreasureChest(placeName) {
   currentEnemy = null;
   updateBattleStage('🧰', '고대의 보물상자', false);
@@ -2447,37 +3065,25 @@ function evTreasureChest(placeName) {
   const pStr = calcStatProb('str', 1.1);
   let html = `
     <button class="choice-btn" data-prob="${pDex}" onclick="resolveChest('dex', ${pDex})">
-      <div class="choice-left">
-        <span class="choice-title">🔓 함정을 정교하게 해체한다</span>
-        <span class="choice-desc">[민첩 판정] 성공 시 장비 획득 / 실패 시 독침 피해</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🔓 함정을 정교하게 해체한다</span><span class="choice-desc">[민첩 판정] 성공 시 장비 획득 / 실패 시 독침 피해</span></div>
       <span class="choice-prob">민첩 ${pDex}%</span>
     </button>
     <button class="choice-btn" data-prob="${pStr}" onclick="resolveChest('str', ${pStr})">
-      <div class="choice-left">
-        <span class="choice-title">🪓 무력으로 자물쇠를 부순다</span>
-        <span class="choice-desc">[힘 판정] 성공 시 장비+추가 골드 / 실패 시 폭발 피해</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🪓 무력으로 자물쇠를 부순다</span><span class="choice-desc">[힘 판정] 성공 시 장비+추가 골드 / 실패 시 폭발 피해</span></div>
       <span class="choice-prob">힘 ${pStr}%</span>
     </button>
   `;
   if (state.classKey === 'rogue') {
     html += `
       <button class="choice-btn class-special" data-prob="100" onclick="resolveChest('rogue', 100)">
-        <div class="choice-left">
-          <span class="choice-title">🗡️ [도적 전용] 비밀 바닥까지 완벽 개방</span>
-          <span class="choice-desc">100% 성공 + 희귀 등급 이상 확정!</span>
-        </div>
+        <div class="choice-left"><span class="choice-title">🗡️ [도적 전용] 비밀 바닥까지 완벽 개방</span><span class="choice-desc">100% 성공 + 희귀 등급 이상 확정!</span></div>
         <span class="choice-prob" style="color:#4cd964;">특수 100%</span>
       </button>
     `;
   }
   html += `
     <button class="choice-btn" data-prob="100" data-safe="true" onclick="state.mp = Math.min(getTotalStats().stats.maxMp, state.mp + 15); advanceNodeAndShowNext('상자를 지나치며 호흡을 가다듬었습니다. (MP +15)');">
-      <div class="choice-left">
-        <span class="choice-title">🚶 미믹일지 모르니 지나간다</span>
-        <span class="choice-desc">안전하게 MP +15 회복</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🚶 미믹일지 모르니 지나간다</span><span class="choice-desc">안전하게 MP +15 회복</span></div>
       <span class="choice-prob">안전 100%</span>
     </button>
   `;
@@ -2513,24 +3119,15 @@ function evTrap(placeName) {
   const pInt = calcStatProb('int', 1.1);
   document.getElementById('choices-wrap').innerHTML = `
     <button class="choice-btn" data-prob="${pDex}" onclick="resolveTrap('dex', ${pDex})">
-      <div class="choice-left">
-        <span class="choice-title">🤸 날렵하게 칼날 사이를 도약한다</span>
-        <span class="choice-desc">[민첩 판정] 성공 시 경험치 획득</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🤸 날렵하게 칼날 사이를 도약한다</span><span class="choice-desc">[민첩 판정] 성공 시 경험치 획득</span></div>
       <span class="choice-prob">민첩 ${pDex}%</span>
     </button>
     <button class="choice-btn" data-prob="${pInt}" onclick="resolveTrap('int', ${pInt})">
-      <div class="choice-left">
-        <span class="choice-title">🔍 마력 코어를 추출해 분해한다</span>
-        <span class="choice-desc">[지능 판정] 성공 시 마력 가루 & 골드 획득</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🔍 마력 코어를 추출해 분해한다</span><span class="choice-desc">[지능 판정] 성공 시 마력 가루 &amp; 골드 획득</span></div>
       <span class="choice-prob">지능 ${pInt}%</span>
     </button>
     <button class="choice-btn" data-prob="100" data-safe="true" onclick="resolveTrap('guard', 100)">
-      <div class="choice-left">
-        <span class="choice-title">🛡️ 방어 자세로 돌파한다</span>
-        <span class="choice-desc">소량의 체력(7%)만 소모하고 안전 통과</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🛡️ 방어 자세로 돌파한다</span><span class="choice-desc">소량의 체력(7%)만 소모하고 안전 통과</span></div>
       <span class="choice-prob">안전 100%</span>
     </button>
   `;
@@ -2571,24 +3168,15 @@ function evSuspiciousNpc(placeName) {
   const cost = Math.floor(50 + state.depth * 15);
   document.getElementById('choices-wrap').innerHTML = `
     <button class="choice-btn" data-prob="${pCha}" onclick="resolveNpc('cha', ${pCha})">
-      <div class="choice-left">
-        <span class="choice-title">🗣️ 설득하여 무료 보급품을 받는다</span>
-        <span class="choice-desc">[매력 판정] 성공 시 체력 회복 + 골드 획득 + 평판 상승</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🗣️ 설득하여 무료 보급품을 받는다</span><span class="choice-desc">[매력 판정] 성공 시 체력 회복 + 골드 획득 + 평판 상승</span></div>
       <span class="choice-prob">매력 ${pCha}%</span>
     </button>
     <button class="choice-btn" data-prob="90" onclick="resolveNpc('buy', ${cost})">
-      <div class="choice-left">
-        <span class="choice-title">🪙 ${fmt(cost)} 골드로 미감정 고대 유물 구매</span>
-        <span class="choice-desc">고급 이상 미감정 장비 확정 획득</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🪙 ${fmt(cost)} 골드로 미감정 고대 유물 구매</span><span class="choice-desc">고급 이상 미감정 장비 확정 획득</span></div>
       <span class="choice-prob">거래</span>
     </button>
     <button class="choice-btn" data-prob="100" data-safe="true" onclick="advanceNodeAndShowNext('수집가에게 목례하고 갈 길을 재촉했습니다.')">
-      <div class="choice-left">
-        <span class="choice-title">🚶 거래를 거절하고 지나간다</span>
-        <span class="choice-desc">아무 일도 일어나지 않음</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🚶 거래를 거절하고 지나간다</span><span class="choice-desc">아무 일도 일어나지 않음</span></div>
       <span class="choice-prob">안전 100%</span>
     </button>
   `;
@@ -2630,30 +3218,21 @@ function evShrine(placeName) {
   const pLuk = calcStatProb('luk', 1.2);
   let html = `
     <button class="choice-btn" data-prob="${pLuk}" onclick="resolveShrine('blood', ${pLuk})">
-      <div class="choice-left">
-        <span class="choice-title">🩸 체력 25%를 바쳐 고대 유물을 소환한다</span>
-        <span class="choice-desc">[행운 판정] 성공 시 영웅~창조 등급 확정!</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🩸 체력 25%를 바쳐 고대 유물을 소환한다</span><span class="choice-desc">[행운 판정] 성공 시 영웅~창조 등급 확정!</span></div>
       <span class="choice-prob">행운 ${pLuk}%</span>
     </button>
   `;
   if (state.classKey === 'cleric') {
     html += `
       <button class="choice-btn class-special" data-prob="100" onclick="resolveShrine('cleric', 100)">
-        <div class="choice-left">
-          <span class="choice-title">✨ [성직자 전용] 제단 정화 및 신성 축복</span>
-          <span class="choice-desc">100% 성공: 5턴 축복 + 영혼석 1개 + 가루 15개</span>
-        </div>
+        <div class="choice-left"><span class="choice-title">✨ [성직자 전용] 제단 정화 및 신성 축복</span><span class="choice-desc">100% 성공: 5턴 축복 + 영혼석 1개 + 가루 15개</span></div>
         <span class="choice-prob" style="color:#4cd964;">특수 100%</span>
       </button>
     `;
   }
   html += `
     <button class="choice-btn" data-prob="100" data-safe="true" onclick="state.flags.blessed = 3; advanceNodeAndShowNext('제단에 가벼운 기도를 올려 3턴간 [축복]을 받았습니다.');">
-      <div class="choice-left">
-        <span class="choice-title">🙏 가볍게 목례만 올리고 지나간다</span>
-        <span class="choice-desc">안전하게 3턴간 축복(공격력 증가) 획득</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🙏 가볍게 목례만 올리고 지나간다</span><span class="choice-desc">안전하게 3턴간 축복(공격력 증가) 획득</span></div>
       <span class="choice-prob">안전 100%</span>
     </button>
   `;
@@ -2690,17 +3269,11 @@ function evCamp(placeName) {
 
   document.getElementById('choices-wrap').innerHTML = `
     <button class="choice-btn" data-prob="100" data-safe="true" onclick="resolveCamp('rest')">
-      <div class="choice-left">
-        <span class="choice-title">🔥 화톳불에서 휴식하여 체력·마나 회복</span>
-        <span class="choice-desc">HP/MP 70% 즉시 회복 및 저주 해제</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🔥 화톳불에서 휴식하여 체력·마나 회복</span><span class="choice-desc">HP/MP 70% 즉시 회복 및 저주 해제</span></div>
       <span class="choice-prob">안전 100%</span>
     </button>
     <button class="choice-btn" data-prob="100" onclick="resolveCamp('merc')">
-      <div class="choice-left">
-        <span class="choice-title">🛡️ 야영지의 정예 용병과 동행 계약</span>
-        <span class="choice-desc">용병 합류(공격력 +15%) + 스탯 포인트 +1</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🛡️ 야영지의 정예 용병과 동행 계약</span><span class="choice-desc">용병 합류(공격력 +15%) + 스탯 포인트 +1</span></div>
       <span class="choice-prob">특수 100%</span>
     </button>
   `;
@@ -2718,13 +3291,11 @@ function resolveCamp(mode) {
   } else {
     state.flags.companion = true;
     state.statPts += 1;
+    if (state.settings.autoStatOnLvUp) applyStatPreset(true);
     advanceNodeAndShowNext(`🛡️ 정예 용병이 합류하고 전술 훈련으로 <strong>스탯 포인트 +1</strong>을 얻었습니다!`);
   }
 }
 
-// =========================================================================
-// 전투 루프 (일반 / 정예 / 10층 보스)
-// =========================================================================
 function startCombat(tier, placeName) {
   const mBase = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
   const mult = tier === 'boss' ? 2.8 : tier === 'elite' ? 1.6 : 1.0;
@@ -2749,12 +3320,10 @@ function startCombat(tier, placeName) {
 
   rollEnemyIntent();
   updateBattleStage(currentEnemy.icon, currentEnemy.name, true);
-
   document.getElementById('ev-title').textContent = `${currentEnemy.name} 조우!`;
   document.getElementById('ev-tag').textContent = tier === 'boss' ? '보스전' : '전투';
   document.getElementById('ev-text').textContent = `${placeName}에서 ${currentEnemy.name}이(가) 살기를 뿜으며 가로막습니다!`;
   setRecentSummary(`${currentEnemy.name} 교전 시작!`);
-
   renderCombatChoices();
 }
 
@@ -2777,61 +3346,40 @@ function renderCombatChoices() {
   if (!currentEnemy) return;
   updateBattleStage(currentEnemy.icon, currentEnemy.name, true);
   const c = CLASSES[state.classKey];
-  const s1 = c.skills[0];
-  const s3 = c.skills[2];
-  const s4 = c.skills[3];
+  const s1 = c.skills[0], s3 = c.skills[2], s4 = c.skills[3];
 
   let html = `
     <button class="choice-btn" data-act="attack" onclick="combatAction('attack')">
-      <div class="choice-left">
-        <span class="choice-title">⚔️ 기본 공격</span>
-        <span class="choice-desc">공격력 100% 피해 + MP 8 회복</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">⚔️ 기본 공격</span><span class="choice-desc">공격력 100% 피해 + MP 8 회복</span></div>
       <span class="choice-prob">MP +8</span>
     </button>
     <button class="choice-btn class-special" data-act="s1" data-mp="${s1.mp}" onclick="combatAction('s1')">
-      <div class="choice-left">
-        <span class="choice-title">${c.icon} ${s1.name} (Lv.${state.skills.s1 || 1})</span>
-        <span class="choice-desc">${s1.desc}</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">${c.icon} ${s1.name} (Lv.${state.skills.s1 || 1})</span><span class="choice-desc">${s1.desc}</span></div>
       <span class="choice-prob">MP ${s1.mp}</span>
     </button>
   `;
-
   if (state.lv >= s3.reqLv) {
     html += `
       <button class="choice-btn class-special" data-act="s3" data-mp="${s3.mp}" onclick="combatAction('s3')">
-        <div class="choice-left">
-          <span class="choice-title">⚡ ${s3.name} (Lv.${state.skills.s3 || 1})</span>
-          <span class="choice-desc">${s3.desc}</span>
-        </div>
+        <div class="choice-left"><span class="choice-title">⚡ ${s3.name} (Lv.${state.skills.s3 || 1})</span><span class="choice-desc">${s3.desc}</span></div>
         <span class="choice-prob">MP ${s3.mp}</span>
       </button>
     `;
   }
-
   if (state.lv >= s4.reqLv) {
     html += `
       <button class="choice-btn class-special" data-act="s4" data-mp="${s4.mp}" style="border-color:#ff9f1a;" onclick="combatAction('s4')">
-        <div class="choice-left">
-          <span class="choice-title">🌟 [궁극기] ${s4.name} (Lv.${state.skills.s4 || 1})</span>
-          <span class="choice-desc">${s4.desc}</span>
-        </div>
+        <div class="choice-left"><span class="choice-title">🌟 [궁극기] ${s4.name} (Lv.${state.skills.s4 || 1})</span><span class="choice-desc">${s4.desc}</span></div>
         <span class="choice-prob" style="color:#ff9f1a;">MP ${s4.mp}</span>
       </button>
     `;
   }
-
   html += `
     <button class="choice-btn" data-act="heal" onclick="combatAction('heal')">
-      <div class="choice-left">
-        <span class="choice-title">🧪 응급 비약 복용</span>
-        <span class="choice-desc">체력 40% & 마나 30% 즉시 회복</span>
-      </div>
+      <div class="choice-left"><span class="choice-title">🧪 응급 비약 복용</span><span class="choice-desc">체력 40% &amp; 마나 30% 즉시 회복</span></div>
       <span class="choice-prob">50 G</span>
     </button>
   `;
-
   document.getElementById('choices-wrap').innerHTML = html;
 }
 
@@ -2845,7 +3393,7 @@ function combatAction(act) {
   if (act === 'heal') {
     if (state.gold < 50) {
       SFX.play('fail');
-      addLog('골드가 부족해 비약을 사용할 수 없습니다!');
+      showToast('응급 비약 골드(50G)가 부족합니다!', 'warn', 1600);
       return;
     }
     state.gold -= 50;
@@ -2857,8 +3405,7 @@ function combatAction(act) {
     logMsg += `🧪 비약을 마셔 HP +${fmt(h)} 회복!<br>`;
     actionSummary = `응급 비약 사용 (HP +${fmt(h)})`;
   } else {
-    let mult = 1.0;
-    let skillName = '기본 공격';
+    let mult = 1.0, skillName = '기본 공격';
     if (act === 'attack') {
       state.mp = Math.min(stats.maxMp, state.mp + 8);
     } else {
@@ -2870,7 +3417,6 @@ function combatAction(act) {
         const sLv = state.skills[act] || 1;
         mult = skObj.mult + (sLv - 1) * 0.35;
         skillName = skObj.name;
-
         if (act === 's4' || (state.classKey === 'warrior' && Math.random() < 0.35) || (state.classKey === 'mage' && act === 's3' && Math.random() < 0.4)) {
           currentEnemy.stunned = true;
         }
@@ -2905,17 +3451,15 @@ function combatAction(act) {
   if (currentEnemy.stunned) {
     logMsg += `💫 적이 기절하여 행동하지 못했습니다!`;
     currentEnemy.stunned = false;
+  } else if (currentEnemy.intent === 'guard') {
+    const eh = Math.floor(currentEnemy.maxHp * 0.08);
+    currentEnemy.hp = Math.min(currentEnemy.maxHp, currentEnemy.hp + eh);
+    logMsg += `🛡️ 적이 방어 태세로 HP +${fmt(eh)} 회복했습니다.`;
   } else {
-    if (currentEnemy.intent === 'guard') {
-      const eh = Math.floor(currentEnemy.maxHp * 0.08);
-      currentEnemy.hp = Math.min(currentEnemy.maxHp, currentEnemy.hp + eh);
-      logMsg += `🛡️ 적이 방어 태세로 HP +${fmt(eh)} 회복했습니다.`;
-    } else {
-      const eDmg = currentEnemy.intent === 'heavy' ? Math.floor(currentEnemy.atk * 1.6) : currentEnemy.atk;
-      state.hp -= eDmg;
-      setTimeout(() => playCombatAnim('enemy', `-${fmt(eDmg)}`, '#ff5252'), 180);
-      logMsg += `🩸 적의 공격! <strong>HP -${fmt(eDmg)}</strong> 피해!`;
-    }
+    const eDmg = currentEnemy.intent === 'heavy' ? Math.floor(currentEnemy.atk * 1.6) : currentEnemy.atk;
+    state.hp -= eDmg;
+    setTimeout(() => playCombatAnim('enemy', `-${fmt(eDmg)}`, '#ff5252'), 180);
+    logMsg += `🩸 적의 공격! <strong>HP -${fmt(eDmg)}</strong> 피해!`;
   }
 
   if (state.hp <= 0) {
@@ -2932,7 +3476,6 @@ function combatAction(act) {
   const rb = document.getElementById('result-box');
   rb.innerHTML = logMsg;
   rb.classList.add('show');
-
   rollEnemyIntent();
   renderCombatChoices();
   updateHUD();
@@ -2970,7 +3513,7 @@ function winCombat(logMsg) {
   currentEnemy = null;
   updateBattleStage('🏆', '전투 승리!', false);
   advanceNodeAndShowNext(
-    `${logMsg}🏆 <strong>${eName} 처치!</strong> (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)${isBoss ? '<br>💎 보스 처치 보상: 영혼석 & 던전 티켓 획득!' : ''}${dropHtml}`,
+    `${logMsg}🏆 <strong>${eName} 처치!</strong> (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)${isBoss ? '<br>💎 보스 처치 보상: 영혼석 &amp; 던전 티켓 획득!' : ''}${dropHtml}`,
     `🏆 ${eName} 처치! (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)`
   );
 }
@@ -2994,13 +3537,19 @@ function gainExp(amount) {
   }
 
   if (leveledUp) {
+    // [1-3] 레벨업 시 스탯 자동 배분
+    if (state.settings.autoStatOnLvUp && state.statPts > 0) {
+      const spent = applyStatPreset(true);
+      if (spent > 0) addLog(`📊 [자동 배분] 레벨업 스탯 +${spent} 비율 투자 완료`);
+    }
+
     const c = CLASSES[state.classKey];
     const nextPromo = c.promotions[state.jobTier];
     const promoJustUnlocked = nextPromo && prevLv < nextPromo.reqLv && state.lv >= nextPromo.reqLv;
 
-    if (promoJustUnlocked && state.settings && state.settings.pauseOnPromo && autoPlay.enabled) {
+    if (promoJustUnlocked && state.settings.pauseOnPromo && autoPlay.enabled) {
       pauseAutoPlay(`${nextPromo.tier}차 전직 가능 레벨(Lv.${nextPromo.reqLv}) 도달로 일시정지!`);
-    } else if (state.settings && state.settings.pauseOnLvUp && autoPlay.enabled) {
+    } else if (state.settings.pauseOnLvUp && autoPlay.enabled) {
       pauseAutoPlay(`Lv.${state.lv} 달성으로 자동 진행 일시정지!`);
     }
   }
@@ -3015,7 +3564,7 @@ function addLog(msg) {
 }
 
 // =========================================================================
-// 탭 UI 렌더링 (캐릭터/전직, 인벤토리/합성, 스킬/환생, 던전/상점, 도감/설정)
+// 탭 UI 렌더링 (캐릭터, 인벤토리, 스킬/환생, 던전/상점, 도감/설정)
 // =========================================================================
 function updateHUD() {
   if (!state) return;
@@ -3048,23 +3597,17 @@ function updateHUD() {
   if (state.flags.companion)   flagsTxt += `🛡️용병`;
   document.getElementById('hud-status-flags').textContent = flagsTxt;
 
-  // [A-2] 업그레이드 가능한 슬롯 수 계산 및 3곳의 일괄장착 버튼 뱃지 동기화
   const upgrades = getUpgradeableSlots();
   const upgCnt = upgrades.length;
-  const equipLabel = upgCnt > 0 ? `⬆️ 일괄장착(${upgCnt}🔺)` : `⬆️ 일괄장착`;
 
   const stripEqBtn = document.getElementById('strip-btn-equip');
   if (stripEqBtn) {
-    stripEqBtn.textContent = equipLabel;
+    stripEqBtn.textContent = upgCnt > 0 ? `⬆️ 장착(${upgCnt})` : `⬆️ 장착`;
     stripEqBtn.classList.toggle('upgrade-ready', upgCnt > 0);
-  }
-  const mapEqBtn = document.getElementById('btn-map-equip');
-  if (mapEqBtn) {
-    mapEqBtn.textContent = equipLabel;
   }
   const invEqBtn = document.getElementById('btn-inv-equip');
   if (invEqBtn) {
-    invEqBtn.textContent = upgCnt > 0 ? `⬆️ 더 좋은 장비 일괄 장착 (${upgCnt}개 발견 🔺)` : `⬆️ 더 좋은 장비 일괄 장착`;
+    invEqBtn.textContent = upgCnt > 0 ? `⬆️ 일괄장착 (${upgCnt}🔺)` : `⬆️ 일괄장착`;
   }
 
   const nextPromo = c.promotions[state.jobTier];
@@ -3090,7 +3633,6 @@ function switchTab(tabId, btn) {
   if (tabId === 'codex') renderCodexTab();
 }
 
-// 캐릭터 & 전직 탭 (업그레이드 가능 슬롯 🔺 표시 포함)
 function renderCharTab() {
   const { stats, setCounts, promo } = getTotalStats();
   const c = CLASSES[state.classKey];
@@ -3099,14 +3641,14 @@ function renderCharTab() {
   const nextPromo = c.promotions[state.jobTier];
   const promoBox = document.getElementById('promotion-box');
   if (!nextPromo) {
-    promoBox.innerHTML = `<div style="font-size:12px; color:#00f5d4; font-weight:700;">🌟 최종 5차 신화 전직을 모두 달성했습니다!</div>`;
+    promoBox.innerHTML = `<div style="font-size:12px; color:#00f5d4; font-weight:700;">🌟 최종 5차 신화 전직 달성!</div>`;
   } else {
     const canP = state.lv >= nextPromo.reqLv;
     promoBox.innerHTML = `
       <div class="item-row" style="cursor:default;">
         <div>
           <div style="font-weight:700; color:var(--border-bright);">${nextPromo.tier}차 전직: [${nextPromo.title}]</div>
-          <div style="font-size:11px; color:var(--text-muted);">요구 레벨: Lv.${nextPromo.reqLv} | 보상: 올스탯 +${nextPromo.allStat}, 공/체 x${nextPromo.atkMult}배, 전용 오라</div>
+          <div style="font-size:11px; color:var(--text-muted);">요구: Lv.${nextPromo.reqLv} | 올스탯 +${nextPromo.allStat}, 공/체 x${nextPromo.atkMult}배</div>
         </div>
         <button class="btn-sm" ${!canP ? 'disabled' : ''} onclick="promoteJob()">전직 돌파</button>
       </div>
@@ -3114,6 +3656,14 @@ function renderCharTab() {
   }
 
   document.getElementById('stat-pts').textContent = state.statPts;
+  const autoStatBtn = document.getElementById('btn-auto-stat');
+  if (autoStatBtn) {
+    const on = !!state.settings.autoStatOnLvUp;
+    autoStatBtn.textContent = `레벨업 자동배분: ${on ? 'ON' : 'OFF'}`;
+    autoStatBtn.style.borderColor = on ? '#4cd964' : 'var(--border-bright)';
+    autoStatBtn.style.color = on ? '#69f0ae' : 'var(--text-main)';
+  }
+
   const statNames = [
     { k: 'str', label: '💪 힘 (STR)' },
     { k: 'dex', label: '🏃 민첩 (DEX)' },
@@ -3121,10 +3671,16 @@ function renderCharTab() {
     { k: 'cha', label: '👑 매력 (CHA)' },
     { k: 'luk', label: '🍀 행운 (LUK)' }
   ];
+  const dis = state.statPts <= 0 ? 'disabled' : '';
   document.getElementById('stat-grid').innerHTML = statNames.map(st => `
-    <div class="stat-item">
-      <span>${st.label}: <strong>${stats[st.k]}</strong></span>
-      <button class="btn-sm" ${state.statPts <= 0 ? 'disabled' : ''} onclick="investStat('${st.k}')">+1</button>
+    <div class="stat-row-full">
+      <span>${st.label}: <strong>${stats[st.k]}</strong> <span style="color:#777; font-size:10px;">(투자 ${state.investedStats[st.k] || 0})</span></span>
+      <div class="btn-group-mini">
+        <button class="btn-sm" ${dis} onpointerdown="startStatHold('${st.k}', 1)" onpointerup="stopStatHold()" onpointerleave="stopStatHold()" onpointercancel="stopStatHold()">+1</button>
+        <button class="btn-sm" ${dis} onpointerdown="startStatHold('${st.k}', 5)" onpointerup="stopStatHold()" onpointerleave="stopStatHold()" onpointercancel="stopStatHold()">+5</button>
+        <button class="btn-sm" ${dis} onpointerdown="startStatHold('${st.k}', 10)" onpointerup="stopStatHold()" onpointerleave="stopStatHold()" onpointercancel="stopStatHold()">+10</button>
+        <button class="btn-sm" ${dis} onclick="investStat('${st.k}', 'MAX')">MAX</button>
+      </div>
     </div>
   `).join('');
 
@@ -3150,13 +3706,14 @@ function renderCharTab() {
   document.getElementById('equipped-grid').innerHTML = SLOTS.map(sl => {
     const itm = state.equipped[sl.id];
     const hasUpg = upgMap[sl.id];
-    const upgMarker = hasUpg ? `<span title="인벤토리에 +${hasUpg.diff}점 상위 장비 보유">🔺</span>` : '';
+    const upgMarker = hasUpg ? `<span>🔺</span>` : '';
     if (!itm) {
       return `<div class="item-row" style="opacity:${hasUpg ? '1' : '0.45'}; border-color:${hasUpg ? 'var(--accent-gold)' : '#33293a'};" onclick="${hasUpg ? 'batchEquipBest(true)' : ''}"><span>${sl.icon} ${sl.name}: 비어있음 ${upgMarker}</span></div>`;
     }
+    const lockMark = itm.locked ? '🔒' : '';
     return `
       <div class="item-row" style="${hasUpg ? 'border-color:var(--accent-gold);' : ''}" onclick="openItemDetail('${itm.uid}', true)">
-        <span class="${itm.gradeCls}">${itm.icon} ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''} ${upgMarker}</span>
+        <span class="${itm.gradeCls}">${lockMark}${itm.icon} ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''} ${upgMarker}</span>
       </div>
     `;
   }).join('');
@@ -3170,25 +3727,21 @@ function promoteJob() {
   triggerScreenFlash('#00f5d4');
   SFX.play('legend');
   addLog(`👑 축하합니다! ${state.jobTier}차 전직 [${nextPromo.title}] 달성!`);
+  showToast(`👑 ${state.jobTier}차 전직 [${nextPromo.title}] 달성!`, 'good', 2600);
   setRecentSummary(`${state.jobTier}차 전직 [${nextPromo.title}] 달성!`);
   updateHUD();
   renderCharTab();
   saveGame();
 }
 
-function investStat(k) {
-  if (state.statPts <= 0) return;
-  SFX.play('click');
-  state.statPts--;
-  state.stats[k]++;
-  updateHUD();
-  renderCharTab();
-  saveGame();
-}
-
-// [A-2] 인벤토리 렌더링 (장비 점수 및 ▲+120 / ▼-30 비교 뱃지 표시)
 function renderInvTab() {
   document.getElementById('inv-count').textContent = state.inventory.length;
+  const salCnt = getSmartSalvageCandidates().length;
+  const salBtn = document.getElementById('btn-smart-salvage');
+  if (salBtn && !armedActions['smart_salvage']) {
+    salBtn.textContent = `♻️ 스마트 분해 (${salCnt}개)`;
+  }
+
   const list = document.getElementById('inv-list');
   if (state.inventory.length === 0) {
     list.innerHTML = `<div class="card" style="text-align:center; color:#777;">보유 중인 장비가 없습니다.</div>`;
@@ -3196,14 +3749,16 @@ function renderInvTab() {
   }
 
   list.innerHTML = state.inventory.map(itm => {
+    const lockBtn = `<button class="btn-sm" style="padding:3px 6px; ${itm.locked ? 'border-color:#ffd180; background:#3d2f18;' : 'opacity:0.65;'}" onclick="event.stopPropagation(); toggleItemLock('${itm.uid}', false)">${itm.locked ? '🔒' : '🔓'}</button>`;
+
     if (itm.unidentified) {
       return `
         <div class="item-row" onclick="openItemDetail('${itm.uid}', false)">
-          <div>
+          <div style="flex:1; min-width:0;">
             <div style="font-weight:700; color:#ffd180;">❓ 미감정 ${itm.slotName} (Lv.${itm.lv})</div>
             <div style="font-size:10.5px; color:var(--text-muted);">클릭하여 감정하기</div>
           </div>
-          <span class="btn-sm">감정</span>
+          <div class="btn-group-mini">${lockBtn}<span class="btn-sm">감정</span></div>
         </div>
       `;
     }
@@ -3215,20 +3770,21 @@ function renderInvTab() {
       else if (cmp.diff < 0) badgeHtml = `<span class="cmp-badge cmp-down">▼${fmt(cmp.diff)}</span>`;
       else badgeHtml = `<span class="cmp-badge cmp-same">━ 0</span>`;
     }
-
+    const willSal = shouldSalvageItem(itm) ? `<span style="font-size:10px; color:#e67e22; margin-left:4px;">[분해대상]</span>` : '';
     const effBase = Math.floor(itm.baseVal * (1 + (itm.enhance || 0) * 0.12));
+
     return `
       <div class="item-row" style="${cmp && cmp.diff > 0 ? 'border-color:rgba(76,217,100,0.5);' : ''}" onclick="openItemDetail('${itm.uid}', false)">
-        <div>
+        <div style="flex:1; min-width:0;">
           <div style="font-weight:700;">
             <span class="${itm.gradeCls}">${itm.icon} [${itm.gradeName}] ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''}</span>
-            ${badgeHtml}
+            ${badgeHtml}${willSal}
           </div>
           <div style="font-size:10.5px; color:var(--text-muted);">
-            [${itm.slotName}] 점수 ${fmt(cmp ? cmp.myScore : 0)} | 기본 ${itm.baseStat.toUpperCase()} +${effBase} | 옵션 ${itm.options.length}줄
+            [${itm.slotName}] 점수 ${fmt(cmp ? cmp.myScore : 0)} | ${itm.baseStat.toUpperCase()} +${effBase} | 옵션 ${itm.options.length}줄
           </div>
         </div>
-        <span class="btn-sm">관리</span>
+        <div class="btn-group-mini">${lockBtn}<span class="btn-sm">관리</span></div>
       </div>
     `;
   }).join('');
@@ -3238,7 +3794,7 @@ function synthesizeAll() {
   let synthCount = 0;
   for (let gIdx = 0; gIdx < GRADES.length - 1; gIdx++) {
     while (true) {
-      const candidates = state.inventory.filter(x => !x.unidentified && x.gradeIdx === gIdx);
+      const candidates = state.inventory.filter(x => !x.unidentified && !x.locked && x.gradeIdx === gIdx);
       if (candidates.length < 3) break;
       const toRemove = candidates.slice(0, 3).map(x => x.uid);
       state.inventory = state.inventory.filter(x => !toRemove.includes(x.uid));
@@ -3254,18 +3810,17 @@ function synthesizeAll() {
   if (synthCount > 0) {
     SFX.play('legend');
     addLog(`⚗️ 장비 합성으로 상위 등급 장비 ${synthCount}개를 연성했습니다!`);
+    showToast(`⚗️ 상위 등급 장비 ${synthCount}개 합성 성공!`, 'good');
     renderInvTab();
     updateHUD();
     saveGame();
   } else {
     SFX.play('fail');
-    alert('동일한 등급의 감정된 장비가 최소 3개 필요합니다.');
+    showToast('잠금 해제된 동일 등급 장비가 최소 3개 필요합니다.', 'warn');
   }
 }
 
-// 아이템 상세 / 강화 / 리롤 / 감정 모달
 function openItemDetail(uid, isEquipped) {
-  SFX.play('click');
   let item = isEquipped
     ? Object.values(state.equipped).find(x => x && x.uid === uid)
     : state.inventory.find(x => x.uid === uid);
@@ -3283,57 +3838,82 @@ function openItemDetail(uid, isEquipped) {
         <div style="font-size:15px; font-weight:700; color:#ffd180;">미감정 ${item.slotName} (Lv.${item.lv})</div>
       </div>
       <button class="choice-btn" style="justify-content:center;" onclick="identifyItem('${item.uid}', ${idCost})">🔍 감정하기 (${fmt(idCost)} G)</button>
-      <button class="choice-btn" style="justify-content:center;" onclick="closeModal()">닫기</button>
+      <button class="choice-btn" data-autoclose="true" style="justify-content:center;" onclick="closeModal()">닫기</button>
     `;
     return;
   }
 
-  const enh = item.enhance || 0;
+  const { enh, cost: enhCost, prob: enhProb } = getEnhanceParams(item);
   const curBase = Math.floor(item.baseVal * (1 + enh * 0.12));
-  const discount = Math.max(0.4, 1 - (state.relics.hammer || 0) * 0.05);
-  const enhCost = Math.floor((35 + item.lv * 12) * Math.pow(1.35, enh) * discount);
-  const enhProb = enh < 5 ? 90 - enh * 5 : enh < 10 ? 60 - (enh - 5) * 4 : Math.max(15, 32 - (enh - 10) * 3);
   const rerollCost = 5 + item.gradeIdx * 3;
   const sc = calcItemScore(item);
   const cmp = !isEquipped ? getItemScoreDiff(item) : null;
+  const targetLv = (state.enhanceSafe && state.enhanceSafe.targetLv) || 10;
 
   const optsHtml = item.options.map(o => `
     <div style="font-size:11.5px; padding:1px 0;">• <strong style="color:#e6c88a">[T${o.tier}]</strong> ${o.name} <strong>+${o.val}${o.unit}</strong> <span style="color:#777">(${o.min}~${o.max}${o.unit})</span></div>
   `).join('');
 
   content.innerHTML = `
-    <div>
-      <div class="${item.gradeCls}" style="font-size:15px; font-weight:800;">
-        ${item.icon} [${item.gradeName}] ${item.name} ${enh ? '+' + enh : ''}
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
+      <div>
+        <div class="${item.gradeCls}" style="font-size:15px; font-weight:800;">
+          ${item.icon} [${item.gradeName}] ${item.name} ${enh ? '+' + enh : ''}
+        </div>
+        <div style="font-size:11px; color:var(--text-muted);">
+          슬롯: ${item.slotName} (Lv.${item.lv}) | 점수: <strong style="color:var(--border-bright)">${fmt(sc)}</strong>
+          ${cmp ? `<span class="cmp-badge ${cmp.diff > 0 ? 'cmp-up' : cmp.diff < 0 ? 'cmp-down' : 'cmp-same'}">${cmp.diff > 0 ? '▲+' + fmt(cmp.diff) : cmp.diff < 0 ? '▼' + fmt(cmp.diff) : '━ 0'}</span>` : ''}
+          ${item.setName ? `<br><span style="color:#4cd964">세트: ${item.setName}</span>` : ''}
+        </div>
       </div>
-      <div style="font-size:11px; color:var(--text-muted);">
-        슬롯: ${item.slotName} (Lv.${item.lv}) | 장비점수: <strong style="color:var(--border-bright)">${fmt(sc)}</strong>
-        ${cmp ? `<span class="cmp-badge ${cmp.diff > 0 ? 'cmp-up' : cmp.diff < 0 ? 'cmp-down' : 'cmp-same'}">${cmp.diff > 0 ? '▲+' + fmt(cmp.diff) : cmp.diff < 0 ? '▼' + fmt(cmp.diff) : '━ 0'}</span>` : ''}
-        ${item.setName ? `<br><span style="color:#4cd964">세트: ${item.setName}</span>` : ''}
-      </div>
+      <button class="btn-sm" style="${item.locked ? 'border-color:#ffd180; background:#3d2f18;' : ''}" onclick="toggleItemLock('${item.uid}', ${isEquipped})">${item.locked ? '🔒 잠김' : '🔓 잠금'}</button>
     </div>
+
     <div class="card">
-      <div style="font-size:12px; font-weight:700; margin-bottom:4px;">기본: ${item.baseStat.toUpperCase()} +${curBase}</div>
+      <div style="font-size:12px; font-weight:700; margin-bottom:4px;">기본: ${item.baseStat.toUpperCase()} +${curBase} (보유 골드: 🪙${fmt(state.gold)})</div>
       ${optsHtml}
     </div>
+
+    <!-- [1-4] 연속 강화 컨트롤 (+1 / +5 / 목표+N / 골드 MAX) -->
+    <div class="card" style="border-color:var(--border-gold);">
+      <div style="font-size:11.5px; font-weight:700; color:var(--accent-gold); margin-bottom:5px;">
+        🔨 장비 강화 (+${enh} ➔ +${enh + 1} | 확률 ${enhProb}% | 비용 ${fmt(enhCost)}G)
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:4px;">
+        <button class="btn-sm" style="padding:6px 2px;" onclick="runEnhanceSequence('${item.uid}', ${isEquipped}, '1')">+1회</button>
+        <button class="btn-sm" style="padding:6px 2px;" onclick="runEnhanceSequence('${item.uid}', ${isEquipped}, '5')">+5회</button>
+        <button class="btn-sm" style="padding:6px 2px; border-color:#4cd964; color:#a8f0b8;" onclick="runEnhanceSequence('${item.uid}', ${isEquipped}, 'target')">목표 +${targetLv}</button>
+        <button class="btn-sm" style="padding:6px 2px; border-color:#ff9f1a; color:#ffd180;" onclick="runEnhanceSequence('${item.uid}', ${isEquipped}, 'max')">골드 MAX</button>
+      </div>
+    </div>
+
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
       <button class="choice-btn" style="justify-content:center;" onclick="toggleEquip('${item.uid}', ${isEquipped})">${isEquipped ? '📥 장착 해제' : '⚔️ 장착하기'}</button>
-      <button class="choice-btn" style="justify-content:center;" onclick="enhanceItem('${item.uid}', ${isEquipped}, ${enhCost}, ${enhProb})">🔨 강화 (+${enh + 1} / ${enhProb}%)<br><span style="font-size:10px; color:var(--accent-gold)">${fmt(enhCost)} G</span></button>
-      <button class="choice-btn" style="justify-content:center;" onclick="rerollItem('${item.uid}', ${isEquipped}, ${rerollCost})">🎲 옵션 재설정<br><span style="font-size:10px; color:#c08cff">✨가루 ${rerollCost}</span></button>
-      ${!isEquipped ? `<button class="choice-btn" style="justify-content:center; border-color:#802f2f;" onclick="salvageSingle('${item.uid}')">♻️ 분해 (+${(item.gradeIdx + 1) * 4}가루)</button>` : `<button class="choice-btn" style="justify-content:center;" onclick="closeModal()">닫기</button>`}
+      <button class="choice-btn" style="justify-content:center;" onclick="rerollItem('${item.uid}', ${isEquipped}, ${rerollCost})">🎲 옵션 리롤 (✨${rerollCost})</button>
     </div>
-    ${!isEquipped ? `<button class="btn-sm" style="padding:7px;" onclick="closeModal()">닫기</button>` : ''}
+    <div style="display:grid; grid-template-columns:${isEquipped ? '1fr' : '1fr 1fr'}; gap:6px;">
+      ${!isEquipped ? `<button class="btn-sm" style="padding:7px; border-color:#802f2f; color:#ff9999;" ${item.locked ? 'disabled' : ''} onclick="salvageSingle('${item.uid}')">${item.locked ? '🔒 잠금 보호중' : `♻️ 분해 (+${(item.gradeIdx + 1) * 4}가루)`}</button>` : ''}
+      <button class="btn-sm" data-autoclose="true" style="padding:7px;" onclick="closeModal()">닫기</button>
+    </div>
   `;
 }
 
 function identifyItem(uid, cost) {
-  if (state.gold < cost) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
+  if (state.gold < cost) { SFX.play('fail'); showToast('감정 골드가 부족합니다!', 'warn'); return; }
   state.gold -= cost;
   const item = state.inventory.find(x => x.uid === uid);
   if (!item) return;
   item.unidentified = false;
-  if (item.gradeIdx >= 4) { triggerScreenFlash(GRADES[item.gradeIdx].color); SFX.play('legend'); }
-  else SFX.play('success');
+  if (item.gradeIdx >= 4) {
+    state.records.legendCnt = (state.records.legendCnt || 0) + 1;
+    triggerScreenFlash(GRADES[item.gradeIdx].color);
+    SFX.play('legend');
+  } else {
+    SFX.play('success');
+  }
+  if (item.isUnique && !state.codexUniques.includes(item.name)) {
+    state.codexUniques.push(item.name);
+  }
   updateHUD(); renderInvTab(); openItemDetail(uid, false); saveGame();
 }
 
@@ -3341,7 +3921,8 @@ function toggleEquip(uid, isEquipped) {
   SFX.play('click');
   if (isEquipped) {
     const slotKey = Object.keys(state.equipped).find(k => state.equipped[k] && state.equipped[k].uid === uid);
-    if (!slotKey || state.inventory.length >= 35) return;
+    if (!slotKey) return;
+    if (state.inventory.length >= 35) { showToast('인벤토리가 가득 찼습니다.', 'warn'); return; }
     state.inventory.unshift(state.equipped[slotKey]);
     state.equipped[slotKey] = null;
   } else {
@@ -3356,29 +3937,8 @@ function toggleEquip(uid, isEquipped) {
   closeModal(); updateHUD(); renderCharTab(); renderInvTab(); saveGame();
 }
 
-function enhanceItem(uid, isEquipped, cost, prob) {
-  if (state.gold < cost) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
-  state.gold -= cost;
-  let item = isEquipped ? Object.values(state.equipped).find(x => x && x.uid === uid) : state.inventory.find(x => x.uid === uid);
-  if (!item) return;
-
-  if (Math.random() * 100 < prob) {
-    item.enhance = (item.enhance || 0) + 1;
-    if (item.enhance > (state.records.maxEnh || 0)) state.records.maxEnh = item.enhance;
-    SFX.play('success');
-    addLog(`🔨 [${item.name}] +${item.enhance} 강화 성공!`);
-  } else {
-    SFX.play('fail');
-    if ((item.enhance || 0) >= 6 && Math.random() < 0.3) {
-      item.enhance--;
-      addLog(`📉 강화 실패로 [${item.name}] 수치가 +${item.enhance}(으)로 하락했습니다.`);
-    }
-  }
-  updateHUD(); renderCharTab(); renderInvTab(); openItemDetail(uid, isEquipped); saveGame();
-}
-
 function rerollItem(uid, isEquipped, dustCost) {
-  if (state.dust < dustCost) { SFX.play('fail'); alert('마력 가루가 부족합니다!'); return; }
+  if (state.dust < dustCost) { SFX.play('fail'); showToast('마력 가루가 부족합니다!', 'warn'); return; }
   state.dust -= dustCost;
   let item = isEquipped ? Object.values(state.equipped).find(x => x && x.uid === uid) : state.inventory.find(x => x.uid === uid);
   if (!item) return;
@@ -3390,6 +3950,7 @@ function rerollItem(uid, isEquipped, dustCost) {
     const tier = rollRatio >= 0.85 ? 1 : rollRatio >= 0.65 ? 2 : rollRatio >= 0.45 ? 3 : rollRatio >= 0.25 ? 4 : 5;
     return { id: raw.id, name: raw.name, val, unit: raw.unit, min: raw.min, max: raw.max, tier };
   });
+  showToast('🎲 옵션 재설정 완료!', 'good', 1400);
   updateHUD(); openItemDetail(uid, isEquipped); saveGame();
 }
 
@@ -3397,54 +3958,54 @@ function salvageSingle(uid) {
   const idx = state.inventory.findIndex(x => x.uid === uid);
   if (idx === -1) return;
   const itm = state.inventory[idx];
-  state.dust += (itm.gradeIdx + 1) * 4;
+  if (itm.locked) { showToast('잠금된 장비는 분해할 수 없습니다.', 'warn'); return; }
+  const dustG = (itm.gradeIdx + 1) * 4;
+  state.dust += dustG;
   state.gold += itm.lv * 10;
   state.inventory.splice(idx, 1);
+  SFX.play('click');
+  showToast(`♻️ [${itm.name}] 분해 (✨+${dustG})`, 'normal', 1500);
   closeModal(); updateHUD(); renderInvTab(); saveGame();
 }
 
-function salvageBelow(maxGradeId) {
-  const maxIdx = GRADES.findIndex(g => g.id === maxGradeId);
-  let count = 0, dustG = 0, goldG = 0;
-  state.inventory = state.inventory.filter(itm => {
-    if (!itm.unidentified && itm.gradeIdx <= maxIdx) {
-      count++; dustG += (itm.gradeIdx + 1) * 4; goldG += itm.lv * 10;
-      return false;
-    }
-    return true;
-  });
-  if (count > 0) {
-    SFX.play('success');
-    state.dust += dustG; state.gold += goldG;
-    addLog(`♻️ 장비 ${count}개 일괄 분해 완료! (가루 +${dustG})`);
-    updateHUD(); renderInvTab(); saveGame();
-  }
-}
-
 // =========================================================================
-// 스킬 트리 & 차원 환생(프레스티지) 탭
+// 스킬 트리 & 환생 탭 렌더링
 // =========================================================================
 function renderSkillTab() {
+  const autoSkBtn = document.getElementById('btn-auto-skill');
+  if (autoSkBtn) {
+    const on = !!state.settings.autoSkillUp;
+    autoSkBtn.textContent = `자동 스킬업: ${on ? 'ON' : 'OFF'}`;
+    autoSkBtn.style.borderColor = on ? '#4cd964' : 'var(--border-bright)';
+    autoSkBtn.style.color = on ? '#69f0ae' : 'var(--text-main)';
+  }
+
   const c = CLASSES[state.classKey];
   document.getElementById('skill-tree-list').innerHTML = c.skills.map(sk => {
     const unlocked = state.lv >= sk.reqLv;
     const sLv = state.skills[sk.id] || 1;
     const cost = Math.floor(90 * Math.pow(1.5, sLv - 1));
+    const dis = !unlocked ? 'disabled' : '';
     return `
       <div class="item-row" style="cursor:default; ${!unlocked ? 'opacity:0.45;' : ''}">
-        <div>
-          <div style="font-weight:700; color:var(--border-bright);">
-            [${sk.type === 'passive' ? '패시브' : sk.type === 'ult' ? '궁극기' : '액티브'}] ${sk.name} (Lv.${sLv})
-          </div>
-          <div style="font-size:11px; color:var(--text-muted);">${unlocked ? sk.desc : `🔒 캐릭터 Lv.${sk.reqLv} 달성 시 해금`}</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-weight:700; color:var(--border-bright);">[${sk.type === 'passive' ? '패시브' : sk.type === 'ult' ? '궁극기' : '액티브'}] ${sk.name} (Lv.${sLv})</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">${unlocked ? `${sk.desc} (다음 ${fmt(cost)}G)` : `🔒 Lv.${sk.reqLv} 해금`}</div>
         </div>
-        <button class="btn-sm" ${!unlocked ? 'disabled' : ''} onclick="upgradeSkillTree('${sk.id}', ${cost})">강화 (${fmt(cost)}G)</button>
+        <div class="btn-group-mini">
+          <button class="btn-sm" ${dis} onclick="upgradeSkillMulti('${sk.id}', 1)">+1</button>
+          <button class="btn-sm" ${dis} onclick="upgradeSkillMulti('${sk.id}', 5)">+5</button>
+          <button class="btn-sm" ${dis} onclick="upgradeSkillMulti('${sk.id}', 'MAX')">MAX</button>
+        </div>
       </div>
     `;
   }).join('');
 
   document.getElementById('ng-plus-txt').textContent = state.ngPlus || 0;
   document.getElementById('soul-stone-txt').textContent = fmt(state.soulStones);
+  const autoPInp = document.getElementById('inp-auto-prestige-depth');
+  if (autoPInp) autoPInp.value = state.settings.autoPrestigeDepth || 0;
+
   const canPrestige = state.lv >= 20 || state.depth >= 15;
   const estSoul = Math.max(5, Math.floor((state.depth * 1.5 + state.lv * 0.8) * (1 + (state.ngPlus || 0) * 0.25)));
 
@@ -3452,9 +4013,9 @@ function renderSkillTab() {
     <div class="item-row" style="cursor:default; border-color:#00a8cc;">
       <div>
         <div style="font-weight:700;">🌌 심연 차원 환생 (요구: Lv.20 또는 15층)</div>
-        <div style="font-size:10.5px; color:var(--text-muted);">장비/유물/도감을 모두 유지한 채 Lv.1부터 더 강하게 시작하며 💎영혼석 <strong>+${estSoul}개</strong>를 획득합니다!</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">장비/유물/도감 유지 + 💎영혼석 <strong>+${estSoul}개</strong> 획득!</div>
       </div>
-      <button class="btn-sm" style="background:#0f3c4c; border-color:#00e5ff;" ${!canPrestige ? 'disabled' : ''} onclick="doPrestige(${estSoul})">환생 실행</button>
+      <button class="btn-sm" id="btn-prestige-exec" style="background:#0f3c4c; border-color:#00e5ff;" ${!canPrestige ? 'disabled' : ''} onclick="doPrestigeWithConfirm(${estSoul})">환생 실행</button>
     </div>
   `;
 
@@ -3463,26 +4024,34 @@ function renderSkillTab() {
     const cost = r.baseCost + rLv * 4;
     return `
       <div class="item-row" style="cursor:default;">
-        <div>
+        <div style="flex:1; min-width:0;">
           <div style="font-weight:700;">${r.name} <span style="color:var(--accent-soul)">(Lv.${rLv})</span></div>
-          <div style="font-size:10.5px; color:var(--text-muted);">${r.desc}</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">${r.desc} (💎${cost})</div>
         </div>
-        <button class="btn-sm" onclick="upgradeRelic('${r.id}', ${cost})">💎 ${cost}</button>
+        <div class="btn-group-mini">
+          <button class="btn-sm" onclick="upgradeRelicMulti('${r.id}', 1)">+1</button>
+          <button class="btn-sm" onclick="upgradeRelicMulti('${r.id}', 5)">+5</button>
+          <button class="btn-sm" onclick="upgradeRelicMulti('${r.id}', 'MAX')">MAX</button>
+        </div>
       </div>
     `;
   }).join('');
 }
 
-function upgradeSkillTree(skId, cost) {
-  if (state.gold < cost) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
-  state.gold -= cost;
-  state.skills[skId] = (state.skills[skId] || 1) + 1;
-  SFX.play('success');
-  updateHUD(); renderSkillTab(); saveGame();
+function updateAutoPrestigeDepth(val) {
+  const n = Math.max(0, parseInt(val, 10) || 0);
+  state.settings.autoPrestigeDepth = n;
+  saveGame();
+  showToast(n > 0 ? `🌌 심연 ${n}층 도달 시 자동 환생이 예약되었습니다.` : '🌌 자동 환생 해제', 'normal', 1800);
 }
 
-function doPrestige(soulGain) {
-  if (!confirm(`차원 환생을 진행하시겠습니까?\n장비·유물·도감은 그대로 유지되며 💎영혼석 +${soulGain}개를 획득합니다!`)) return;
+function doPrestigeWithConfirm(soulGain) {
+  const btn = document.getElementById('btn-prestige-exec');
+  if (!checkInlineConfirm('prestige_exec', btn, `🌌 +💎${soulGain} 확인`)) return;
+  executePrestigeCore(soulGain, false);
+}
+
+function executePrestigeCore(soulGain, isAuto = false) {
   SFX.play('legend');
   triggerScreenFlash('#00e5ff');
   state.soulStones += soulGain;
@@ -3497,49 +4066,49 @@ function doPrestige(soulGain) {
   const { stats } = getTotalStats();
   state.hp = stats.maxHp;
   state.mp = stats.maxMp;
-  addLog(`🌌 [NG+${state.ngPlus}] 차원 환생 완료! 영혼석 +${soulGain}개 및 보너스 스탯을 획득했습니다!`);
-  setRecentSummary(`NG+${state.ngPlus} 차원 환생 완료! (💎+${soulGain})`);
+  const prefix = isAuto ? '[자동 환생] ' : '';
+  addLog(`🌌 ${prefix}NG+${state.ngPlus} 환생 완료! 💎+${soulGain}개 &amp; 스탯 +${state.statPts}`);
+  showToast(`🌌 ${prefix}NG+${state.ngPlus} 차원 환생 완료! (💎+${soulGain})`, 'good', 2600);
+  setRecentSummary(`NG+${state.ngPlus} 환생 완료! (💎+${soulGain})`);
   updateHUD();
   renderSkillTab();
   saveGame();
 }
 
-function upgradeRelic(rId, cost) {
-  if (state.soulStones < cost) { SFX.play('fail'); alert('영혼석이 부족합니다! (보스 처치 또는 환생으로 획득)'); return; }
-  state.soulStones -= cost;
-  state.relics[rId] = (state.relics[rId] || 0) + 1;
-  SFX.play('success');
-  updateHUD(); renderSkillTab(); saveGame();
-}
-
 // =========================================================================
-// 특수 던전 3종 & 일일 퀘스트 & 상점 탭
+// 특수 던전 / 일일 퀘스트 / 상점 탭
 // =========================================================================
 function renderShopTab() {
   document.getElementById('dungeon-tickets').textContent = state.dungeonTickets || 0;
   const dScale = state.depth + state.lv;
 
+  const autoDngBtn = document.getElementById('btn-auto-dungeon');
+  if (autoDngBtn) {
+    const on = !!state.settings.autoSpecialDungeon;
+    autoDngBtn.textContent = `자동 토벌: ${on ? 'ON' : 'OFF'}`;
+    autoDngBtn.style.borderColor = on ? '#4cd964' : 'var(--border-bright)';
+    autoDngBtn.style.color = on ? '#69f0ae' : 'var(--text-main)';
+  }
+  const autoQBtn = document.getElementById('btn-auto-quest');
+  if (autoQBtn) {
+    const on = !!state.settings.autoClaimQuest;
+    autoQBtn.textContent = `자동 수령: ${on ? 'ON' : 'OFF'}`;
+    autoQBtn.style.borderColor = on ? '#4cd964' : 'var(--border-bright)';
+    autoQBtn.style.color = on ? '#69f0ae' : 'var(--text-main)';
+  }
+
   document.getElementById('special-dungeon-list').innerHTML = `
-    <div class="item-row" onclick="runSpecialDungeon('gold')">
-      <div>
-        <div style="font-weight:700; color:var(--accent-gold);">🪙 황금 고블린 비밀금고</div>
-        <div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌 보상: 약 ${fmt(dScale * 95)} 골드 대량 획득</div>
-      </div>
-      <span class="btn-sm">입장권 1장</span>
+    <div class="item-row" onclick="runSpecialDungeon('gold', false)">
+      <div><div style="font-weight:700; color:var(--accent-gold);">🪙 황금 고블린 비밀금고</div><div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌: 약 ${fmt(dScale * 95)} 골드 획득</div></div>
+      <span class="btn-sm">티켓 1장</span>
     </div>
-    <div class="item-row" onclick="runSpecialDungeon('dust')">
-      <div>
-        <div style="font-weight:700; color:#c08cff;">✨ 고대 마력 수정 광산</div>
-        <div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌 보상: 마력 가루 +${25 + state.depth * 3}개 & 경험치</div>
-      </div>
-      <span class="btn-sm">입장권 1장</span>
+    <div class="item-row" onclick="runSpecialDungeon('dust', false)">
+      <div><div style="font-weight:700; color:#c08cff;">✨ 고대 마력 수정 광산</div><div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌: 마력 가루 +${25 + state.depth * 3}개 &amp; 경험치</div></div>
+      <span class="btn-sm">티켓 1장</span>
     </div>
-    <div class="item-row" onclick="runSpecialDungeon('gear')">
-      <div>
-        <div style="font-weight:700; color:#ff9f1a;">👑 심연 군주의 무기고</div>
-        <div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌 보상: 영웅~창조 등급 장비 1개 확정 드롭!</div>
-      </div>
-      <span class="btn-sm">입장권 1장</span>
+    <div class="item-row" onclick="runSpecialDungeon('gear', false)">
+      <div><div style="font-weight:700; color:#ff9f1a;">👑 심연 군주의 무기고</div><div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌: 영웅~창조 등급 장비 1개 확정!</div></div>
+      <span class="btn-sm">티켓 1장</span>
     </div>
   `;
 
@@ -3560,71 +4129,73 @@ function renderShopTab() {
   const highGachaCost = Math.floor(320 + state.depth * 85);
   document.getElementById('shop-list').innerHTML = `
     <div class="item-row" onclick="buyTicket()">
-      <div>
-        <div style="font-weight:700; color:#ffd180;">🎟️ 특수 던전 입장권 구매</div>
-        <div style="font-size:10.5px; color:var(--text-muted);">특수 비경 즉시 토벌용 입장권 +1장</div>
-      </div>
+      <div><div style="font-weight:700; color:#ffd180;">🎟️ 특수 던전 입장권 구매</div><div style="font-size:10.5px; color:var(--text-muted);">특수 비경 즉시 토벌용 입장권 +1장</div></div>
       <span class="btn-sm">250 G</span>
     </div>
     <div class="item-row" onclick="buyMysteryBox(0, ${gachaCost})">
-      <div>
-        <div style="font-weight:700; color:#4cd964;">🧰 방랑 상인의 장비 상자</div>
-        <div style="font-size:10.5px; color:var(--text-muted);">현재 층수 기준 랜덤 장비 1개</div>
-      </div>
+      <div><div style="font-weight:700; color:#4cd964;">🧰 방랑 상인의 장비 상자</div><div style="font-size:10.5px; color:var(--text-muted);">현재 층수 기준 랜덤 장비 1개</div></div>
       <span class="btn-sm">${fmt(gachaCost)} G</span>
     </div>
     <div class="item-row" onclick="buyMysteryBox(2, ${highGachaCost})">
-      <div>
-        <div style="font-weight:700; color:#ff9f1a;">👑 왕가의 황금 유물 상자</div>
-        <div style="font-size:10.5px; color:var(--text-muted);">희귀~창조 등급 확정!</div>
-      </div>
+      <div><div style="font-weight:700; color:#ff9f1a;">👑 왕가의 황금 유물 상자</div><div style="font-size:10.5px; color:var(--text-muted);">희귀~창조 등급 확정!</div></div>
       <span class="btn-sm">${fmt(highGachaCost)} G</span>
     </div>
   `;
 }
 
-function runSpecialDungeon(type) {
-  if ((state.dungeonTickets || 0) <= 0) { SFX.play('fail'); alert('입장권이 부족합니다! (보스 처치 또는 상점에서 구매)'); return; }
+function runSpecialDungeon(type, silent = false) {
+  if ((state.dungeonTickets || 0) <= 0) {
+    if (!silent) { SFX.play('fail'); showToast('던전 입장권이 부족합니다!', 'warn'); }
+    return;
+  }
   state.dungeonTickets--;
-  SFX.play('legend');
+  if (!silent) SFX.play('legend');
   if (type === 'gold') {
     const g = (state.depth + state.lv) * 95;
     state.gold += g;
-    addLog(`🏰 황금 고블린 금고 토벌 완료! (+${fmt(g)} 골드)`);
+    addLog(`🏰 황금 고블린 금고 토벌! (+${fmt(g)}G)`);
+    if (!silent) showToast(`🪙 황금 금고 토벌! +${fmt(g)} 골드`, 'good');
   } else if (type === 'dust') {
     const d = 25 + state.depth * 3;
     state.dust += d;
     gainExp(state.depth * 35);
-    addLog(`🏰 마력 수정 광산 토벌 완료! (가루 +${d}개)`);
+    addLog(`🏰 마력 수정 광산 토벌! (✨+${d})`);
+    if (!silent) showToast(`✨ 마력 광산 토벌! 가루 +${d}개`, 'good');
   } else {
     const itm = generateItem(state.depth + 2, 3, false);
-    acquireItemWithChest(itm, true);
+    acquireItemWithChest(itm, !silent);
+    if (silent) addLog(`🏰 [자동 토벌] 심연 군주의 무기고 ➔ [${itm.gradeName}] ${itm.name}`);
   }
-  updateHUD(); renderShopTab(); saveGame();
+  updateHUD();
+  if (!silent) renderShopTab();
+  saveGame();
 }
 
 function claimQuest(idx) {
   const q = state.quests[idx];
   if (!q || q.prog < q.goal) return;
   SFX.play('legend');
-  state.gold += q.rewardGold;
-  state.soulStones += q.rewardSoul;
-  q.prog = 0;
+  const g = q.rewardGold, s = q.rewardSoul;
+  state.gold += g;
+  state.soulStones += s;
+  q.prog -= q.goal;
   q.goal = Math.floor(q.goal * 1.4);
   q.rewardGold = Math.floor(q.rewardGold * 1.5);
+  showToast(`📜 퀘스트 보상 수령! (+${fmt(g)}G, 💎+${s})`, 'good');
   updateHUD(); renderShopTab(); saveGame();
 }
 
 function buyTicket() {
-  if (state.gold < 250) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
+  if (state.gold < 250) { SFX.play('fail'); showToast('골드가 부족합니다!', 'warn'); return; }
   state.gold -= 250;
   state.dungeonTickets = (state.dungeonTickets || 0) + 1;
   SFX.play('success');
+  showToast('🎟️ 던전 입장권 +1장 구매!', 'good', 1400);
   updateHUD(); renderShopTab(); saveGame();
 }
 
 function buyMysteryBox(minGrade, cost) {
-  if (state.gold < cost) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
+  if (state.gold < cost) { SFX.play('fail'); showToast('골드가 부족합니다!', 'warn'); return; }
   state.gold -= cost;
   const itm = generateItem(state.depth + 1, minGrade, false);
   acquireItemWithChest(itm, true);
@@ -3632,15 +4203,13 @@ function buyMysteryBox(minGrade, cost) {
 }
 
 // =========================================================================
-// 도감 / 업적 / 설정 탭 (A-1 & A-2 토글 제어 포함)
+// 도감 / 업적 / 정비·자동화 설정 탭
 // =========================================================================
 function renderCodexTab() {
   const { codexBonus, achBonus } = getTotalStats();
   document.getElementById('ach-bonus-txt').textContent = `영구 공격력 +${achBonus}%`;
   document.getElementById('codex-bonus-txt').textContent = `영구 공격력 +${codexBonus}%`;
 
-  // 설정 UI 상태 반영
-  const st = state.settings || {};
   const bindBtn = (id, flag) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -3648,13 +4217,28 @@ function renderCodexTab() {
     el.style.borderColor = flag ? '#4cd964' : 'var(--border-bright)';
     el.style.color = flag ? '#69f0ae' : 'var(--text-main)';
   };
+
+  const m = state.maintOptions || {};
+  bindBtn('maint-opt-id', m.identify);
+  bindBtn('maint-opt-eq', m.equip);
+  bindBtn('maint-opt-sal', m.salvage);
+  bindBtn('maint-opt-stat', m.stat);
+  bindBtn('maint-opt-skill', m.skill);
+  bindBtn('maint-opt-quest', m.quest);
+
+  const st = state.settings || {};
   bindBtn('set-auto-equip', st.autoEquipOnDrop);
+  bindBtn('set-auto-salvage', st.autoSalvageOnDrop);
   bindBtn('set-pause-lv', st.pauseOnLvUp);
   bindBtn('set-pause-promo', st.pauseOnPromo);
   bindBtn('set-pause-unique', st.pauseOnUnique);
 
-  const salvageSel = document.getElementById('set-auto-salvage');
-  if (salvageSel) salvageSel.value = String(st.autoSalvageGradeIdx !== undefined ? st.autoSalvageGradeIdx : -1);
+  const es = state.enhanceSafe || {};
+  const tInp = document.getElementById('set-enh-target');
+  if (tInp) tInp.value = es.targetLv || 10;
+  const gInp = document.getElementById('set-enh-mingold');
+  if (gInp) gInp.value = es.minGold !== undefined ? es.minGold : 500;
+  bindBtn('set-enh-stopdrop', es.stopOnDrop);
 
   document.getElementById('achievement-list').innerHTML = ACHIEVEMENTS.map(a => {
     const cur = state.records[a.key] || 0;
@@ -3679,18 +4263,32 @@ function renderCodexTab() {
   `;
 }
 
-function toggleSetting(key) {
+function toggleMaintOption(key) {
   SFX.play('click');
-  if (!state.settings) state.settings = {};
-  state.settings[key] = !state.settings[key];
+  state.maintOptions[key] = !state.maintOptions[key];
   renderCodexTab();
   saveGame();
 }
 
-function changeAutoSalvage(val) {
+function updateEnhanceSafeConfig(key, val) {
+  const n = Math.max(0, parseInt(val, 10) || 0);
+  state.enhanceSafe[key] = key === 'targetLv' ? Math.max(1, Math.min(20, n)) : n;
+  saveGame();
+  showToast('🔨 목표 강화 안전 설정이 저장되었습니다.', 'normal', 1500);
+}
+
+function toggleEnhanceSafeFlag(key) {
+  SFX.play('click');
+  state.enhanceSafe[key] = !state.enhanceSafe[key];
+  renderCodexTab();
+  saveGame();
+}
+
+function toggleSetting(key) {
   SFX.play('click');
   if (!state.settings) state.settings = {};
-  state.settings.autoSalvageGradeIdx = parseInt(val, 10);
+  state.settings[key] = !state.settings[key];
+  refreshActiveTab();
   saveGame();
 }
 
@@ -3705,17 +4303,20 @@ function exportSave() {
   saveGame();
   const raw = localStorage.getItem('ABYSS_RPG_SAVE_V2');
   navigator.clipboard?.writeText(raw);
-  alert('세이브 데이터가 클립보드에 복사되었습니다!');
+  showToast('💾 세이브 데이터가 클립보드에 복사되었습니다!', 'good');
 }
 
-function resetGame() {
-  if (!confirm('정말 모든 진행 데이터를 초기화하시겠습니까?')) return;
+function resetGameWithConfirm() {
+  const btn = document.getElementById('btn-hard-reset');
+  if (!checkInlineConfirm('hard_reset', btn, '⚠️ 정말 초기화(재클릭)')) return;
   localStorage.removeItem('ABYSS_RPG_SAVE_V2');
   localStorage.removeItem('ABYSS_RPG_SAVE_V1');
   location.reload();
 }
 
-// 신규 시작 직업 선택 모달
+// =========================================================================
+// 신규 시작 직업 선택 & 오프라인 보상
+// =========================================================================
 function showClassSelectModal() {
   const overlay = document.getElementById('modal-overlay');
   const content = document.getElementById('modal-content');
@@ -3734,7 +4335,7 @@ function showClassSelectModal() {
   content.innerHTML = `
     <div style="text-align:center;">
       <div style="font-size:17px; font-weight:800; color:var(--border-bright);">⚔️ 운명의 클래스를 선택하십시오</div>
-      <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">2차~5차 전직과 전용 스킬 트리, 오라 연출이 해금됩니다.</div>
+      <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">2차~5차 전직과 전용 스킬 트리, 원클릭 편의 시스템이 탑재되었습니다.</div>
     </div>
     <div style="display:flex; flex-direction:column; gap:7px;">${cards}</div>
   `;
@@ -3751,6 +4352,7 @@ function startNewGame(classKey) {
   closeModal();
   addLog(`🚩 [${CLASSES[classKey].name}] 클래스로 심연 원정을 시작합니다!`);
   setRecentSummary(`[${CLASSES[classKey].name}] 클래스로 원정 개시!`);
+  syncAutoButtonsUI();
   updateHUD();
   nextTurnEvent();
 }
