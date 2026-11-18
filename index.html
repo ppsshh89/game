@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>심연의 연대기 : 무한의 선택</title>
+<title>심연의 연대기 : 무한의 선택 (v2.0)</title>
 <style>
   :root {
-    --bg-dark: #0d0b0e;
-    --bg-panel: #18141c;
-    --bg-card: #221c28;
-    --parchment: #2a2229;
+    --bg-dark: #0b090d;
+    --bg-panel: #16121a;
+    --bg-card: #211b27;
     --border-gold: #6e552f;
-    --border-bright: #c89d54;
-    --text-main: #e8dcc8;
+    --border-bright: #d4a959;
+    --text-main: #ede3d2;
     --text-muted: #9e9181;
-    --accent-red: #c93b3b;
-    --accent-blue: #3b7dc9;
-    --accent-green: #45a858;
-    --accent-gold: #e6b84d;
-    /* 7단계 아이템 등급 색상 */
+    --accent-red: #d63c3c;
+    --accent-blue: #3b82d6;
+    --accent-green: #45b858;
+    --accent-gold: #f0c24b;
+    --accent-soul: #00e5ff;
+    /* 7단계 등급 색상 */
     --g-common: #a0a0a0;
     --g-uncommon: #4cd964;
-    --g-rare: #3498db;
-    --g-epic: #b056f5;
+    --g-rare: #38a1ff;
+    --g-epic: #b85cff;
     --g-legend: #ff9f1a;
     --g-mythic: #ff3838;
     --g-genesis: #00f5d4;
@@ -37,7 +37,7 @@
   }
 
   body {
-    background-color: #050406;
+    background-color: #040305;
     color: var(--text-main);
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
@@ -50,7 +50,7 @@
     width: 100%;
     max-width: 480px;
     height: 100dvh;
-    background: radial-gradient(circle at top, #1f1926 0%, var(--bg-dark) 75%);
+    background: radial-gradient(circle at top, #1f1826 0%, var(--bg-dark) 80%);
     display: flex;
     flex-direction: column;
     border-left: 1px solid #2e2418;
@@ -59,73 +59,79 @@
     overflow: hidden;
   }
 
-  /* 전설 이상 획득 시 전체 화면 플래시 */
   #screen-flash {
     position: absolute;
     inset: 0;
     pointer-events: none;
     opacity: 0;
     z-index: 999;
-    transition: opacity 0.6s ease-out;
+    transition: opacity 0.55s ease-out;
   }
 
-  /* 상단 상태바 */
+  /* 상단 HUD */
   .top-hud {
-    background: linear-gradient(180deg, #1d1721 0%, #130f16 100%);
+    background: linear-gradient(180deg, #1b1520 0%, #110d14 100%);
     border-bottom: 2px solid var(--border-gold);
-    padding: 8px 12px;
+    padding: 7px 10px;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.65);
   }
 
   .hud-row1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
-    margin-bottom: 6px;
+    font-size: 12px;
+    margin-bottom: 5px;
   }
 
   .char-badge {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     font-weight: 700;
     color: var(--border-bright);
   }
 
+  .tier-pill {
+    background: #332419;
+    border: 1px solid var(--border-bright);
+    color: #ffd984;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
   .depth-badge {
-    background: #2b2133;
+    background: #281e30;
     border: 1px solid var(--border-gold);
     padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    color: #e6c88a;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #f0d290;
+    font-weight: 700;
   }
 
   .hud-bars {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-bottom: 6px;
+    gap: 5px;
+    margin-bottom: 4px;
   }
 
   .bar-wrap {
-    background: #0b090d;
-    border: 1px solid #3a2e3f;
-    height: 16px;
+    background: #09070b;
+    border: 1px solid #382c3d;
+    height: 14px;
     border-radius: 4px;
     position: relative;
     overflow: hidden;
   }
 
-  .bar-fill {
-    height: 100%;
-    transition: width 0.25s ease;
-  }
-  .bar-hp { background: linear-gradient(90deg, #7a1c1c, #cc3333); }
-  .bar-mp { background: linear-gradient(90deg, #1c3d7a, #3377cc); }
-  .bar-exp { background: linear-gradient(90deg, #594316, #cfa036); height: 6px; }
+  .bar-fill { height: 100%; transition: width 0.2s ease; }
+  .bar-hp { background: linear-gradient(90deg, #7a1c1c, #d93636); }
+  .bar-mp { background: linear-gradient(90deg, #1c3d7a, #3680d9); }
+  .bar-exp { background: linear-gradient(90deg, #594316, #deb038); height: 5px; }
 
   .bar-text {
     position: absolute;
@@ -133,7 +139,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
     text-shadow: 1px 1px 2px #000;
   }
@@ -142,83 +148,296 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
+    font-size: 11px;
     margin-top: 4px;
     color: var(--text-muted);
   }
 
   .currency-group {
     display: flex;
-    gap: 10px;
-    font-weight: 600;
+    gap: 8px;
+    font-weight: 700;
   }
   .gold-txt { color: var(--accent-gold); }
-  .dust-txt { color: #b589ff; }
-  .rep-txt { color: #7ed6df; }
+  .dust-txt { color: #c08cff; }
+  .soul-txt { color: var(--accent-soul); }
+  .rep-txt { color: #82e0aa; }
 
   /* 메인 컨텐츠 영역 */
   .main-view {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 12px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .tab-panel {
     display: none;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     height: 100%;
   }
-  .tab-panel.active {
-    display: flex;
-  }
+  .tab-panel.active { display: flex; }
 
-  /* 스토리 카드 (양피지/금속 느낌) */
-  .story-card {
-    background: linear-gradient(160deg, #241d26 0%, #171319 100%);
-    border: 1px solid var(--border-gold);
-    border-radius: 8px;
-    padding: 12px;
-    box-shadow: inset 0 0 18px rgba(0,0,0,0.7), 0 4px 10px rgba(0,0,0,0.4);
+  /* 1. 미니맵 & 오토 컨트롤 바 */
+  .minimap-card {
+    background: #151118;
+    border: 1px solid #3b2e42;
+    border-radius: 7px;
+    padding: 6px 8px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-height: 185px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .minimap-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+
+  .node-track {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 3px;
+    align-items: center;
+  }
+
+  .map-node {
+    height: 26px;
+    border-radius: 4px;
+    background: #1f1924;
+    border: 1px solid #352a3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
     position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .map-node.cleared {
+    opacity: 0.38;
+    background: #100d13;
+  }
+  .map-node.current {
+    border-color: var(--border-bright);
+    background: #382a1e;
+    transform: scale(1.08);
+    box-shadow: 0 0 8px rgba(212, 169, 89, 0.6);
+    z-index: 2;
+  }
+  .map-node.boss-node {
+    border-color: #9e2a2b;
+    background: #2b1419;
+  }
+
+  .auto-bar {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .auto-btn {
+    flex: 1;
+    background: #211a26;
+    border: 1px solid #483852;
+    color: var(--text-main);
+    padding: 5px 6px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .auto-btn.active {
+    background: linear-gradient(90deg, #1d4028, #275936);
+    border-color: #4cd964;
+    color: #eaffea;
+    box-shadow: 0 0 8px rgba(76, 217, 100, 0.35);
+  }
+
+  /* 2. 비주얼 전투씬 & 이벤트 스테이지 */
+  .battle-stage {
+    height: 128px;
+    border-radius: 8px;
+    border: 1px solid var(--border-gold);
+    background: linear-gradient(180deg, #140f1d 0%, #231829 65%, #19131c 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 10px 22px 14px;
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.85);
+    flex-shrink: 0;
+  }
+
+  .stage-bg-deco {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 46px;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+
+  .stage-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 22px;
+    background: linear-gradient(180deg, #2b212e 0%, #120e14 100%);
+    border-top: 1px solid #4a3931;
+  }
+
+  .unit-box {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 115px;
+    transition: transform 0.18s ease;
+  }
+
+  .unit-sprite-wrap {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+  }
+
+  /* 전직 단계별 오라 이펙트 */
+  .aura-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .aura-t2 { opacity: 0.5; box-shadow: 0 0 12px #38a1ff; }
+  .aura-t3 { opacity: 0.7; box-shadow: 0 0 15px #b85cff; }
+  .aura-t4 { opacity: 0.85; box-shadow: 0 0 18px #ff9f1a; animation: pulseAura 1.5s infinite alternate; }
+  .aura-t5 { opacity: 1; box-shadow: 0 0 22px #00f5d4, inset 0 0 10px #ff007f; animation: pulseAura 1s infinite alternate; }
+
+  @keyframes pulseAura {
+    0% { transform: scale(0.95); }
+    100% { transform: scale(1.12); }
+  }
+
+  .weapon-badge {
+    position: absolute;
+    bottom: 0;
+    right: -4px;
+    font-size: 20px;
+    transform: rotate(-15deg);
+  }
+
+  .companion-badge {
+    position: absolute;
+    bottom: 2px;
+    left: -18px;
+    font-size: 20px;
+    filter: drop-shadow(0 2px 3px #000);
+  }
+
+  .unit-name-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(10, 8, 12, 0.8);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid #3c3042;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .unit-mini-hp {
+    width: 86px;
+    height: 6px;
+    background: #0d0a0f;
+    border: 1px solid #3d2f42;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 3px;
+  }
+
+  .intent-bubble {
+    position: absolute;
+    top: -18px;
+    background: rgba(40, 12, 16, 0.92);
+    border: 1px solid #cc4444;
+    color: #ffd180;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  /* 전투 애니메이션 클래스 */
+  .lunge-right { transform: translateX(48px) scale(1.12) !important; }
+  .lunge-left  { transform: translateX(-48px) scale(1.12) !important; }
+  .hit-shake   { animation: unitShake 0.28s ease; filter: brightness(2) sepia(1) hue-rotate(-50deg); }
+
+  @keyframes unitShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
+  }
+
+  /* 데미지 플로팅 텍스트 */
+  .dmg-float {
+    position: absolute;
+    z-index: 30;
+    font-weight: 800;
+    font-size: 15px;
+    pointer-events: none;
+    text-shadow: 0 2px 4px #000, 0 0 6px #000;
+    animation: floatUp 0.75s ease-out forwards;
+  }
+  @keyframes floatUp {
+    0%   { opacity: 1; transform: translateY(0) scale(0.9); }
+    40%  { opacity: 1; transform: translateY(-18px) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-34px) scale(0.95); }
+  }
+
+  /* 스토리 카드 */
+  .story-card {
+    background: linear-gradient(160deg, #231c26 0%, #161218 100%);
+    border: 1px solid var(--border-gold);
+    border-radius: 7px;
+    padding: 9px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .event-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(200, 157, 84, 0.25);
-    padding-bottom: 6px;
-  }
-
-  .event-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .event-emoji {
-    font-size: 26px;
-    background: #120e14;
-    border: 1px solid var(--border-gold);
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-bottom: 1px solid rgba(200, 157, 84, 0.2);
+    padding-bottom: 4px;
   }
 
   .event-type-tag {
-    font-size: 11px;
-    padding: 2px 7px;
+    font-size: 10px;
+    padding: 1px 6px;
     border-radius: 4px;
     background: #2f2436;
     color: var(--border-bright);
@@ -226,122 +445,79 @@
   }
 
   .story-text {
-    font-size: 14px;
-    line-height: 1.55;
+    font-size: 13px;
+    line-height: 1.45;
     color: var(--text-main);
-    min-height: 66px;
-    white-space: pre-line;
+    min-height: 38px;
   }
 
   .result-box {
-    background: rgba(12, 9, 15, 0.75);
+    background: rgba(10, 8, 13, 0.8);
     border-left: 3px solid var(--border-bright);
-    padding: 8px 10px;
-    font-size: 13px;
-    line-height: 1.45;
+    padding: 6px 9px;
+    font-size: 12px;
+    line-height: 1.4;
     border-radius: 0 4px 4px 0;
     display: none;
   }
   .result-box.show { display: block; }
 
-  /* 전투 적 상태창 */
-  .enemy-box {
-    background: rgba(45, 16, 22, 0.65);
-    border: 1px solid #802f2f;
-    border-radius: 6px;
-    padding: 8px 10px;
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .enemy-box.show { display: flex; }
-
-  .enemy-top {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    font-weight: 700;
-    color: #ff9999;
-  }
-
-  .enemy-intent {
-    font-size: 11px;
-    color: #ffd180;
-  }
-
-  /* 선택지 버튼 영역 */
+  /* 선택지 버튼 */
   .choices-wrap {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 6px;
     margin-top: auto;
   }
 
   .choice-btn {
-    background: linear-gradient(180deg, #2b2330 0%, #1c1620 100%);
+    background: linear-gradient(180deg, #2b2330 0%, #1b151f 100%);
     border: 1px solid var(--border-gold);
     color: var(--text-main);
-    padding: 11px 12px;
-    border-radius: 7px;
+    padding: 9px 11px;
+    border-radius: 6px;
     text-align: left;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.08s, border-color 0.15s, background 0.15s;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+    transition: transform 0.08s, border-color 0.15s, box-shadow 0.15s;
   }
-
-  .choice-btn:active {
-    transform: scale(0.985);
-    border-color: var(--border-bright);
-  }
-
+  .choice-btn:active { transform: scale(0.985); }
   .choice-btn.class-special {
     border-color: #5ca4ff;
-    background: linear-gradient(180deg, #1f293d 0%, #151b29 100%);
+    background: linear-gradient(180deg, #1f293d 0%, #141a28 100%);
+  }
+  .choice-btn.auto-picked {
+    border-color: #4cd964 !important;
+    box-shadow: 0 0 12px rgba(76, 217, 100, 0.7) !important;
   }
 
-  .choice-left {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding-right: 8px;
-  }
-
-  .choice-title {
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .choice-desc {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
+  .choice-left { display: flex; flex-direction: column; gap: 2px; padding-right: 6px; }
+  .choice-title { font-size: 13px; font-weight: 700; }
+  .choice-desc { font-size: 10.5px; color: var(--text-muted); }
   .choice-prob {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
-    padding: 3px 7px;
-    border-radius: 5px;
+    padding: 3px 6px;
+    border-radius: 4px;
     background: #120e15;
     border: 1px solid #3d3145;
     white-space: nowrap;
   }
 
-  /* 최근 로그 창 */
   .log-box {
-    background: #110e14;
-    border: 1px solid #2d2433;
-    border-radius: 6px;
-    padding: 6px 9px;
-    max-height: 76px;
+    background: #100d13;
+    border: 1px solid #2b2230;
+    border-radius: 5px;
+    padding: 5px 8px;
+    max-height: 58px;
     overflow-y: auto;
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--text-muted);
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     flex-shrink: 0;
   }
 
@@ -350,14 +526,14 @@
     background: var(--bg-card);
     border: 1px solid #3c3042;
     border-radius: 7px;
-    padding: 10px;
+    padding: 9px 10px;
   }
 
   .section-title {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--border-bright);
-    margin-bottom: 8px;
+    margin-bottom: 7px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -366,18 +542,18 @@
   .stat-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 5px;
   }
 
   .stat-item {
-    background: #16121a;
+    background: #151119;
     border: 1px solid #2e2536;
     border-radius: 5px;
-    padding: 6px 8px;
+    padding: 5px 7px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
+    font-size: 11.5px;
   }
 
   .btn-sm {
@@ -387,56 +563,52 @@
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
+    white-space: nowrap;
   }
-  .btn-sm:disabled {
-    opacity: 0.35;
-    cursor: default;
-  }
+  .btn-sm:disabled { opacity: 0.35; cursor: default; }
 
-  /* 장비 슬롯 & 인벤토리 */
   .equip-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
+    gap: 5px;
   }
 
   .item-row {
-    background: #16121a;
+    background: #151119;
     border: 1px solid #33293a;
     border-radius: 6px;
-    padding: 8px;
+    padding: 7px 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11.5px;
   }
 
-  /* 등급별 색상 및 테두리 연출 */
+  /* 7등급 색상 */
   .g-common { color: var(--g-common); }
   .g-uncommon { color: var(--g-uncommon); }
   .g-rare { color: var(--g-rare); }
   .g-epic { color: var(--g-epic); }
-  .g-legend { color: var(--g-legend); text-shadow: 0 0 6px rgba(255,159,26,0.4); }
-  .g-mythic { color: var(--g-mythic); text-shadow: 0 0 8px rgba(255,56,56,0.6); }
+  .g-legend { color: var(--g-legend); text-shadow: 0 0 6px rgba(255,159,26,0.45); }
+  .g-mythic { color: var(--g-mythic); text-shadow: 0 0 8px rgba(255,56,56,0.65); }
   .g-genesis {
     color: var(--g-genesis);
-    text-shadow: 0 0 10px rgba(0,245,212,0.8);
+    text-shadow: 0 0 10px rgba(0,245,212,0.85);
     animation: genesisPulse 2s infinite alternate;
   }
-
   @keyframes genesisPulse {
     0% { filter: drop-shadow(0 0 2px #00f5d4); }
-    100% { filter: drop-shadow(0 0 8px #ff007f); }
+    100% { filter: drop-shadow(0 0 7px #ff007f); }
   }
 
-  /* 하단 내비게이션 탭 */
+  /* 하단 탭바 */
   .bottom-nav {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    background: #120e15;
+    background: #110d14;
     border-top: 2px solid var(--border-gold);
     flex-shrink: 0;
   }
@@ -445,8 +617,8 @@
     background: none;
     border: none;
     color: var(--text-muted);
-    padding: 8px 2px;
-    font-size: 11px;
+    padding: 7px 2px;
+    font-size: 10.5px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -454,17 +626,16 @@
     cursor: pointer;
     position: relative;
   }
-
   .nav-btn.active {
     color: var(--border-bright);
-    background: #1f1824;
+    background: #1e1723;
     font-weight: 700;
   }
 
   .badge-dot {
     position: absolute;
     top: 4px;
-    right: 12px;
+    right: 10px;
     width: 7px;
     height: 7px;
     background: #ff3b3b;
@@ -473,7 +644,7 @@
   }
   .badge-dot.show { display: block; }
 
-  /* 모달 (직업선택, 상자 연출, 아이템 상세, 오프라인 보상) */
+  /* 모달 */
   .modal-overlay {
     position: absolute;
     inset: 0;
@@ -481,35 +652,28 @@
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 14px;
     z-index: 100;
   }
   .modal-overlay.show { display: flex; }
 
   .modal-card {
-    background: linear-gradient(180deg, #251e2b 0%, #16121a 100%);
+    background: linear-gradient(180deg, #251e2b 0%, #151119 100%);
     border: 2px solid var(--border-bright);
     border-radius: 10px;
     width: 100%;
     max-width: 400px;
-    padding: 16px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 9px;
     max-height: 88dvh;
     overflow-y: auto;
-    box-shadow: 0 0 30px rgba(0,0,0,0.9);
+    box-shadow: 0 0 30px rgba(0,0,0,0.95);
   }
 
-  /* 상자 흔들림 애니메이션 */
-  .chest-icon {
-    font-size: 64px;
-    text-align: center;
-    margin: 12px 0;
-  }
-  .chest-shake {
-    animation: shakeAnim 0.12s infinite;
-  }
+  .chest-icon { font-size: 58px; text-align: center; margin: 8px 0; }
+  .chest-shake { animation: shakeAnim 0.12s infinite; }
   @keyframes shakeAnim {
     0% { transform: rotate(-6deg) scale(1.05); }
     50% { transform: rotate(6deg) scale(1.1); }
@@ -522,13 +686,14 @@
 <div id="app">
   <div id="screen-flash"></div>
 
-  <!-- 상단 HUD -->
+  <!-- 상단 상태바 -->
   <header class="top-hud">
     <div class="hud-row1">
       <div class="char-badge">
         <span id="hud-class-icon">⚔️</span>
         <span id="hud-lv">Lv.1</span>
-        <span id="hud-title">초보 모험가</span>
+        <span id="hud-title">강철의 검투사</span>
+        <span class="tier-pill" id="hud-tier">1차</span>
       </div>
       <div class="depth-badge" id="hud-depth">심연 1층</div>
     </div>
@@ -544,7 +709,7 @@
       </div>
     </div>
 
-    <div class="bar-wrap" style="height:7px;">
+    <div class="bar-wrap" style="height:5px;">
       <div class="bar-fill bar-exp" id="hud-exp-bar" style="width:0%"></div>
     </div>
 
@@ -552,58 +717,91 @@
       <div class="currency-group">
         <span class="gold-txt">🪙 <span id="hud-gold">0</span></span>
         <span class="dust-txt">✨ <span id="hud-dust">0</span></span>
-        <span class="rep-txt">⚖️ 평판 <span id="hud-rep">0</span></span>
+        <span class="soul-txt">💎 <span id="hud-soul">0</span></span>
+        <span class="rep-txt">⚖️ <span id="hud-rep">0</span></span>
       </div>
-      <div id="hud-status-flags" style="font-size:11px;"></div>
+      <div id="hud-status-flags" style="font-size:10.5px;"></div>
     </div>
   </header>
 
-  <!-- 메인 뷰 -->
+  <!-- 메인 컨텐츠 뷰 -->
   <main class="main-view">
-    <!-- 1. 모험 탭 -->
+    <!-- 1. 모험 탭 (미니맵 + 오토바 + 전투씬 + 선택지) -->
     <section id="tab-adventure" class="tab-panel active">
-      <div class="story-card" id="story-card">
-        <div class="event-header">
-          <div class="event-title-wrap">
-            <div class="event-emoji" id="ev-emoji">🏰</div>
-            <div>
-              <div style="font-size:14px; font-weight:700;" id="ev-title">모험의 시작</div>
-              <div style="font-size:11px; color:var(--text-muted);" id="ev-place">버려진 성문 앞</div>
-            </div>
+      <!-- 미니맵 & 자동 진행 컨트롤 -->
+      <div class="minimap-card">
+        <div class="minimap-top">
+          <span style="font-weight:700; color:var(--border-bright);" id="map-floor-label">🗺️ 심연 1층 탐사 경로 (1/10)</span>
+          <span style="color:var(--text-muted);" id="map-next-hint">10번째 방: 계층 군주(보스)</span>
+        </div>
+        <div class="node-track" id="node-track"></div>
+        <div class="auto-bar">
+          <button class="auto-btn" id="btn-auto-toggle" onclick="toggleAutoPlay()">🤖 자동선택: OFF</button>
+          <button class="auto-btn" id="btn-auto-speed" onclick="cycleAutoSpeed()" style="flex:0.55;">⚡ 1x</button>
+          <button class="auto-btn" id="btn-auto-mode" onclick="cycleAutoMode()" style="flex:0.85;">🎯 성향: 균형</button>
+        </div>
+      </div>
+
+      <!-- 실시간 캐릭터 vs 몬스터/오브젝트 전투씬 -->
+      <div class="battle-stage" id="battle-stage">
+        <div class="stage-bg-deco" id="stage-bg-deco"><span>🏛️</span><span>🕯️</span><span>🕸️</span></div>
+        <div class="stage-floor"></div>
+
+        <!-- 아군 유닛 -->
+        <div class="unit-box" id="hero-unit">
+          <div class="unit-sprite-wrap">
+            <div class="aura-ring" id="hero-aura"></div>
+            <span id="hero-sprite">🤺</span>
+            <span class="weapon-badge" id="hero-weapon">⚔️</span>
+            <span class="companion-badge" id="hero-companion" style="display:none;">🛡️</span>
           </div>
+          <div class="unit-name-tag" id="hero-stage-name">모험가</div>
+          <div class="unit-mini-hp"><div class="bar-fill bar-hp" id="hero-stage-hp" style="width:100%"></div></div>
+        </div>
+
+        <!-- 적군 또는 이벤트 오브젝트 유닛 -->
+        <div class="unit-box" id="target-unit">
+          <div class="intent-bubble" id="stage-intent" style="display:none;">⚠️ 공격 준비</div>
+          <div class="unit-sprite-wrap">
+            <span id="target-sprite">🏰</span>
+          </div>
+          <div class="unit-name-tag" id="target-stage-name">미지의 방</div>
+          <div class="unit-mini-hp" id="target-hp-wrap" style="display:none;">
+            <div class="bar-fill bar-hp" id="target-stage-hp" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 상황 및 결과 카드 -->
+      <div class="story-card">
+        <div class="event-header">
+          <div style="font-size:13px; font-weight:700;" id="ev-title">모험의 시작</div>
           <span class="event-type-tag" id="ev-tag">탐험</span>
         </div>
-
-        <div class="story-text" id="ev-text">운명의 갈림길에 섰습니다.</div>
-
-        <!-- 전투 시 적 정보 -->
-        <div class="enemy-box" id="enemy-box">
-          <div class="enemy-top">
-            <span id="enemy-name">고블린 정찰병</span>
-            <span id="enemy-hp-txt">HP 80/80</span>
-          </div>
-          <div class="bar-wrap" style="height:10px;">
-            <div class="bar-fill bar-hp" id="enemy-hp-bar" style="width:100%"></div>
-          </div>
-          <div class="enemy-intent" id="enemy-intent">⚠️ 예고: 일반 공격 준비 중</div>
-        </div>
-
-        <!-- 선택 결과 박스 -->
+        <div class="story-text" id="ev-text">심연의 문을 열었습니다.</div>
         <div class="result-box" id="result-box"></div>
       </div>
 
-      <!-- 하단 선택지 버튼 -->
+      <!-- 선택지 버튼 영역 -->
       <div class="choices-wrap" id="choices-wrap"></div>
 
-      <!-- 최근 사건 로그 -->
+      <!-- 로그 창 -->
       <div class="log-box" id="log-box"></div>
     </section>
 
-    <!-- 2. 캐릭터 탭 -->
+    <!-- 2. 캐릭터 & 전직 탭 -->
     <section id="tab-char" class="tab-panel">
       <div class="card">
         <div class="section-title">
-          <span>기본 능력치</span>
+          <span>👑 클래스 전직 (2차~5차 승급)</span>
+          <span id="job-tier-txt" style="color:var(--accent-gold)">현재: 1차</span>
+        </div>
+        <div id="promotion-box"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span>기본 능력치 배분</span>
           <span>남은 포인트: <strong style="color:var(--accent-gold)" id="stat-pts">0</strong></span>
         </div>
         <div class="stat-grid" id="stat-grid"></div>
@@ -612,66 +810,97 @@
       <div class="card">
         <div class="section-title">전투 상세 스탯 & 세트 효과</div>
         <div class="stat-grid" id="combat-stat-grid"></div>
-        <div id="active-sets-box" style="margin-top:8px; font-size:12px; color:#82e0aa;"></div>
+        <div id="active-sets-box" style="margin-top:6px; font-size:11.5px; color:#82e0aa;"></div>
       </div>
 
       <div class="card">
-        <div class="section-title">장착 중인 장비 (클릭하여 해제/강화)</div>
+        <div class="section-title">장착 중인 장비 (클릭하여 상세/강화)</div>
         <div class="equip-grid" id="equipped-grid"></div>
       </div>
     </section>
 
-    <!-- 3. 인벤토리 탭 -->
+    <!-- 3. 인벤토리 & 합성 탭 -->
     <section id="tab-inv" class="tab-panel">
-      <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-        <span style="font-size:12px;">보유 장비 (<span id="inv-count">0</span>/30)</span>
-        <div style="display:flex; gap:5px;">
-          <button class="btn-sm" onclick="salvageBelow('rare')">희귀 이하 일괄분해</button>
-          <button class="btn-sm" onclick="salvageBelow('epic')">영웅 이하 일괄분해</button>
+      <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
+        <span style="font-size:12px; font-weight:700;">보유 장비 (<span id="inv-count">0</span>/35)</span>
+        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+          <button class="btn-sm" style="background:#263849; border-color:#5ca4ff;" onclick="synthesizeAll()">⚗️ 동일등급 3개 합성</button>
+          <button class="btn-sm" onclick="salvageBelow('rare')">희귀↓ 분해</button>
+          <button class="btn-sm" onclick="salvageBelow('epic')">영웅↓ 분해</button>
         </div>
       </div>
-      <div id="inv-list" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto;"></div>
+      <div id="inv-list" style="display:flex; flex-direction:column; gap:5px; overflow-y:auto;"></div>
     </section>
 
-    <!-- 4. 스킬 탭 (1단계 기본 스킬 + 2단계 확장 예고) -->
+    <!-- 4. 스킬 트리 & 환생(프레스티지) 탭 -->
     <section id="tab-skill" class="tab-panel">
       <div class="card">
-        <div class="section-title">직업 고유 스킬 강화</div>
-        <div id="skill-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <div class="section-title">📘 직업 스킬 트리 (4단계 해금)</div>
+        <div id="skill-tree-list" style="display:flex; flex-direction:column; gap:6px;"></div>
       </div>
-      <div class="card" style="color:var(--text-muted); font-size:12px; line-height:1.5;">
-        💡 <strong>[2단계 업데이트 예고]</strong><br>
-        • 2차~5차 전직 트리 및 전용 궁극기 해금<br>
-        • 환생(프레스티지) 영구 유물 시스템
+
+      <div class="card" style="border-color:#00a8cc;">
+        <div class="section-title">
+          <span style="color:var(--accent-soul)">🌌 차원 환생 (프레스티지 NG+<span id="ng-plus-txt">0</span>)</span>
+          <span class="soul-txt">보유 영혼석: 💎<span id="soul-stone-txt">0</span></span>
+        </div>
+        <div id="prestige-action-box" style="margin-bottom:8px;"></div>
+        <div style="font-size:11.5px; font-weight:700; color:var(--border-bright); margin-bottom:5px;">🏛️ 고대 영혼 유물 (환생 시에도 영구 유지)</div>
+        <div id="relic-list" style="display:flex; flex-direction:column; gap:5px;"></div>
       </div>
     </section>
 
-    <!-- 5. 상점 탭 -->
+    <!-- 5. 특수 던전 & 일일 퀘스트 & 상점 탭 -->
     <section id="tab-shop" class="tab-panel">
       <div class="card">
-        <div class="section-title">방랑 상인의 보급품</div>
-        <div style="display:flex; flex-direction:column; gap:8px;" id="shop-list"></div>
+        <div class="section-title">
+          <span>🏰 심연 특수 비경 (즉시 토벌)</span>
+          <span style="font-size:11px; color:#ffd180;">남은 입장권: <strong id="dungeon-tickets">3</strong>장</span>
+        </div>
+        <div id="special-dungeon-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">📜 일일 현상금 퀘스트</div>
+        <div id="daily-quest-list" style="display:flex; flex-direction:column; gap:5px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">⚖️ 방랑 상인의 보급품</div>
+        <div id="shop-list" style="display:flex; flex-direction:column; gap:6px;"></div>
       </div>
     </section>
 
-    <!-- 6. 도감/설정 탭 -->
+    <!-- 6. 도감 / 업적 / 설정 탭 -->
     <section id="tab-codex" class="tab-panel">
       <div class="card">
-        <div class="section-title">발견한 유니크 & 등급 수집 현황</div>
-        <div id="codex-summary" style="font-size:12px; line-height:1.6;"></div>
+        <div class="section-title">
+          <span>🏆 영구 업적 (달성 시 능력치 영구 상승)</span>
+          <span id="ach-bonus-txt" style="color:#4cd964; font-size:11px;">공격력 +0%</span>
+        </div>
+        <div id="achievement-list" style="display:flex; flex-direction:column; gap:5px;"></div>
       </div>
+
       <div class="card">
-        <div class="section-title">게임 설정 & 데이터 관리</div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <div class="section-title">
+          <span>📖 수집 도감 (유니크 발견당 공격력 +2%)</span>
+          <span id="codex-bonus-txt" style="color:var(--accent-gold); font-size:11px;">보너스 +0%</span>
+        </div>
+        <div id="codex-summary" style="font-size:11.5px; line-height:1.55;"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">⚙️ 게임 설정 & 세이브 관리</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="btn-sm" onclick="toggleSound()" id="btn-sound">🔊 효과음: 켜짐</button>
           <button class="btn-sm" onclick="exportSave()">💾 세이브 복사</button>
-          <button class="btn-sm" style="border-color:#c93b3b; color:#ff9999;" onclick="resetGame()">🗑️ 데이터 초기화</button>
+          <button class="btn-sm" style="border-color:#c93b3b; color:#ff9999;" onclick="resetGame()">🗑️ 전체 초기화</button>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- 하단 탭바 -->
+  <!-- 하단 내비게이션 탭 -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('adventure', this)"><span>🧭</span><span>모험</span></button>
     <button class="nav-btn" onclick="switchTab('char', this)">
@@ -682,12 +911,15 @@
       <span>🎒</span><span>인벤토리</span>
       <span class="badge-dot" id="dot-inv"></span>
     </button>
-    <button class="nav-btn" onclick="switchTab('skill', this)"><span>📘</span><span>스킬</span></button>
-    <button class="nav-btn" onclick="switchTab('shop', this)"><span>⚖️</span><span>상점</span></button>
-    <button class="nav-btn" onclick="switchTab('codex', this)"><span>📖</span><span>도감/설정</span></button>
+    <button class="nav-btn" onclick="switchTab('skill', this)">
+      <span>📘</span><span>스킬/환생</span>
+      <span class="badge-dot" id="dot-skill"></span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('shop', this)"><span>🏰</span><span>던전/상점</span></button>
+    <button class="nav-btn" onclick="switchTab('codex', this)"><span>📖</span><span>도감/업적</span></button>
   </nav>
 
-  <!-- 모달창 (직업선택 / 상자열기 / 아이템 상세 / 오프라인 보상) -->
+  <!-- 모달 오버레이 -->
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal-card" id="modal-content"></div>
   </div>
@@ -695,54 +927,39 @@
 
 <script>
 /* =========================================================================
- * [밸런스 설계 문서 & 핵심 수식 정리]
+ * [심연의 연대기 v2.0 - 밸런스 공식 및 시스템 설계 주석]
  * -------------------------------------------------------------------------
- * 1. 요구 경험치 공식 (레벨 스케일링):
- *    ReqEXP(lv) = floor( 50 * (lv ^ 1.65) )
+ * 1. 레벨 경험치 및 몬스터 스케일링 공식:
+ *    - 필요 경험치 ReqEXP(lv) = floor( 48 * (lv ^ 1.62) )
+ *    - NG+(환생 회차) 난이도 배율 NG_Mult = 1 + (ngPlus * 0.35)
+ *    - 몬스터 스케일 Scale = (1 + depth * 0.18) * (1 + lv * 0.07) * NG_Mult * (보스 2.8 / 정예 1.6 / 일반 1.0)
  *
- * 2. 몬스터 스탯 공식 (심연 층수 depth 및 플레이어 레벨 기반):
- *    Scale = (1 + depth * 0.18) * (1 + playerLv * 0.08) * (보스 여부 ? 2.8 : 정예 여부 ? 1.6 : 1.0)
- *    MonsterHP  = floor( 55 * Scale )
- *    MonsterATK = floor( 9 * Scale )
- *    GoldReward = floor( (15 + depth * 6) * (보스 ? 4 : 1) * 골드보너스 )
- *    ExpReward  = floor( (20 + depth * 8) * (보스 ? 3.5 : 1) )
+ * 2. 2차~5차 전직 시스템 (Lv.10 / Lv.25 / Lv.50 / Lv.100):
+ *    - 전직 달성 시 고유 칭호 변경, 영구 올스탯 보너스(+10 / +25 / +60 / +150),
+ *      최종 공격력·생명력 배율 증폭, 캐릭터 전투씬 오라(Aura) 이펙트 진화.
  *
- * 3. 스탯 판정 성공 확률 공식 (힘/민첩/지능/매력/행운):
- *    요구치 ReqStat = 6 + floor(depth * 1.35) * 난이도계수(안전 0.7 / 보통 1.0 / 위험 1.4)
- *    성공확률(%) = clamp( 55 + (내스탯 - ReqStat) * 4 + 행운보정(LUK * 0.6), 10%, 95% )
+ * 3. 환생(프레스티지) 및 영혼석(Soul Stone) 공식:
+ *    - Lv.20 이상 또는 심연 15층 이상에서 환생 가능.
+ *    - 획득 영혼석 = floor( (depth * 1.5) + (lv * 0.8) ) * (1 + ngPlus * 0.2)
+ *    - 환생 시 레벨/층수/골드는 초기화되지만 [장착 장비, 인벤토리, 영혼 유물, 도감, 업적]은 영구 보존.
  *
- * 4. 아이템 7등급 드롭 가중치 (기본 확률 + 행운(LUK) 및 층수 보정):
- *    - 일반(Common)   : 44.0%
- *    - 고급(Uncommon) : 28.0%
- *    - 희귀(Rare)     : 15.0%
- *    - 영웅(Epic)     :  8.0%  (옵션 4줄)
- *    - 전설(Legendary):  3.5%  (옵션 5줄, 화면 플래시, 고유명)
- *    - 신화(Mythic)   :  1.2%  (옵션 5줄, 강렬한 진홍 플래시, 세트/고유명)
- *    - 창조(Genesis)  :  0.3%  (옵션 6줄, 신성 청록 플래시, 최상위 티어 보정)
- *    * 행운(LUK) 1당 희귀 이상 가중치 +0.8%p 증가
- *
- * 5. 장비 강화 확률 및 리스크 (+1 ~ +20):
- *    - +1 ~ +5  : 성공 90~70%, 실패 시 유지
- *    - +6 ~ +10 : 성공 60~40%, 실패 시 30% 확률로 -1 하락
- *    - +11 이상 : 성공 30~12%, 실패 시 40% 하락 / 10% 파괴(마력가루 환원)
+ * 4. 층별 10노드 미니맵 & 스마트 자동선택(Auto-Choice) AI:
+ *    - 각 층은 1~10번 방(노드)으로 구성 (5번 방: 보물/성소 확정, 10번 방: 계층 보스 확정).
+ *    - 자동선택 ON 시 설정된 속도(1x/2x/4x)와 성향(균형/파밍/안전)에 따라
+ *      전투 스킬·물약·비전투 선택지를 실시간 하이라이트하며 자동 실행.
  * ========================================================================= */
 
-// 숫자 단위 포맷터 (K, M, B, T)
 function fmt(n) {
   if (n === undefined || n === null || isNaN(n)) return '0';
   n = Math.floor(n);
   if (n < 1000) return n.toString();
   const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi'];
-  let u = -1;
-  let val = n;
-  while (val >= 1000 && u < units.length - 1) {
-    val /= 1000;
-    u++;
-  }
+  let u = -1, val = n;
+  while (val >= 1000 && u < units.length - 1) { val /= 1000; u++; }
   return val.toFixed(val >= 100 ? 0 : val >= 10 ? 1 : 2) + units[u];
 }
 
-// Web Audio API 절차적 사운드 생성기 (외부 파일 불필요)
+// Web Audio API 사운드 엔진
 const SFX = {
   ctx: null,
   enabled: true,
@@ -761,230 +978,400 @@ const SFX = {
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      osc.connect(gain); gain.connect(this.ctx.destination);
 
       if (type === 'click') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(320, now);
-        osc.frequency.exponentialRampToValueAtTime(120, now + 0.06);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
-        osc.start(now); osc.stop(now + 0.06);
+        osc.frequency.setValueAtTime(340, now);
+        osc.frequency.exponentialRampToValueAtTime(130, now + 0.05);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now); osc.stop(now + 0.05);
       } else if (type === 'hit') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(160, now);
-        osc.frequency.exponentialRampToValueAtTime(45, now + 0.12);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-        osc.start(now); osc.stop(now + 0.12);
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(42, now + 0.11);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.11);
+        osc.start(now); osc.stop(now + 0.11);
       } else if (type === 'success') {
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(440, now);
-        osc.frequency.setValueAtTime(660, now + 0.08);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
-        osc.start(now); osc.stop(now + 0.22);
+        osc.frequency.setValueAtTime(460, now);
+        osc.frequency.setValueAtTime(680, now + 0.07);
+        gain.gain.setValueAtTime(0.13, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
       } else if (type === 'fail') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(200, now);
-        osc.frequency.linearRampToValueAtTime(95, now + 0.25);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-        osc.start(now); osc.stop(now + 0.25);
+        osc.frequency.setValueAtTime(190, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.22);
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+        osc.start(now); osc.stop(now + 0.22);
       } else if (type === 'legend') {
-        // 전설 이상 팡파르 화음
         [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
           const o = this.ctx.createOscillator();
           const g = this.ctx.createGain();
           o.type = 'triangle';
           o.connect(g); g.connect(this.ctx.destination);
-          o.frequency.setValueAtTime(freq, now + idx * 0.07);
-          g.gain.setValueAtTime(0.18, now + idx * 0.07);
-          g.gain.exponentialRampToValueAtTime(0.008, now + idx * 0.07 + 0.45);
-          o.start(now + idx * 0.07);
-          o.stop(now + idx * 0.07 + 0.45);
+          o.frequency.setValueAtTime(freq, now + idx * 0.06);
+          g.gain.setValueAtTime(0.15, now + idx * 0.06);
+          g.gain.exponentialRampToValueAtTime(0.008, now + idx * 0.06 + 0.4);
+          o.start(now + idx * 0.06); o.stop(now + idx * 0.06 + 0.4);
         });
       }
     } catch (e) {}
   }
 };
 
-// 직업 4종 정의
+// 4대 직업 & 전직 트리(1차~5차) & 4단계 스킬 트리
 const CLASSES = {
   warrior: {
-    name: '전사', icon: '⚔️', title: '강철의 검투사',
+    name: '전사', icon: '⚔️', sprite: '🤺',
+    promotions: [
+      { tier: 1, reqLv: 1,   title: '강철의 검투사', atkMult: 1.0, hpMult: 1.0, allStat: 0 },
+      { tier: 2, reqLv: 10,  title: '광기 어린 버서커', atkMult: 1.25, hpMult: 1.25, allStat: 10 },
+      { tier: 3, reqLv: 25,  title: '불패의 워로드', atkMult: 1.6, hpMult: 1.6, allStat: 25 },
+      { tier: 4, reqLv: 50,  title: '파멸의 소울브링어', atkMult: 2.2, hpMult: 2.2, allStat: 60 },
+      { tier: 5, reqLv: 100, title: '심연을 가르는 투신', atkMult: 3.5, hpMult: 3.5, allStat: 150 }
+    ],
     stats: { str: 10, dex: 5, int: 3, cha: 4, luk: 4 },
-    skillName: '대지 분쇄', skillMp: 12, skillMult: 2.3,
-    skillDesc: '힘(STR) 비례 230% 물리 피해 및 30% 확률로 적 기절'
+    skills: [
+      { id: 's1', name: '대지 분쇄', type: 'active', reqLv: 1, mp: 10, mult: 2.2, desc: '220% 물리 피해 + 30% 기절' },
+      { id: 's2', name: '강철의 육체', type: 'passive', reqLv: 5, mp: 0, mult: 0, desc: '패시브: 공격력 및 최대 HP +15%/Lv' },
+      { id: 's3', name: '피의 소용돌이', type: 'active', reqLv: 15, mp: 18, mult: 3.3, desc: '330% 광역 베기 + 피해량 15% 흡혈' },
+      { id: 's4', name: '투신의 천지개벽', type: 'ult', reqLv: 30, mp: 28, mult: 5.0, desc: '궁극기: 500% 확정 치명타 + 적 확정 기절' }
+    ]
   },
   rogue: {
-    name: '도적', icon: '🗡️', title: '그림자 추격자',
+    name: '도적', icon: '🗡️', sprite: '🥷',
+    promotions: [
+      { tier: 1, reqLv: 1,   title: '그림자 추격자', atkMult: 1.0, hpMult: 1.0, allStat: 0 },
+      { tier: 2, reqLv: 10,  title: '심야의 어쌔신', atkMult: 1.3, hpMult: 1.15, allStat: 10 },
+      { tier: 3, reqLv: 25,  title: '팬텀 블레이드', atkMult: 1.7, hpMult: 1.45, allStat: 25 },
+      { tier: 4, reqLv: 50,  title: '죽음의 나이트로드', atkMult: 2.35, hpMult: 1.9, allStat: 60 },
+      { tier: 5, reqLv: 100, title: '공허의 그림자군주', atkMult: 3.8, hpMult: 3.0, allStat: 150 }
+    ],
     stats: { str: 5, dex: 10, int: 4, cha: 4, luk: 7 },
-    skillName: '급소 암습', skillMp: 10, skillMult: 2.1,
-    skillDesc: '민첩(DEX)+행운(LUK) 비례 치명타 확정 일격'
+    skills: [
+      { id: 's1', name: '급소 암습', type: 'active', reqLv: 1, mp: 9, mult: 2.1, desc: '210% 확정 치명타 일격' },
+      { id: 's2', name: '암살자의 직감', type: 'passive', reqLv: 5, mp: 0, mult: 0, desc: '패시브: 치명타 피해 +20% & 행운 +4/Lv' },
+      { id: 's3', name: '그림자 난무', type: 'active', reqLv: 15, mp: 16, mult: 3.4, desc: '340% 연속 베기 + 이번 턴 회피율 상승' },
+      { id: 's4', name: '무영지옥살', type: 'ult', reqLv: 30, mp: 26, mult: 5.2, desc: '궁극기: 520% 치명타 + 골드 강탈' }
+    ]
   },
   mage: {
-    name: '마법사', icon: '🔮', title: '비전 탐구자',
+    name: '마법사', icon: '🔮', sprite: '🧙',
+    promotions: [
+      { tier: 1, reqLv: 1,   title: '비전 탐구자', atkMult: 1.0, hpMult: 1.0, allStat: 0 },
+      { tier: 2, reqLv: 10,  title: '홍련의 아크메이지', atkMult: 1.35, hpMult: 1.15, allStat: 10 },
+      { tier: 3, reqLv: 25,  title: '엘리멘탈 로드', atkMult: 1.8, hpMult: 1.4, allStat: 25 },
+      { tier: 4, reqLv: 50,  title: '차원술사 아스트랄', atkMult: 2.5, hpMult: 1.85, allStat: 60 },
+      { tier: 5, reqLv: 100, title: '만물의 대현자', atkMult: 4.0, hpMult: 2.9, allStat: 150 }
+    ],
     stats: { str: 3, dex: 4, int: 11, cha: 5, luk: 5 },
-    skillName: '심연의 화염', skillMp: 16, skillMult: 2.6,
-    skillDesc: '지능(INT) 비례 260% 폭발 마법 피해'
+    skills: [
+      { id: 's1', name: '심연의 화염', type: 'active', reqLv: 1, mp: 12, mult: 2.5, desc: '250% 폭발 마법 피해' },
+      { id: 's2', name: '비전 각성', type: 'passive', reqLv: 5, mp: 0, mult: 0, desc: '패시브: 마법 공격력 +18% & 최대 MP 증가/Lv' },
+      { id: 's3', name: '절대영도 빙옥', type: 'active', reqLv: 15, mp: 20, mult: 3.6, desc: '360% 냉기 피해 + 40% 확률 적 빙결(기절)' },
+      { id: 's4', name: '메테오 스트라이크', type: 'ult', reqLv: 30, mp: 32, mult: 5.8, desc: '궁극기: 580% 운석 낙하 파멸 피해' }
+    ]
   },
   cleric: {
-    name: '성직자', icon: '✨', title: '성소의 집행관',
+    name: '성직자', icon: '✨', sprite: '🧝',
+    promotions: [
+      { tier: 1, reqLv: 1,   title: '성소의 집행관', atkMult: 1.0, hpMult: 1.0, allStat: 0 },
+      { tier: 2, reqLv: 10,  title: '이단심문관 인퀴지터', atkMult: 1.25, hpMult: 1.3, allStat: 10 },
+      { tier: 3, reqLv: 25,  title: '빛의 세인트', atkMult: 1.6, hpMult: 1.7, allStat: 25 },
+      { tier: 4, reqLv: 50,  title: '천상의 아크비숍', atkMult: 2.2, hpMult: 2.3, allStat: 60 },
+      { tier: 5, reqLv: 100, title: '태양신의 대행자', atkMult: 3.6, hpMult: 3.6, allStat: 150 }
+    ],
     stats: { str: 6, dex: 4, int: 8, cha: 7, luk: 5 },
-    skillName: '성스러운 심판', skillMp: 14, skillMult: 1.9,
-    skillDesc: '지능(INT) 비례 190% 신성 피해 + 최대 체력의 20% 즉시 회복'
+    skills: [
+      { id: 's1', name: '성스러운 심판', type: 'active', reqLv: 1, mp: 11, mult: 2.0, desc: '200% 신성 피해 + HP 20% 회복' },
+      { id: 's2', name: '천상의 은총', type: 'passive', reqLv: 5, mp: 0, mult: 0, desc: '패시브: 공격력/체력 +14% & 축복 강화/Lv' },
+      { id: 's3', name: '대천사의 천벌', type: 'active', reqLv: 15, mp: 18, mult: 3.2, desc: '320% 신성 뇌격 + 3턴 축복 버프 부여' },
+      { id: 's4', name: '에덴의 낙원', type: 'ult', reqLv: 30, mp: 28, mult: 4.6, desc: '궁극기: 460% 심판 + 체력 50% 즉시 회복' }
+    ]
   }
 };
 
-// 7단계 등급 데이터
-const GRADES = [
-  { id: 'common',   name: '일반', cls: 'g-common',   color: '#a0a0a0', weight: 440, mult: 1.0, optCnt: 2 },
-  { id: 'uncommon', name: '고급', cls: 'g-uncommon', color: '#4cd964', weight: 280, mult: 1.35, optCnt: 2 },
-  { id: 'rare',     name: '희귀', cls: 'g-rare',     color: '#3498db', weight: 150, mult: 1.85, optCnt: 3 },
-  { id: 'epic',     name: '영웅', cls: 'g-epic',     color: '#b056f5', weight: 80,  mult: 2.6,  optCnt: 4 },
-  { id: 'legend',   name: '전설', cls: 'g-legend',   color: '#ff9f1a', weight: 35,  mult: 3.8,  optCnt: 5 },
-  { id: 'mythic',   name: '신화', cls: 'g-mythic',   color: '#ff3838', weight: 12,  mult: 5.5,  optCnt: 5 },
-  { id: 'genesis',  name: '창조', cls: 'g-genesis',  color: '#00f5d4', weight: 3,   mult: 8.5,  optCnt: 6 }
+// 영혼 유물 5종 (환생 재화로 강화)
+const RELICS = [
+  { id: 'grail',   name: '🍷 심연의 성배', desc: '최종 공격력 영구 +25% / Lv', baseCost: 5 },
+  { id: 'heart',   name: '❤️ 불멸자의 심장', desc: '최대 생명력 영구 +30% / Lv', baseCost: 5 },
+  { id: 'compass', name: '🧭 황금 나침반', desc: '골드 및 경험치 획득 +30% / Lv', baseCost: 6 },
+  { id: 'dice',    name: '🎲 운명의 주사위', desc: '모든 선택지 성공률 +3%p & 행운 +5 / Lv', baseCost: 8 },
+  { id: 'hammer',  name: '🔨 창조주의 망치', desc: '고등급 드롭 보정 & 강화 비용 -5% / Lv', baseCost: 10 }
 ];
 
-// 장비 슬롯 7종
+// 업적 목록 (영구 보너스)
+const ACHIEVEMENTS = [
+  { id: 'kill50',   name: '심연의 사냥꾼', desc: '몬스터 30마리 처치', goal: 30, key: 'kills', bonusTxt: '공격력 +10%' },
+  { id: 'depth20',  name: '심층 탐사자', desc: '심연 20층 도달', goal: 20, key: 'maxDepth', bonusTxt: '공격력 +15%' },
+  { id: 'enh10',    name: '전설의 대장장이', desc: '+7강 이상 장비 달성', goal: 7, key: 'maxEnh', bonusTxt: '공격력 +15%' },
+  { id: 'legend1',  name: '선택받은 자', desc: '전설 등급 이상 장비 획득', goal: 1, key: 'legendCnt', bonusTxt: '공격력 +20%' }
+];
+
+// 7등급, 7슬롯, 세트, 옵션 풀
+const GRADES = [
+  { id: 'common',   name: '일반', cls: 'g-common',   color: '#a0a0a0', weight: 430, mult: 1.0, optCnt: 2 },
+  { id: 'uncommon', name: '고급', cls: 'g-uncommon', color: '#4cd964', weight: 280, mult: 1.35, optCnt: 2 },
+  { id: 'rare',     name: '희귀', cls: 'g-rare',     color: '#38a1ff', weight: 155, mult: 1.85, optCnt: 3 },
+  { id: 'epic',     name: '영웅', cls: 'g-epic',     color: '#b85cff', weight: 82,  mult: 2.65, optCnt: 4 },
+  { id: 'legend',   name: '전설', cls: 'g-legend',   color: '#ff9f1a', weight: 36,  mult: 3.9,  optCnt: 5 },
+  { id: 'mythic',   name: '신화', cls: 'g-mythic',   color: '#ff3838', weight: 13,  mult: 5.7,  optCnt: 5 },
+  { id: 'genesis',  name: '창조', cls: 'g-genesis',  color: '#00f5d4', weight: 4,   mult: 9.0,  optCnt: 6 }
+];
+
 const SLOTS = [
-  { id: 'weapon', name: '무기', icon: '⚔️', baseStat: 'atk', baseVal: 8 },
-  { id: 'armor',  name: '갑옷', icon: '🛡️', baseStat: 'hp',  baseVal: 35 },
-  { id: 'helmet', name: '투구', icon: '🪖', baseStat: 'hp',  baseVal: 20 },
-  { id: 'gloves', name: '장갑', icon: '🧤', baseStat: 'atk', baseVal: 4 },
+  { id: 'weapon', name: '무기', icon: '⚔️', baseStat: 'atk', baseVal: 9 },
+  { id: 'armor',  name: '갑옷', icon: '🛡️', baseStat: 'hp',  baseVal: 38 },
+  { id: 'helmet', name: '투구', icon: '🪖', baseStat: 'hp',  baseVal: 22 },
+  { id: 'gloves', name: '장갑', icon: '🧤', baseStat: 'atk', baseVal: 5 },
   { id: 'boots',  name: '신발', icon: '🥾', baseStat: 'dex', baseVal: 3 },
   { id: 'ring',   name: '반지', icon: '💍', baseStat: 'crit',baseVal: 3 },
   { id: 'amulet', name: '목걸이',icon: '📿', baseStat: 'luk', baseVal: 3 }
 ];
 
-// 세트 효과 정의
 const SETS = [
-  { id: 'abyss', name: '심연의 지배자', bonus2: '공격력 +15%', bonus4: '치명타 피해 +40%' },
-  { id: 'solar', name: '태양왕의 유산', bonus2: '최대 HP +20%', bonus4: '턴마다 HP 6% 재생' },
-  { id: 'shadow', name: '그림자 군주', bonus2: '치명타 확률 +10%', bonus4: '회피 및 행운 +15' }
+  { id: 'abyss',  name: '심연의 지배자', bonus2: '공격력 +18%', bonus4: '치명타 피해 +45%' },
+  { id: 'solar',  name: '태양왕의 유산', bonus2: '최대 HP +22%', bonus4: '매 턴 HP 7% 재생' },
+  { id: 'shadow', name: '그림자 군주',   bonus2: '치명타 확률 +12%', bonus4: '민첩/행운 +18' }
 ];
 
-// 랜덤 옵션 풀
 const OPT_POOL = [
-  { id: 'atkPct',  name: '공격력 증가', unit: '%', min: 4, max: 25 },
-  { id: 'hpPct',   name: '최대 생명력', unit: '%', min: 5, max: 30 },
-  { id: 'crit',    name: '치명타 확률', unit: '%', min: 2, max: 12 },
-  { id: 'critDmg', name: '치명타 피해', unit: '%', min: 8, max: 45 },
-  { id: 'vamp',    name: '생명력 흡수', unit: '%', min: 2, max: 10 },
-  { id: 'goldPct', name: '골드 획득량', unit: '%', min: 5, max: 35 },
-  { id: 'str',     name: '힘(STR)',    unit: '',  min: 2, max: 18 },
-  { id: 'dex',     name: '민첩(DEX)',  unit: '',  min: 2, max: 18 },
-  { id: 'int',     name: '지능(INT)',  unit: '',  min: 2, max: 18 },
-  { id: 'luk',     name: '행운(LUK)',  unit: '',  min: 2, max: 18 }
+  { id: 'atkPct',  name: '공격력 증가', unit: '%', min: 5, max: 28 },
+  { id: 'hpPct',   name: '최대 생명력', unit: '%', min: 6, max: 32 },
+  { id: 'crit',    name: '치명타 확률', unit: '%', min: 2, max: 13 },
+  { id: 'critDmg', name: '치명타 피해', unit: '%', min: 10, max: 50 },
+  { id: 'vamp',    name: '생명력 흡수', unit: '%', min: 2, max: 11 },
+  { id: 'goldPct', name: '골드 획득량', unit: '%', min: 6, max: 40 },
+  { id: 'str',     name: '힘(STR)',    unit: '',  min: 3, max: 22 },
+  { id: 'dex',     name: '민첩(DEX)',  unit: '',  min: 3, max: 22 },
+  { id: 'int',     name: '지능(INT)',  unit: '',  min: 3, max: 22 },
+  { id: 'luk',     name: '행운(LUK)',  unit: '',  min: 3, max: 22 }
 ];
 
-// 유니크 아이템 고유 접두/명칭
 const UNIQUE_NAMES = {
-  weapon: ['심연가르기', '천둥벼락 대검', '피의 속삭임', '태양삼킴 마검', '창조주의 단죄'],
-  armor:  ['불멸자의 성갑', '용비늘 흉갑', '공허의 외투', '성기사단장의 갑주'],
-  helmet: ['광기의 왕관', '통찰의 비전투구', '고대 군주의 투구'],
-  gloves: ['거인학살자의 건틀릿', '그림자 손아귀', '마력 증폭 장갑'],
-  boots:  ['바람걸음 경갑', '차원도약 장화', '침묵의 발걸음'],
-  ring:   ['영원한 윤회의 반지', '탐욕의 군주 반지', '핏빛 맹세'],
-  amulet: ['타락한 성배의 목걸이', '별빛의 눈물', '운명조작의 펜던트']
+  weapon: ['심연가르기', '천둥벼락 대검', '피의 속삭임', '태양삼킴 마검', '창조주의 단죄', '운명파괴자'],
+  armor:  ['불멸자의 성갑', '용비늘 흉갑', '공허의 외투', '성기사단장의 갑주', '별빛 수호갑'],
+  helmet: ['광기의 왕관', '통찰의 비전투구', '고대 군주의 투구', '심판자의 면류관'],
+  gloves: ['거인학살자의 건틀릿', '그림자 손아귀', '마력 증폭 장갑', '파멸의 주먹'],
+  boots:  ['바람걸음 경갑', '차원도약 장화', '침묵의 발걸음', '유성우 부츠'],
+  ring:   ['영원한 윤회의 반지', '탐욕의 군주 반지', '핏빛 맹세', '심연핵 반지'],
+  amulet: ['타락한 성배의 목걸이', '별빛의 눈물', '운명조작의 펜던트', '창세의 심장']
 };
 
-// 절차적 이벤트 조합용 데이터 (수백 가지 변주)
 const PLACES = [
-  '안개 낀 고대 묘지', '무너진 지하 성당', '독기가 피어오르는 늪', '버려진 드워프 광산',
-  '핏빛 달이 비치는 회랑', '얼어붙은 심연의 다리', '고대 마법사의 연구실', '해골이 쌓인 제단',
-  '속삭이는 그림자 숲', '잊혀진 왕가의 보물고', '용암이 흐르는 균열', '차원이 뒤틀린 도서관'
+  { name: '안개 낀 고대 묘지', decos: ['🪦','🕯️','🕸️'] },
+  { name: '무너진 지하 대성당', decos: ['⛪',' stained_glass' ? '🕯️' : '🕯️','✝️'] },
+  { name: '독기가 피어오르는 늪', decos: ['🍄','🌿','🐍'] },
+  { name: '버려진 드워프 용광로', decos: ['⚒️','🔥','⚙️'] },
+  { name: '얼어붙은 심연의 회랑', decos: ['❄️','🧊','🏛️'] },
+  { name: '차원이 뒤틀린 마탑', decos: ['🔮','📚','✨'] }
 ];
 
-const ADJECTIVES = [
-  '기분 나쁜 정적이 흐르는', '푸른 귀신불이 떠다니는', '오래된 피비린내가 진동하는',
-  '황금빛 문양이 희미하게 빛나는', '기이한 마력이 소용돌이치는', '누군가의 비명 소리가 메아리치는'
+const MONSTERS = [
+  { name: '해골 수호병', icon: '💀' },
+  { name: '심연의 가고일', icon: '🦇' },
+  { name: '타락한 성전사', icon: '🩸' },
+  { name: '맹독 아라크네', icon: '🕷️' },
+  { name: '지옥불 집행자', icon: '👹' },
+  { name: '공허의 사신', icon: '👻' },
+  { name: '암흑 마룡의 화신', icon: '🐉' }
 ];
 
-// 초기 게임 상태
+// 전역 상태 변수
 let state = null;
 let currentEnemy = null;
-let typingTimer = null;
 
+// 오토 플레이 상태
+let autoPlay = {
+  enabled: false,
+  speedIdx: 0, // 0: 1x(1100ms), 1: 2x(550ms), 2: 4x(260ms)
+  speeds: [
+    { label: '1x', ms: 1050 },
+    { label: '2x', ms: 520 },
+    { label: '4x', ms: 250 }
+  ],
+  modeIdx: 0, // 0: 균형, 1: 파밍(적극), 2: 안전(생존)
+  modes: ['균형', '파밍', '안전'],
+  timer: null
+};
+
+// 신규 세이브 생성
 function createNewState(classKey) {
   const c = CLASSES[classKey];
   return {
+    version: 2,
     classKey,
+    jobTier: 1,
     lv: 1,
     exp: 0,
-    reqExp: 50,
+    reqExp: 48,
     statPts: 0,
     depth: 1,
-    turnCount: 0,
-    gold: 120,
-    dust: 10,
+    maxDepth: 1,
+    nodeIdx: 0,
+    floorNodes: [],
+    ngPlus: 0,
+    soulStones: 0,
+    gold: 150,
+    dust: 15,
     rep: 0,
-    hp: 120,
-    maxHp: 120,
+    hp: 130,
+    maxHp: 130,
     mp: 60,
     maxMp: 60,
     stats: { ...c.stats },
-    skillLv: 1,
+    skills: { s1: 1, s2: 1, s3: 1, s4: 1 },
+    relics: { grail: 0, heart: 0, compass: 0, dice: 0, hammer: 0 },
     flags: { cursed: 0, blessed: 0, companion: false },
-    equipped: {
-      weapon: null, armor: null, helmet: null,
-      gloves: null, boots: null, ring: null, amulet: null
-    },
+    equipped: { weapon: null, armor: null, helmet: null, gloves: null, boots: null, ring: null, amulet: null },
     inventory: [],
     codexGrades: {},
     codexUniques: [],
+    records: { kills: 0, maxDepth: 1, maxEnh: 0, legendCnt: 0 },
+    dungeonTickets: 3,
+    quests: [
+      { id: 'q_kill', name: '심연 몬스터 5마리 처치', prog: 0, goal: 5, rewardGold: 250, rewardSoul: 2 },
+      { id: 'q_node', name: '탐사 방(노드) 10회 돌파', prog: 0, goal: 10, rewardGold: 300, rewardSoul: 2 }
+    ],
     lastSaveTime: Date.now()
   };
 }
 
-// 세이브 & 로드
-function saveGame() {
-  if (!state) return;
-  state.lastSaveTime = Date.now();
-  localStorage.setItem('ABYSS_RPG_SAVE_V1', JSON.stringify(state));
-}
-
+// 1단계 세이브 호환 마이그레이션 포함 로드
 function loadGame() {
-  const raw = localStorage.getItem('ABYSS_RPG_SAVE_V1');
-  if (!raw) return false;
+  const rawV2 = localStorage.getItem('ABYSS_RPG_SAVE_V2') || localStorage.getItem('ABYSS_RPG_SAVE_V1');
+  if (!rawV2) return false;
   try {
-    state = JSON.parse(raw);
+    const parsed = JSON.parse(rawV2);
+    const def = createNewState(parsed.classKey || 'warrior');
+    state = { ...def, ...parsed };
+    state.skills = { ...def.skills, ...(parsed.skills || {}) };
+    state.relics = { ...def.relics, ...(parsed.relics || {}) };
+    state.records = { ...def.records, ...(parsed.records || {}) };
+    if (!state.floorNodes || state.floorNodes.length !== 10) {
+      generateFloorNodes();
+    }
     return true;
   } catch (e) {
     return false;
   }
 }
 
-// 총합 스탯 계산 (장비 + 세트 + 버프 포함)
+function saveGame() {
+  if (!state) return;
+  state.lastSaveTime = Date.now();
+  localStorage.setItem('ABYSS_RPG_SAVE_V2', JSON.stringify(state));
+}
+
+// =========================================================================
+// 미니맵 층별 10노드 생성 및 렌더링
+// =========================================================================
+const NODE_TYPES = [
+  { type: 'combat', icon: '⚔️', name: '일반 전투' },
+  { type: 'elite',  icon: '⚡', name: '정예 몬스터' },
+  { type: 'chest',  icon: '🧰', name: '보물상자' },
+  { type: 'trap',   icon: '⚙️', name: '고대 함정' },
+  { type: 'npc',    icon: '🧙‍♂️', name: '방랑자 조우' },
+  { type: 'shrine', icon: '🎲', name: '운명의 제단' },
+  { type: 'camp',   icon: '🏕️', name: '화톳불 쉼터' }
+];
+
+function generateFloorNodes() {
+  const nodes = [];
+  for (let i = 0; i < 10; i++) {
+    if (i === 9) {
+      nodes.push({ type: 'boss', icon: '👑', name: '계층 군주(보스)' });
+    } else if (i === 4) {
+      const mid = Math.random() < 0.5
+        ? { type: 'chest', icon: '🧰', name: '보물상자' }
+        : { type: 'camp', icon: '🏕️', name: '화톳불 쉼터' };
+      nodes.push(mid);
+    } else {
+      const r = Math.random();
+      if (r < 0.36) nodes.push(NODE_TYPES[0]);
+      else if (r < 0.46) nodes.push(NODE_TYPES[1]);
+      else if (r < 0.60) nodes.push(NODE_TYPES[2]);
+      else if (r < 0.70) nodes.push(NODE_TYPES[3]);
+      else if (r < 0.80) nodes.push(NODE_TYPES[4]);
+      else if (r < 0.90) nodes.push(NODE_TYPES[5]);
+      else nodes.push(NODE_TYPES[6]);
+    }
+  }
+  state.floorNodes = nodes;
+  state.nodeIdx = 0;
+}
+
+function renderMinimap() {
+  if (!state.floorNodes || state.floorNodes.length !== 10) generateFloorNodes();
+  const curNode = state.floorNodes[state.nodeIdx] || state.floorNodes[0];
+  document.getElementById('map-floor-label').textContent =
+    `🗺️ 심연 ${state.depth}층 (${state.nodeIdx + 1}/10: ${curNode.name})`;
+  const nextNode = state.floorNodes[state.nodeIdx + 1];
+  document.getElementById('map-next-hint').textContent =
+    nextNode ? `다음 방: ${nextNode.icon}${nextNode.name}` : `🔥 계층 돌파 임박!`;
+
+  const track = document.getElementById('node-track');
+  track.innerHTML = state.floorNodes.map((n, idx) => {
+    const cls = idx < state.nodeIdx ? 'cleared' : idx === state.nodeIdx ? 'current' : '';
+    const bossCls = n.type === 'boss' ? 'boss-node' : '';
+    return `<div class="map-node ${cls} ${bossCls}" title="${idx + 1}번 방: ${n.name}">${n.icon}</div>`;
+  }).join('');
+}
+
+// =========================================================================
+// 캐릭터 총합 능력치 계산 (전직 + 스킬 패시브 + 유물 + 세트 + 도감/업적)
+// =========================================================================
 function getTotalStats() {
+  const c = CLASSES[state.classKey];
+  const promo = c.promotions[Math.min(c.promotions.length - 1, (state.jobTier || 1) - 1)];
+  const diceLv = state.relics.dice || 0;
+
   const s = {
-    str: state.stats.str,
-    dex: state.stats.dex,
-    int: state.stats.int,
-    cha: state.stats.cha,
-    luk: state.stats.luk,
-    atk: 10 + Math.floor(state.lv * 2.5),
-    maxHp: 100 + state.lv * 22,
-    maxMp: 50 + state.lv * 8,
-    crit: 5,
+    str: state.stats.str + promo.allStat,
+    dex: state.stats.dex + promo.allStat,
+    int: state.stats.int + promo.allStat,
+    cha: state.stats.cha + promo.allStat,
+    luk: state.stats.luk + promo.allStat + diceLv * 5,
+    atk: 12 + Math.floor(state.lv * 3),
+    maxHp: 110 + state.lv * 25,
+    maxMp: 55 + state.lv * 9,
+    crit: 6,
     critDmg: 150,
     vamp: 0,
-    goldPct: 0,
-    atkPct: 0,
-    hpPct: 0
+    goldPct: (state.relics.compass || 0) * 30,
+    atkPct: (state.relics.grail || 0) * 25,
+    hpPct: (state.relics.heart || 0) * 30
   };
 
-  // 주 스탯에 따른 기본 공격력 반영
-  if (state.classKey === 'warrior') s.atk += Math.floor(s.str * 2.2);
-  if (state.classKey === 'rogue')   s.atk += Math.floor(s.dex * 2.0 + s.luk * 0.8);
-  if (state.classKey === 'mage')    s.atk += Math.floor(s.int * 2.5);
-  if (state.classKey === 'cleric')  s.atk += Math.floor(s.int * 1.6 + s.str * 1.1);
+  // 패시브 스킬(s2) 보너스
+  const s2Lv = state.lv >= 5 ? (state.skills.s2 || 1) : 0;
+  if (s2Lv > 0) {
+    if (state.classKey === 'warrior') { s.atkPct += s2Lv * 15; s.hpPct += s2Lv * 15; }
+    if (state.classKey === 'rogue')   { s.critDmg += s2Lv * 20; s.luk += s2Lv * 4; }
+    if (state.classKey === 'mage')    { s.atkPct += s2Lv * 18; s.maxMp += s2Lv * 15; }
+    if (state.classKey === 'cleric')  { s.atkPct += s2Lv * 14; s.hpPct += s2Lv * 14; }
+  }
+
+  // 도감 & 업적 영구 보너스
+  const codexBonus = state.codexUniques.length * 2;
+  let achBonus = 0;
+  ACHIEVEMENTS.forEach(a => {
+    if ((state.records[a.key] || 0) >= a.goal) achBonus += parseInt(a.bonusTxt.replace(/[^0-9]/g, ''), 10);
+  });
+  s.atkPct += codexBonus + achBonus;
+
+  // 주 스탯 공격력 반영
+  if (state.classKey === 'warrior') s.atk += Math.floor(s.str * 2.4);
+  if (state.classKey === 'rogue')   s.atk += Math.floor(s.dex * 2.1 + s.luk * 0.9);
+  if (state.classKey === 'mage')    s.atk += Math.floor(s.int * 2.7);
+  if (state.classKey === 'cleric')  s.atk += Math.floor(s.int * 1.8 + s.str * 1.2);
 
   const setCounts = {};
-
   Object.values(state.equipped).forEach(item => {
     if (!item) return;
     const enhMult = 1 + (item.enhance || 0) * 0.12;
@@ -995,44 +1382,233 @@ function getTotalStats() {
     if (item.baseStat === 'crit') s.crit += bVal;
     if (item.baseStat === 'luk') s.luk += bVal;
 
-    if (item.setId) {
-      setCounts[item.setId] = (setCounts[item.setId] || 0) + 1;
-    }
-
+    if (item.setId) setCounts[item.setId] = (setCounts[item.setId] || 0) + 1;
     (item.options || []).forEach(opt => {
       if (s[opt.id] !== undefined) s[opt.id] += opt.val;
     });
   });
 
-  // 세트 효과 적용
-  if ((setCounts['abyss'] || 0) >= 2) s.atkPct += 15;
-  if ((setCounts['abyss'] || 0) >= 4) s.critDmg += 40;
-  if ((setCounts['solar'] || 0) >= 2) s.hpPct += 20;
-  if ((setCounts['shadow'] || 0) >= 2) s.crit += 10;
-  if ((setCounts['shadow'] || 0) >= 4) { s.dex += 15; s.luk += 15; }
+  if ((setCounts['abyss'] || 0) >= 2) s.atkPct += 18;
+  if ((setCounts['abyss'] || 0) >= 4) s.critDmg += 45;
+  if ((setCounts['solar'] || 0) >= 2) s.hpPct += 22;
+  if ((setCounts['shadow'] || 0) >= 2) s.crit += 12;
+  if ((setCounts['shadow'] || 0) >= 4) { s.dex += 18; s.luk += 18; }
 
-  // 축복/저주/동료 플래그 반영
-  if (state.flags.blessed > 0) s.atkPct += 15;
+  if (state.flags.blessed > 0) s.atkPct += 18;
   if (state.flags.cursed > 0)  s.atkPct -= 10;
-  if (state.flags.companion)   s.atkPct += 12;
+  if (state.flags.companion)   s.atkPct += 15;
 
-  s.maxHp += s.str * 6;
+  s.maxHp += s.str * 7;
   s.maxMp += s.int * 5;
-  s.crit  = Math.min(85, s.crit + Math.floor(s.dex * 0.3 + s.luk * 0.4));
+  s.crit  = Math.min(90, s.crit + Math.floor(s.dex * 0.3 + s.luk * 0.4));
 
-  s.atk   = Math.floor(s.atk * (1 + s.atkPct / 100));
-  s.maxHp = Math.floor(s.maxHp * (1 + s.hpPct / 100));
+  s.atk   = Math.floor(s.atk * (1 + s.atkPct / 100) * promo.atkMult);
+  s.maxHp = Math.floor(s.maxHp * (1 + s.hpPct / 100) * promo.hpMult);
 
-  return { stats: s, setCounts };
+  return { stats: s, setCounts, promo, codexBonus, achBonus };
 }
 
-// 아이템 생성기
+// =========================================================================
+// 전투씬 비주얼 업데이트 및 애니메이션 연출
+// =========================================================================
+function updateBattleStage(targetIcon, targetName, isCombat = false) {
+  const c = CLASSES[state.classKey];
+  const { stats, promo } = getTotalStats();
+
+  // 아군 스프라이트 & 오라
+  document.getElementById('hero-sprite').textContent = c.sprite;
+  document.getElementById('hero-weapon').textContent = state.equipped.weapon ? state.equipped.weapon.icon : c.icon;
+  document.getElementById('hero-companion').style.display = state.flags.companion ? 'inline' : 'none';
+  document.getElementById('hero-stage-name').textContent = `Lv.${state.lv} ${promo.title}`;
+  document.getElementById('hero-stage-hp').style.width = `${Math.max(0, Math.min(100, (state.hp / stats.maxHp) * 100))}%`;
+
+  const aura = document.getElementById('hero-aura');
+  aura.className = 'aura-ring' + (state.jobTier >= 2 ? ` aura-t${state.jobTier}` : '');
+
+  // 타겟 스프라이트
+  if (targetIcon) document.getElementById('target-sprite').textContent = targetIcon;
+  if (targetName) document.getElementById('target-stage-name').textContent = targetName;
+
+  const hpWrap = document.getElementById('target-hp-wrap');
+  const intentEl = document.getElementById('stage-intent');
+
+  if (isCombat && currentEnemy) {
+    hpWrap.style.display = 'block';
+    const ePct = Math.max(0, Math.min(100, (currentEnemy.hp / currentEnemy.maxHp) * 100));
+    document.getElementById('target-stage-hp').style.width = `${ePct}%`;
+    intentEl.style.display = 'block';
+    intentEl.textContent = currentEnemy.stunned ? '💫 기절함!' : currentEnemy.intentShort;
+  } else {
+    hpWrap.style.display = 'none';
+    intentEl.style.display = 'none';
+  }
+}
+
+function playCombatAnim(attacker, dmgText, color = '#fff', isCrit = false) {
+  const heroEl = document.getElementById('hero-unit');
+  const targetEl = document.getElementById('target-unit');
+  const stage = document.getElementById('battle-stage');
+
+  if (attacker === 'hero') {
+    heroEl.classList.add('lunge-right');
+    setTimeout(() => {
+      heroEl.classList.remove('lunge-right');
+      targetEl.classList.add('hit-shake');
+      setTimeout(() => targetEl.classList.remove('hit-shake'), 260);
+    }, 140);
+  } else if (attacker === 'enemy') {
+    targetEl.classList.add('lunge-left');
+    setTimeout(() => {
+      targetEl.classList.remove('lunge-left');
+      heroEl.classList.add('hit-shake');
+      setTimeout(() => heroEl.classList.remove('hit-shake'), 260);
+    }, 140);
+  }
+
+  // 데미지 플로팅 생성
+  const fl = document.createElement('div');
+  fl.className = 'dmg-float';
+  fl.style.color = color;
+  fl.style.left = attacker === 'hero' ? '64%' : '18%';
+  fl.style.top = isCrit ? '22%' : '32%';
+  if (isCrit) fl.style.fontSize = '18px';
+  fl.textContent = dmgText;
+  stage.appendChild(fl);
+  setTimeout(() => fl.remove(), 750);
+}
+
+// =========================================================================
+// 스마트 자동선택 (오토 플레이) 컨트롤러
+// =========================================================================
+function toggleAutoPlay() {
+  SFX.play('click');
+  autoPlay.enabled = !autoPlay.enabled;
+  const btn = document.getElementById('btn-auto-toggle');
+  btn.textContent = `🤖 자동선택: ${autoPlay.enabled ? 'ON' : 'OFF'}`;
+  btn.classList.toggle('active', autoPlay.enabled);
+
+  if (autoPlay.enabled) {
+    scheduleAutoTick();
+  } else if (autoPlay.timer) {
+    clearTimeout(autoPlay.timer);
+    autoPlay.timer = null;
+  }
+}
+
+function cycleAutoSpeed() {
+  SFX.play('click');
+  autoPlay.speedIdx = (autoPlay.speedIdx + 1) % autoPlay.speeds.length;
+  document.getElementById('btn-auto-speed').textContent = `⚡ ${autoPlay.speeds[autoPlay.speedIdx].label}`;
+  if (autoPlay.enabled) scheduleAutoTick();
+}
+
+function cycleAutoMode() {
+  SFX.play('click');
+  autoPlay.modeIdx = (autoPlay.modeIdx + 1) % autoPlay.modes.length;
+  document.getElementById('btn-auto-mode').textContent = `🎯 성향: ${autoPlay.modes[autoPlay.modeIdx]}`;
+}
+
+function scheduleAutoTick() {
+  if (autoPlay.timer) clearTimeout(autoPlay.timer);
+  if (!autoPlay.enabled) return;
+  const delay = autoPlay.speeds[autoPlay.speedIdx].ms;
+  autoPlay.timer = setTimeout(executeAutoStep, delay);
+}
+
+function executeAutoStep() {
+  if (!autoPlay.enabled) return;
+  // 모달이 열려 있으면 보물상자 확인 버튼만 자동 닫기
+  const modal = document.getElementById('modal-overlay');
+  if (modal.classList.contains('show')) {
+    const closeBtn = modal.querySelector('button[data-autoclose="true"]');
+    if (closeBtn) closeBtn.click();
+    scheduleAutoTick();
+    return;
+  }
+
+  // 모험 탭이 아닐 때는 대기
+  if (!document.getElementById('tab-adventure').classList.contains('active')) {
+    scheduleAutoTick();
+    return;
+  }
+
+  const btns = Array.from(document.querySelectorAll('#choices-wrap .choice-btn'));
+  if (btns.length === 0) {
+    scheduleAutoTick();
+    return;
+  }
+
+  const { stats } = getTotalStats();
+  const hpRatio = state.hp / stats.maxHp;
+  const mode = autoPlay.modes[autoPlay.modeIdx];
+  let chosen = btns[0];
+
+  if (btns.length === 1) {
+    chosen = btns[0];
+  } else if (currentEnemy) {
+    // 전투 중 스마트 판단
+    const healBtn = btns.find(b => b.dataset.act === 'heal');
+    const ultBtn  = btns.find(b => b.dataset.act === 's4');
+    const s3Btn   = btns.find(b => b.dataset.act === 's3');
+    const s1Btn   = btns.find(b => b.dataset.act === 's1');
+    const atkBtn  = btns.find(b => b.dataset.act === 'attack');
+
+    if (hpRatio < 0.38 && state.gold >= 50 && healBtn) {
+      chosen = healBtn;
+    } else if (ultBtn && state.mp >= parseInt(ultBtn.dataset.mp || '999', 10)) {
+      chosen = ultBtn;
+    } else if (s3Btn && state.mp >= parseInt(s3Btn.dataset.mp || '999', 10)) {
+      chosen = s3Btn;
+    } else if (s1Btn && state.mp >= parseInt(s1Btn.dataset.mp || '999', 10)) {
+      chosen = s1Btn;
+    } else {
+      chosen = atkBtn || btns[0];
+    }
+  } else {
+    // 비전투 선택지 스마트 판단
+    const specialBtn = btns.find(b => b.classList.contains('class-special'));
+    const safeBtn = btns.find(b => (b.dataset.prob || '') === '100' && b.dataset.safe === 'true');
+
+    if (specialBtn) {
+      chosen = specialBtn;
+    } else if ((mode === '안전' || hpRatio < 0.35) && safeBtn) {
+      chosen = safeBtn;
+    } else if (mode === '파밍') {
+      // 첫 번째 주 보상 선택지 우선
+      chosen = btns[0];
+    } else {
+      // 균형: 확률이 가장 높은 보상 선택지 선택
+      let bestProb = -1;
+      btns.forEach(b => {
+        const p = parseInt(b.dataset.prob || '60', 10);
+        if (b.dataset.safe !== 'true' && p > bestProb) {
+          bestProb = p;
+          chosen = b;
+        }
+      });
+    }
+  }
+
+  if (chosen) {
+    chosen.classList.add('auto-picked');
+    setTimeout(() => {
+      if (chosen) chosen.click();
+      scheduleAutoTick();
+    }, 130);
+  } else {
+    scheduleAutoTick();
+  }
+}
+
+// =========================================================================
+// 아이템 생성, 상자 연출, 합성 시스템
+// =========================================================================
 function generateItem(depth, forceMinGradeIdx = 0, isUnidentified = false) {
   const { stats } = getTotalStats();
-  const lukBonus = stats.luk * 0.8 + depth * 0.5;
+  const hammerLv = state.relics.hammer || 0;
+  const lukBonus = stats.luk * 0.85 + depth * 0.5 + hammerLv * 12;
 
-  // 가중치 추첨
-  let pool = GRADES.map((g, idx) => {
+  const pool = GRADES.map((g, idx) => {
     let w = idx < forceMinGradeIdx ? 0 : g.weight;
     if (idx >= 2 && w > 0) w += lukBonus * (8 - idx);
     return { g, idx, w };
@@ -1047,79 +1623,52 @@ function generateItem(depth, forceMinGradeIdx = 0, isUnidentified = false) {
 
   const grade = picked.g;
   const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
-  const itemLv = Math.max(1, depth + Math.floor(Math.random() * 3) - 1);
-  const scale = (1 + itemLv * 0.22) * grade.mult;
+  const itemLv = Math.max(1, depth + Math.floor(Math.random() * 3));
+  const scale = (1 + itemLv * 0.24) * grade.mult * (1 + state.ngPlus * 0.25);
   const baseVal = Math.max(1, Math.floor(slot.baseVal * scale));
 
-  // 유니크 이름 및 세트 부여 (영웅 이상 확률적, 전설 이상 100%)
-  let isUnique = picked.idx >= 4 || (picked.idx === 3 && Math.random() < 0.45);
+  const isUnique = picked.idx >= 4 || (picked.idx === 3 && Math.random() < 0.5);
   let name = `심연의 ${slot.name}`;
   if (isUnique) {
     const list = UNIQUE_NAMES[slot.id];
     name = list[Math.floor(Math.random() * list.length)];
   }
 
-  let setId = null;
-  let setName = null;
-  if (picked.idx >= 3 && Math.random() < 0.55) {
+  let setId = null, setName = null;
+  if (picked.idx >= 3 && Math.random() < 0.6) {
     const st = SETS[Math.floor(Math.random() * SETS.length)];
-    setId = st.id;
-    setName = st.name;
+    setId = st.id; setName = st.name;
   }
 
-  // 랜덤 옵션 생성 (티어 T1~T5 계산)
   const options = [];
   for (let i = 0; i < grade.optCnt; i++) {
     const raw = OPT_POOL[Math.floor(Math.random() * OPT_POOL.length)];
-    // 고등급일수록 상위 티어 확률 상승
     const rollRatio = Math.min(1, Math.random() * 0.75 + (picked.idx * 0.05));
     const val = Math.max(raw.min, Math.round(raw.min + (raw.max - raw.min) * rollRatio));
     const tier = rollRatio >= 0.85 ? 1 : rollRatio >= 0.65 ? 2 : rollRatio >= 0.45 ? 3 : rollRatio >= 0.25 ? 4 : 5;
-    options.push({
-      id: raw.id,
-      name: raw.name,
-      val,
-      unit: raw.unit,
-      min: raw.min,
-      max: raw.max,
-      tier
-    });
+    options.push({ id: raw.id, name: raw.name, val, unit: raw.unit, min: raw.min, max: raw.max, tier });
   }
 
   return {
     uid: 'itm_' + Date.now() + '_' + Math.floor(Math.random() * 99999),
-    name,
-    slotId: slot.id,
-    slotName: slot.name,
-    icon: slot.icon,
-    lv: itemLv,
-    gradeId: grade.id,
-    gradeName: grade.name,
-    gradeCls: grade.cls,
-    gradeIdx: picked.idx,
-    baseStat: slot.baseStat,
-    baseVal,
-    enhance: 0,
-    setId,
-    setName,
-    isUnique,
-    unidentified: isUnidentified,
-    options
+    name, slotId: slot.id, slotName: slot.name, icon: slot.icon,
+    lv: itemLv, gradeId: grade.id, gradeName: grade.name, gradeCls: grade.cls, gradeIdx: picked.idx,
+    baseStat: slot.baseStat, baseVal, enhance: 0, setId, setName, isUnique, unidentified: isUnidentified, options
   };
 }
 
-// 상자 열기 연출 및 아이템 획득
 function acquireItemWithChest(item, isChestModal = true) {
-  // 도감 기록
   state.codexGrades[item.gradeId] = (state.codexGrades[item.gradeId] || 0) + 1;
+  if (item.gradeIdx >= 4) state.records.legendCnt = (state.records.legendCnt || 0) + 1;
   if (item.isUnique && !state.codexUniques.includes(item.name)) {
     state.codexUniques.push(item.name);
+    addLog(`📖 신규 유니크 도감 등록: [${item.name}] (영구 공격력 +2%!)`);
   }
 
-  if (state.inventory.length >= 30) {
+  if (state.inventory.length >= 35) {
     const dustGain = (item.gradeIdx + 1) * 5;
     state.dust += dustGain;
-    addLog(`🎒 인벤토리가 가득 차 [${item.name}]이(가) 마력 가루 +${dustGain}개로 자동 분해되었습니다.`);
+    addLog(`🎒 가방이 가득 차 [${item.name}] 자동 분해 (가루 +${dustGain})`);
     updateHUD();
     return;
   }
@@ -1127,7 +1676,6 @@ function acquireItemWithChest(item, isChestModal = true) {
   state.inventory.unshift(item);
   document.getElementById('dot-inv').classList.add('show');
 
-  // 전설 이상 화면 플래시 효과
   if (item.gradeIdx >= 4 && !item.unidentified) {
     triggerScreenFlash(GRADES[item.gradeIdx].color);
     SFX.play('legend');
@@ -1135,7 +1683,7 @@ function acquireItemWithChest(item, isChestModal = true) {
     SFX.play('success');
   }
 
-  if (isChestModal) {
+  if (isChestModal && !autoPlay.enabled) {
     showChestModal(item);
   } else {
     addLog(`🎁 획득: [${item.gradeName}] ${item.unidentified ? '미감정 ' + item.slotName : item.name}`);
@@ -1148,7 +1696,7 @@ function triggerScreenFlash(color) {
   const fl = document.getElementById('screen-flash');
   fl.style.background = `radial-gradient(circle, ${color} 0%, transparent 75%)`;
   fl.style.opacity = '0.85';
-  setTimeout(() => { fl.style.opacity = '0'; }, 550);
+  setTimeout(() => { fl.style.opacity = '0'; }, 520);
 }
 
 function showChestModal(item) {
@@ -1159,178 +1707,156 @@ function showChestModal(item) {
   content.innerHTML = `
     <div style="text-align:center;">
       <div style="font-size:15px; font-weight:700; color:var(--border-bright);">보물 상자 개봉 중...</div>
-      <div class="chest-icon chest-shake" id="chest-anim">🧰</div>
-      <div style="font-size:12px; color:var(--text-muted);">고대 자물쇠가 풀리고 있습니다...</div>
+      <div class="chest-icon chest-shake">🧰</div>
     </div>
   `;
 
   setTimeout(() => {
     const titleStr = item.unidentified ? `❓ 미감정 ${item.slotName}` : `${item.icon} [${item.gradeName}] ${item.name}`;
     const optsHtml = item.unidentified
-      ? `<div style="color:#ffd180; font-size:12px; margin:8px 0;">상점이나 인벤토리에서 감정 시 숨겨진 등급과 옵션이 공개됩니다!</div>`
-      : item.options.map(o => `<div style="font-size:12px; color:#d2c5b0;">• [T${o.tier}] ${o.name} +${o.val}${o.unit} <span style="color:#777">(${o.min}~${o.max}${o.unit})</span></div>`).join('');
+      ? `<div style="color:#ffd180; font-size:12px;">감정 시 숨겨진 등급과 옵션이 공개됩니다!</div>`
+      : item.options.map(o => `<div style="font-size:11.5px;">• [T${o.tier}] ${o.name} +${o.val}${o.unit}</div>`).join('');
 
     content.innerHTML = `
       <div style="text-align:center;">
-        <div style="font-size:13px; color:var(--text-muted);">아이템 획득!</div>
-        <div style="font-size:44px; margin:6px 0;">${item.icon}</div>
-        <div class="${item.unidentified ? '' : item.gradeCls}" style="font-size:16px; font-weight:800;">
-          ${titleStr}
-        </div>
-        ${item.setName && !item.unidentified ? `<div style="font-size:11px; color:#4cd964; margin-top:2px;">세트: [${item.setName}]</div>` : ''}
+        <div style="font-size:42px;">${item.icon}</div>
+        <div class="${item.unidentified ? '' : item.gradeCls}" style="font-size:16px; font-weight:800;">${titleStr}</div>
+        ${item.setName && !item.unidentified ? `<div style="font-size:11px; color:#4cd964;">세트: [${item.setName}]</div>` : ''}
       </div>
-      <div class="card" style="margin-top:6px;">
-        <div style="font-size:12px; font-weight:700; margin-bottom:4px;">
-          기본 성능: ${item.baseStat.toUpperCase()} +${item.baseVal} (Lv.${item.lv})
-        </div>
+      <div class="card">
+        <div style="font-size:12px; font-weight:700; margin-bottom:4px;">기본: ${item.baseStat.toUpperCase()} +${item.baseVal} (Lv.${item.lv})</div>
         ${optsHtml}
       </div>
-      <button class="choice-btn" style="justify-content:center; font-weight:700;" onclick="closeModal()">확인</button>
+      <button class="choice-btn" data-autoclose="true" style="justify-content:center; font-weight:700;" onclick="closeModal()">확인</button>
     `;
-  }, 650);
+  }, 520);
 }
 
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('show');
 }
 
-// 스탯 판정 성공률 계산기
+// =========================================================================
+// 메인 턴 루프 & 미니맵 노드 진행
+// =========================================================================
 function calcStatProb(statKey, difficulty = 1.0) {
   const { stats } = getTotalStats();
-  const req = Math.floor((6 + state.depth * 1.35) * difficulty);
+  const diceBonus = (state.relics.dice || 0) * 3;
+  const req = Math.floor((6 + state.depth * 1.3) * difficulty);
   const myVal = stats[statKey] || 5;
-  const prob = Math.round(55 + (myVal - req) * 4 + stats.luk * 0.6);
-  return Math.max(10, Math.min(95, prob));
+  const prob = Math.round(56 + (myVal - req) * 4 + stats.luk * 0.5 + diceBonus);
+  return Math.max(12, Math.min(96, prob));
 }
 
-// 타이핑 효과
-function typeStoryText(text) {
-  const el = document.getElementById('ev-text');
-  if (typingTimer) clearInterval(typingTimer);
-  el.textContent = '';
-  let i = 0;
-  typingTimer = setInterval(() => {
-    el.textContent += text.charAt(i);
-    i++;
-    if (i >= text.length) clearInterval(typingTimer);
-  }, 14);
-}
-
-// =========================================================================
-// 절차적 무한 이벤트 생성기 (전투, 상자, 함정, NPC, 도박, 성소, 퀘스트 등)
-// =========================================================================
 function nextTurnEvent() {
-  state.turnCount++;
-  // 상태이상 지속시간 감소
   if (state.flags.cursed > 0) state.flags.cursed--;
   if (state.flags.blessed > 0) state.flags.blessed--;
 
-  // 4턴마다 심연 1층 상승
-  if (state.turnCount % 4 === 0) {
-    state.depth++;
-    addLog(`⬇️ 더욱 깊은 심연(${state.depth}층)으로 내려갑니다.`);
-  }
-
-  // 태양왕 4세트 재생 효과
+  // 태양왕 4세트 재생
   const { stats, setCounts } = getTotalStats();
   if ((setCounts['solar'] || 0) >= 4) {
-    const heal = Math.floor(stats.maxHp * 0.06);
-    state.hp = Math.min(stats.maxHp, state.hp + heal);
+    state.hp = Math.min(stats.maxHp, state.hp + Math.floor(stats.maxHp * 0.07));
   }
 
   document.getElementById('result-box').classList.remove('show');
-  document.getElementById('enemy-box').classList.remove('show');
 
-  const place = PLACES[Math.floor(Math.random() * PLACES.length)];
-  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
-  document.getElementById('ev-place').textContent = `${place} (심연 ${state.depth}층)`;
+  // 배경 테마 업데이트
+  const placeObj = PLACES[state.depth % PLACES.length];
+  document.getElementById('stage-bg-deco').innerHTML = placeObj.decos.map(d => `<span>${d}</span>`).join('');
 
-  // 10층 배수 첫 진입 시 보스전 발생
-  if (state.depth % 10 === 0 && state.turnCount % 4 === 0) {
-    startCombat('boss', place);
-    return;
-  }
+  renderMinimap();
+  const node = state.floorNodes[state.nodeIdx] || { type: 'combat', icon: '⚔️', name: '일반 전투' };
 
-  // 랜덤 이벤트 카테고리 추첨
-  const roll = Math.random();
-  if (roll < 0.34) {
-    startCombat(Math.random() < 0.22 ? 'elite' : 'normal', place);
-  } else if (roll < 0.48) {
-    evTreasureChest(adj, place);
-  } else if (roll < 0.60) {
-    evTrap(adj, place);
-  } else if (roll < 0.72) {
-    evSuspiciousNpc(adj, place);
-  } else if (roll < 0.84) {
-    evGambleOrShrine(adj, place);
+  if (node.type === 'boss') {
+    startCombat('boss', placeObj.name);
+  } else if (node.type === 'elite') {
+    startCombat('elite', placeObj.name);
+  } else if (node.type === 'combat') {
+    startCombat('normal', placeObj.name);
+  } else if (node.type === 'chest') {
+    evTreasureChest(placeObj.name);
+  } else if (node.type === 'trap') {
+    evTrap(placeObj.name);
+  } else if (node.type === 'npc') {
+    evSuspiciousNpc(placeObj.name);
+  } else if (node.type === 'shrine') {
+    evShrine(placeObj.name);
   } else {
-    evQuestOrSanctuary(adj, place);
+    evCamp(placeObj.name);
   }
 
   updateHUD();
   saveGame();
 }
 
-function showResultAndNext(resultHtml) {
+function advanceNodeAndShowNext(resultHtml) {
+  // 퀘스트 진행도(노드 돌파)
+  if (state.quests && state.quests[1]) state.quests[1].prog++;
+
+  state.nodeIdx++;
+  if (state.nodeIdx >= 10) {
+    state.depth++;
+    if (state.depth > (state.records.maxDepth || 1)) state.records.maxDepth = state.depth;
+    generateFloorNodes();
+    addLog(`🔥 심연 ${state.depth}층으로 진입했습니다!`);
+  }
+
   const rb = document.getElementById('result-box');
   rb.innerHTML = resultHtml;
   rb.classList.add('show');
 
-  const wrap = document.getElementById('choices-wrap');
-  wrap.innerHTML = `
-    <button class="choice-btn" style="justify-content:center; border-color:var(--border-bright);" onclick="SFX.play('click'); nextTurnEvent();">
-      <span class="choice-title">➡️ 다음 발걸음을 옮긴다</span>
+  document.getElementById('choices-wrap').innerHTML = `
+    <button class="choice-btn" data-prob="100" style="justify-content:center; border-color:var(--border-bright);" onclick="SFX.play('click'); nextTurnEvent();">
+      <span class="choice-title">➡️ 다음 방으로 전진한다 (${state.nodeIdx + 1}/10)</span>
     </button>
   `;
+  renderMinimap();
   updateHUD();
   saveGame();
 }
 
-// 1) 보물상자 이벤트
-function evTreasureChest(adj, place) {
-  document.getElementById('ev-emoji').textContent = '🧰';
-  document.getElementById('ev-title').textContent = '고대의 보물상자';
+// 비전투 이벤트 5종
+function evTreasureChest(placeName) {
+  currentEnemy = null;
+  updateBattleStage('🧰', '고대의 보물상자', false);
+  document.getElementById('ev-title').textContent = '고대의 보물상자 발견';
   document.getElementById('ev-tag').textContent = '보물상자';
-  typeStoryText(`${adj} ${place} 구석에서 기이한 룬 문양이 새겨진 보물상자를 발견했습니다. 함정이 설치되어 있을지도 모릅니다.`);
+  document.getElementById('ev-text').textContent = `${placeName}에서 룬 자물쇠로 잠긴 보물상자를 발견했습니다.`;
 
   const pDex = calcStatProb('dex', 1.0);
   const pStr = calcStatProb('str', 1.1);
-  const isRogue = state.classKey === 'rogue';
-
   let html = `
-    <button class="choice-btn" onclick="resolveChest('dex', ${pDex})">
+    <button class="choice-btn" data-prob="${pDex}" onclick="resolveChest('dex', ${pDex})">
       <div class="choice-left">
-        <span class="choice-title">🔓 정교하게 함정을 해체하고 연다</span>
-        <span class="choice-desc">[민첩 판정] 성공 시 안전한 장비 획득 / 실패 시 독침 피해</span>
+        <span class="choice-title">🔓 함정을 정교하게 해체한다</span>
+        <span class="choice-desc">[민첩 판정] 성공 시 장비 획득 / 실패 시 독침 피해</span>
       </div>
       <span class="choice-prob">민첩 ${pDex}%</span>
     </button>
-    <button class="choice-btn" onclick="resolveChest('str', ${pStr})">
+    <button class="choice-btn" data-prob="${pStr}" onclick="resolveChest('str', ${pStr})">
       <div class="choice-left">
-        <span class="choice-title">🪓 자물쇠를 무력으로 박살낸다</span>
-        <span class="choice-desc">[힘 판정] 성공 시 장비+추가 골드 / 실패 시 상자 폭발</span>
+        <span class="choice-title">🪓 무력으로 자물쇠를 부순다</span>
+        <span class="choice-desc">[힘 판정] 성공 시 장비+추가 골드 / 실패 시 폭발 피해</span>
       </div>
       <span class="choice-prob">힘 ${pStr}%</span>
     </button>
   `;
-
-  if (isRogue) {
+  if (state.classKey === 'rogue') {
     html += `
-      <button class="choice-btn class-special" onclick="resolveChest('rogue', 100)">
+      <button class="choice-btn class-special" data-prob="100" onclick="resolveChest('rogue', 100)">
         <div class="choice-left">
-          <span class="choice-title">🗡️ [도적 전용] 그림자 열쇠로 이중 바닥까지 개방</span>
-          <span class="choice-desc">100% 성공 + 희귀 등급 이상 확정 드롭!</span>
+          <span class="choice-title">🗡️ [도적 전용] 비밀 바닥까지 완벽 개방</span>
+          <span class="choice-desc">100% 성공 + 희귀 등급 이상 확정!</span>
         </div>
         <span class="choice-prob" style="color:#4cd964;">특수 100%</span>
       </button>
     `;
   }
-
   html += `
-    <button class="choice-btn" onclick="showResultAndNext('조심스럽게 상자를 지나쳐 체력을 보존했습니다. (MP +10 회복)'); state.mp = Math.min(getTotalStats().stats.maxMp, state.mp + 10);">
+    <button class="choice-btn" data-prob="100" data-safe="true" onclick="state.mp = Math.min(getTotalStats().stats.maxMp, state.mp + 15); advanceNodeAndShowNext('상자를 지나치며 호흡을 가다듬었습니다. (MP +15)');">
       <div class="choice-left">
-        <span class="choice-title">🚶 미믹일지 모르니 무시하고 지나간다</span>
-        <span class="choice-desc">안전하게 MP +10 회복</span>
+        <span class="choice-title">🚶 미믹일지 모르니 지나간다</span>
+        <span class="choice-desc">안전하게 MP +15 회복</span>
       </div>
       <span class="choice-prob">안전 100%</span>
     </button>
@@ -1339,56 +1865,51 @@ function evTreasureChest(adj, place) {
 }
 
 function resolveChest(mode, prob) {
-  if (mode === 'rogue') {
-    const itm = generateItem(state.depth, 2, false);
+  if (mode === 'rogue' || Math.random() * 100 < prob) {
+    playCombatAnim('hero', 'OPEN!', '#ffd180', true);
+    const minG = mode === 'rogue' ? 2 : 0;
+    const itm = generateItem(state.depth, minG, Math.random() < 0.2);
+    const bonusG = mode === 'str' ? 40 + state.depth * 15 : 0;
+    state.gold += bonusG;
     acquireItemWithChest(itm, true);
-    showResultAndNext(`✨ 도적의 숙련된 손놀림으로 비밀 칸을 열어 <strong>[${itm.gradeName}] ${itm.name}</strong>을(를) 손에 넣었습니다!`);
-    return;
-  }
-  const win = Math.random() * 100 < prob;
-  if (win) {
-    const bonusGold = mode === 'str' ? Math.floor(30 + state.depth * 12) : 0;
-    state.gold += bonusGold;
-    const itm = generateItem(state.depth, 0, Math.random() < 0.25);
-    acquireItemWithChest(itm, true);
-    showResultAndNext(`🎉 상자 개방 성공! 장비를 획득했습니다.${bonusGold ? ` (추가 골드 +${fmt(bonusGold)})` : ''}`);
+    advanceNodeAndShowNext(`🎉 보물상자 개방! <strong>[${itm.gradeName}] ${itm.name}</strong> 획득!${bonusG ? ` (+${fmt(bonusG)}G)` : ''}`);
   } else {
     SFX.play('fail');
-    const dmg = Math.floor(getTotalStats().stats.maxHp * 0.18);
+    const dmg = Math.floor(getTotalStats().stats.maxHp * 0.16);
     state.hp = Math.max(1, state.hp - dmg);
-    showResultAndNext(`💥 함정이 작동했습니다! 파편에 맞아 <strong>HP -${dmg}</strong> 피해를 입었습니다.`);
+    playCombatAnim('enemy', `-${dmg}`, '#ff4d4d');
+    advanceNodeAndShowNext(`💥 상자 함정이 폭발해 HP -${fmt(dmg)} 피해를 입었습니다.`);
   }
 }
 
-// 2) 함정 이벤트
-function evTrap(adj, place) {
-  document.getElementById('ev-emoji').textContent = '⚙️';
-  document.getElementById('ev-title').textContent = '치명적인 고대 함정';
+function evTrap(placeName) {
+  currentEnemy = null;
+  updateBattleStage('⚙️', '회전 칼날 함정', false);
+  document.getElementById('ev-title').textContent = '고대 기계 함정';
   document.getElementById('ev-tag').textContent = '함정';
-  typeStoryText(`${adj} ${place} 바닥이 갑자기 내려앉으며 거대한 회전 칼날이 날아옵니다!`);
+  document.getElementById('ev-text').textContent = `${placeName} 복도에서 거대한 칼날 함정이 작동했습니다!`;
 
   const pDex = calcStatProb('dex', 1.0);
-  const pInt = calcStatProb('int', 1.15);
-
+  const pInt = calcStatProb('int', 1.1);
   document.getElementById('choices-wrap').innerHTML = `
-    <button class="choice-btn" onclick="resolveTrap('dex', ${pDex})">
+    <button class="choice-btn" data-prob="${pDex}" onclick="resolveTrap('dex', ${pDex})">
       <div class="choice-left">
-        <span class="choice-title">🤸 곡예하듯 칼날 사이를 도약한다</span>
-        <span class="choice-desc">[민첩 판정] 성공 시 경험치 획득 / 실패 시 체력 손실</span>
+        <span class="choice-title">🤸 날렵하게 칼날 사이를 도약한다</span>
+        <span class="choice-desc">[민첩 판정] 성공 시 경험치 획득</span>
       </div>
       <span class="choice-prob">민첩 ${pDex}%</span>
     </button>
-    <button class="choice-btn" onclick="resolveTrap('int', ${pInt})">
+    <button class="choice-btn" data-prob="${pInt}" onclick="resolveTrap('int', ${pInt})">
       <div class="choice-left">
-        <span class="choice-title">🔍 마력 회로를 역추적해 코어를 추출한다</span>
-        <span class="choice-desc">[지능 판정] 성공 시 마력 가루 & 골드 대량 획득</span>
+        <span class="choice-title">🔍 마력 코어를 추출해 분해한다</span>
+        <span class="choice-desc">[지능 판정] 성공 시 마력 가루 & 골드 획득</span>
       </div>
       <span class="choice-prob">지능 ${pInt}%</span>
     </button>
-    <button class="choice-btn" onclick="resolveTrap('guard', 100)">
+    <button class="choice-btn" data-prob="100" data-safe="true" onclick="resolveTrap('guard', 100)">
       <div class="choice-left">
-        <span class="choice-title">🛡️ 방어 자세로 충격을 견뎌낸다</span>
-        <span class="choice-desc">소량의 체력 피해(8%)만 입고 안전히 돌파</span>
+        <span class="choice-title">🛡️ 방어 자세로 돌파한다</span>
+        <span class="choice-desc">소량의 체력(7%)만 소모하고 안전 통과</span>
       </div>
       <span class="choice-prob">안전 100%</span>
     </button>
@@ -1398,265 +1919,202 @@ function evTrap(adj, place) {
 function resolveTrap(mode, prob) {
   const { stats } = getTotalStats();
   if (mode === 'guard') {
-    const dmg = Math.max(1, Math.floor(stats.maxHp * 0.08));
+    const dmg = Math.max(1, Math.floor(stats.maxHp * 0.07));
     state.hp = Math.max(1, state.hp - dmg);
-    showResultAndNext(`🛡️ 무기를 들어 충격을 흘려냈습니다. (HP -${dmg})`);
+    advanceNodeAndShowNext(`🛡️ 방패로 칼날을 막아내며 돌파했습니다. (HP -${fmt(dmg)})`);
     return;
   }
   if (Math.random() * 100 < prob) {
     SFX.play('success');
-    if (mode === 'dex') {
-      const expG = Math.floor(25 + state.depth * 10);
-      gainExp(expG);
-      showResultAndNext(`✨ 완벽한 몸놀림으로 함정을 돌파했습니다! (EXP +${fmt(expG)})`);
-    } else {
-      const dustG = 8 + Math.floor(state.depth * 1.5);
-      const goldG = 40 + state.depth * 15;
-      state.dust += dustG;
-      state.gold += goldG;
-      showResultAndNext(`🔮 함정 코어 해체 성공! 마력 가루 +${dustG}, 골드 +${fmt(goldG)} 획득!`);
-    }
+    const dustG = 10 + state.depth * 2;
+    const expG = 35 + state.depth * 14;
+    state.dust += dustG;
+    gainExp(expG);
+    advanceNodeAndShowNext(`✨ 함정을 완벽히 파훼했습니다! (EXP +${fmt(expG)}, 가루 +${dustG})`);
   } else {
     SFX.play('fail');
-    const dmg = Math.max(5, Math.floor(stats.maxHp * 0.24));
+    const dmg = Math.floor(stats.maxHp * 0.2);
     state.hp = Math.max(1, state.hp - dmg);
-    showResultAndNext(`🩸 칼날에 스쳐 깊은 상처를 입었습니다! (HP -${dmg})`);
+    playCombatAnim('enemy', `-${dmg}`, '#ff4d4d');
+    advanceNodeAndShowNext(`🩸 함정에 스쳐 HP -${fmt(dmg)} 피해를 입었습니다.`);
   }
 }
 
-// 3) 수상한 NPC 조우
-function evSuspiciousNpc(adj, place) {
-  document.getElementById('ev-emoji').textContent = 'フード' ? '🧙‍♂️' : '🧙‍♂️';
-  document.getElementById('ev-title').textContent = '수상한 방랑자와의 조우';
-  document.getElementById('ev-tag').textContent = '수상한 NPC';
-  typeStoryText(`${adj} ${place}에서 검은 로브를 뒤집어쓴 자가 정체불명의 유물을 내밀며 거래를 제안합니다.`);
+function evSuspiciousNpc(placeName) {
+  currentEnemy = null;
+  updateBattleStage('🧙‍♂️', '수상한 유물상', false);
+  document.getElementById('ev-title').textContent = '심연의 유물 수집가';
+  document.getElementById('ev-tag').textContent = 'NPC 조우';
+  document.getElementById('ev-text').textContent = `${placeName}에서 마주친 수집가가 흥미로운 거래를 제안합니다.`;
 
   const pCha = calcStatProb('cha', 1.0);
-  const pLuk = calcStatProb('luk', 1.3);
-  const cost = Math.floor(45 + state.depth * 14);
-
+  const cost = Math.floor(50 + state.depth * 15);
   document.getElementById('choices-wrap').innerHTML = `
-    <button class="choice-btn" onclick="resolveNpc('buy', ${cost})">
+    <button class="choice-btn" data-prob="${pCha}" onclick="resolveNpc('cha', ${pCha})">
       <div class="choice-left">
-        <span class="choice-title">🪙 ${fmt(cost)} 골드를 주고 미감정 유물을 구매한다</span>
-        <span class="choice-desc">미감정 장비 1개 확정 획득 (고등급 확률 상승)</span>
-      </div>
-      <span class="choice-prob">거래</span>
-    </button>
-    <button class="choice-btn" onclick="resolveNpc('cha', ${pCha})">
-      <div class="choice-left">
-        <span class="choice-title">🗣️ 화술로 상대를 설득해 정보와 선물을 얻는다</span>
-        <span class="choice-desc">[매력 판정] 성공 시 평판 상승 + 무료 물약/골드</span>
+        <span class="choice-title">🗣️ 설득하여 무료 보급품을 받는다</span>
+        <span class="choice-desc">[매력 판정] 성공 시 체력 회복 + 골드 획득 + 평판 상승</span>
       </div>
       <span class="choice-prob">매력 ${pCha}%</span>
     </button>
-    <button class="choice-btn" onclick="resolveNpc('rob', ${pLuk})">
+    <button class="choice-btn" data-prob="90" onclick="resolveNpc('buy', ${cost})">
       <div class="choice-left">
-        <span class="choice-title">⚔️ 보따리를 강탈한다 (위험/악행)</span>
-        <span class="choice-desc">[행운 판정] 성공 시 대량 보상(평판 하락) / 실패 시 정예 전투</span>
+        <span class="choice-title">🪙 ${fmt(cost)} 골드로 미감정 고대 유물 구매</span>
+        <span class="choice-desc">고급 이상 미감정 장비 확정 획득</span>
       </div>
-      <span class="choice-prob">위험 ${pLuk}%</span>
+      <span class="choice-prob">거래</span>
+    </button>
+    <button class="choice-btn" data-prob="100" data-safe="true" onclick="advanceNodeAndShowNext('수집가에게 목례하고 갈 길을 재촉했습니다.')">
+      <div class="choice-left">
+        <span class="choice-title">🚶 거래를 거절하고 지나간다</span>
+        <span class="choice-desc">아무 일도 일어나지 않음</span>
+      </div>
+      <span class="choice-prob">안전 100%</span>
     </button>
   `;
 }
 
 function resolveNpc(mode, val) {
-  if (mode === 'buy') {
-    if (state.gold < val) {
+  const { stats } = getTotalStats();
+  if (mode === 'cha') {
+    if (Math.random() * 100 < val) {
+      SFX.play('success');
+      state.rep += 6;
+      const g = 60 + state.depth * 18;
+      state.gold += g;
+      state.hp = stats.maxHp;
+      advanceNodeAndShowNext(`🤝 수집가가 호탕하게 웃으며 체력을 회복시켜 주고 +${fmt(g)} 골드를 주었습니다! (평판 +6)`);
+    } else {
       SFX.play('fail');
-      showResultAndNext(`골드가 부족하자 방랑자는 비웃으며 안개 속으로 사라졌습니다.`);
+      advanceNodeAndShowNext(`수집가는 고개를 저으며 안개 속으로 사라졌습니다.`);
+    }
+  } else {
+    if (state.gold < val) {
+      advanceNodeAndShowNext(`골드가 부족해 거래가 무산되었습니다.`);
       return;
     }
     state.gold -= val;
     const itm = generateItem(state.depth + 2, 1, true);
     acquireItemWithChest(itm, true);
-    showResultAndNext(`🔮 방랑자에게서 수수께끼의 미감정 유물을 건네받았습니다.`);
-  } else if (mode === 'cha') {
-    if (Math.random() * 100 < val) {
-      SFX.play('success');
-      state.rep += 5;
-      const g = 50 + state.depth * 15;
-      state.gold += g;
-      state.hp = getTotalStats().stats.maxHp;
-      showResultAndNext(`🤝 방랑자가 당신의 기품에 감복하여 체력을 모두 회복시켜 주고 노잣돈 +${fmt(g)} 골드를 건넸습니다! (평판 +5)`);
-    } else {
-      SFX.play('fail');
-      showResultAndNext(`방랑자는 시큰둥한 표정으로 고개를 젓더니 자리를 떠났습니다.`);
-    }
-  } else if (mode === 'rob') {
-    state.rep -= 10;
-    if (Math.random() * 100 < val) {
-      const itm = generateItem(state.depth + 3, 2, false);
-      acquireItemWithChest(itm, true);
-      showResultAndNext(`😈 기습에 성공해 방랑자의 보물 보따리를 빼앗았습니다! (평판 -10)`);
-    } else {
-      addLog(`⚠️ 방랑자가 정체를 드러내고 공격해 옵니다!`);
-      startCombat('elite', '분노한 암흑 마도사');
-    }
+    advanceNodeAndShowNext(`🔮 미감정 고대 유물을 구매했습니다!`);
   }
 }
 
-// 4) 도박 & 고대 제단
-function evGambleOrShrine(adj, place) {
-  document.getElementById('ev-emoji').textContent = '🎲';
+function evShrine(placeName) {
+  currentEnemy = null;
+  updateBattleStage('🎲', '운명의 제단', false);
   document.getElementById('ev-title').textContent = '운명의 피의 제단';
   document.getElementById('ev-tag').textContent = '도박/성소';
-  typeStoryText(`${adj} ${place} 중앙에 붉은 보석이 박힌 운명의 제단이 서 있습니다. 제물을 바치면 축복이나 전설적인 유물을 내린다고 전해집니다.`);
+  document.getElementById('ev-text').textContent = `${placeName} 한가운데에 고대 신의 제단이 붉은 빛을 내뿜고 있습니다.`;
 
-  const pLuk = calcStatProb('luk', 1.25);
-  const isCleric = state.classKey === 'cleric';
-
+  const pLuk = calcStatProb('luk', 1.2);
   let html = `
-    <button class="choice-btn" onclick="resolveShrine('blood', ${pLuk})">
+    <button class="choice-btn" data-prob="${pLuk}" onclick="resolveShrine('blood', ${pLuk})">
       <div class="choice-left">
-        <span class="choice-title">🩸 현재 체력의 30%를 바쳐 유물을 소환한다</span>
-        <span class="choice-desc">[행운 판정] 대성공 시 영웅~창조 등급 장비 / 실패 시 저주</span>
+        <span class="choice-title">🩸 체력 25%를 바쳐 고대 유물을 소환한다</span>
+        <span class="choice-desc">[행운 판정] 성공 시 영웅~창조 등급 확정!</span>
       </div>
       <span class="choice-prob">행운 ${pLuk}%</span>
     </button>
-    <button class="choice-btn" onclick="resolveShrine('gold', 50)">
-      <div class="choice-left">
-        <span class="choice-title">🪙 보유 골드의 25%를 걸고 운명의 주사위를 굴린다</span>
-        <span class="choice-desc">50% 확률로 투자 골드 3배 획득!</span>
-      </div>
-      <span class="choice-prob">도박 50%</span>
-    </button>
   `;
-
-  if (isCleric) {
+  if (state.classKey === 'cleric') {
     html += `
-      <button class="choice-btn class-special" onclick="resolveShrine('cleric', 100)">
+      <button class="choice-btn class-special" data-prob="100" onclick="resolveShrine('cleric', 100)">
         <div class="choice-left">
-          <span class="choice-title">✨ [성직자 전용] 사악한 제단을 정화한다</span>
-          <span class="choice-desc">100% 축복 버프(5턴간 공격력 +15%) + 마력 가루 획득</span>
+          <span class="choice-title">✨ [성직자 전용] 제단 정화 및 신성 축복</span>
+          <span class="choice-desc">100% 성공: 5턴 축복 + 영혼석 1개 + 가루 15개</span>
         </div>
         <span class="choice-prob" style="color:#4cd964;">특수 100%</span>
       </button>
     `;
   }
-
+  html += `
+    <button class="choice-btn" data-prob="100" data-safe="true" onclick="state.flags.blessed = 3; advanceNodeAndShowNext('제단에 가벼운 기도를 올려 3턴간 [축복]을 받았습니다.');">
+      <div class="choice-left">
+        <span class="choice-title">🙏 가볍게 목례만 올리고 지나간다</span>
+        <span class="choice-desc">안전하게 3턴간 축복(공격력 증가) 획득</span>
+      </div>
+      <span class="choice-prob">안전 100%</span>
+    </button>
+  `;
   document.getElementById('choices-wrap').innerHTML = html;
 }
 
 function resolveShrine(mode, prob) {
   if (mode === 'cleric') {
-    SFX.play('success');
+    SFX.play('legend');
     state.flags.blessed = 5;
-    state.flags.cursed = 0;
+    state.soulStones += 1;
     state.dust += 15;
-    state.rep += 8;
-    showResultAndNext(`✨ 성스러운 빛으로 제단을 정화했습니다! 5턴간 [축복] 상태가 되며 마력 가루 +15, 평판 +8을 얻었습니다.`);
+    advanceNodeAndShowNext(`✨ 제단을 정화하여 <strong>영혼석 +1개</strong>, 마력 가루 +15개와 축복을 얻었습니다!`);
     return;
   }
-  if (mode === 'blood') {
-    state.hp = Math.max(1, Math.floor(state.hp * 0.7));
-    if (Math.random() * 100 < prob) {
-      const itm = generateItem(state.depth + 2, 3, false); // 최소 영웅 등급!
-      acquireItemWithChest(itm, true);
-      showResultAndNext(`🔥 제단이 피를 받아들이고 찬란한 유물을 토해냈습니다!`);
-    } else {
-      SFX.play('fail');
-      state.flags.cursed = 4;
-      showResultAndNext(`💀 제단이 불길한 연기를 뿜어냅니다. 4턴 동안 [저주: 공격력 -10%]에 걸렸습니다.`);
-    }
+  state.hp = Math.max(1, Math.floor(state.hp * 0.75));
+  if (Math.random() * 100 < prob) {
+    const itm = generateItem(state.depth + 2, 3, false);
+    acquireItemWithChest(itm, true);
+    advanceNodeAndShowNext(`🔥 제단이 응답하여 <strong>[${itm.gradeName}] ${itm.name}</strong>을(를) 내렸습니다!`);
   } else {
-    const bet = Math.max(10, Math.floor(state.gold * 0.25));
-    state.gold -= bet;
-    if (Math.random() < 0.5) {
-      SFX.play('success');
-      const winG = bet * 3;
-      state.gold += winG;
-      showResultAndNext(`🎰 주사위가 황금빛 눈을 가리켰습니다! <strong>+${fmt(winG)} 골드</strong> 대박!`);
-    } else {
-      SFX.play('fail');
-      showResultAndNext(`💸 주사위가 해골 눈을 가리키며 ${fmt(bet)} 골드가 제단 속으로 증발했습니다...`);
-    }
+    SFX.play('fail');
+    state.flags.cursed = 3;
+    advanceNodeAndShowNext(`💀 제단이 피만 삼키고 3턴간 [저주]를 내렸습니다.`);
   }
 }
 
-// 5) 퀘스트 & 성소 휴식
-function evQuestOrSanctuary(adj, place) {
-  document.getElementById('ev-emoji').textContent = '🏕️';
-  document.getElementById('ev-title').textContent = '고대 수호자의 화톳불';
-  document.getElementById('ev-tag').textContent = '마을/퀘스트';
-  typeStoryText(`${adj} ${place} 한켠에 아직 꺼지지 않은 마법 화톳불과 부상당한 용병이 보입니다.`);
-
-  const pInt = calcStatProb('int', 1.0);
+function evCamp(placeName) {
+  currentEnemy = null;
+  updateBattleStage('🏕️', '수호자의 화톳불', false);
+  document.getElementById('ev-title').textContent = '안식의 화톳불';
+  document.getElementById('ev-tag').textContent = '쉼터';
+  document.getElementById('ev-text').textContent = `${placeName}에서 안전한 마법 화톳불과 용병 야영지를 발견했습니다.`;
 
   document.getElementById('choices-wrap').innerHTML = `
-    <button class="choice-btn" onclick="resolveCamp('rest')">
+    <button class="choice-btn" data-prob="100" data-safe="true" onclick="resolveCamp('rest')">
       <div class="choice-left">
-        <span class="choice-title">🔥 화톳불 곁에서 휴식을 취한다</span>
-        <span class="choice-desc">HP와 MP 60% 즉시 회복 및 저주 해제</span>
+        <span class="choice-title">🔥 화톳불에서 휴식하여 체력·마나 회복</span>
+        <span class="choice-desc">HP/MP 70% 즉시 회복 및 저주 해제</span>
       </div>
-      <span class="choice-prob">회복 100%</span>
+      <span class="choice-prob">안전 100%</span>
     </button>
-    <button class="choice-btn" onclick="resolveCamp('mercenary')">
+    <button class="choice-btn" data-prob="100" onclick="resolveCamp('merc')">
       <div class="choice-left">
-        <span class="choice-title">🤝 부상당한 용병을 치료해 동행한다</span>
-        <span class="choice-desc">평판 +10 & 동료 합류(영구 공격력 +12% 보너스)</span>
+        <span class="choice-title">🛡️ 야영지의 정예 용병과 동행 계약</span>
+        <span class="choice-desc">용병 합류(공격력 +15%) + 스탯 포인트 +1</span>
       </div>
-      <span class="choice-prob">선행</span>
-    </button>
-    <button class="choice-btn" onclick="resolveCamp('study', ${pInt})">
-      <div class="choice-left">
-        <span class="choice-title">📜 화톳불 옆 고대 비석을 해독한다</span>
-        <span class="choice-desc">[지능 판정] 성공 시 대량 경험치 & 스탯 포인트 +1</span>
-      </div>
-      <span class="choice-prob">지능 ${pInt}%</span>
+      <span class="choice-prob">특수 100%</span>
     </button>
   `;
 }
 
-function resolveCamp(mode, prob) {
+function resolveCamp(mode) {
   const { stats } = getTotalStats();
+  SFX.play('success');
   if (mode === 'rest') {
-    SFX.play('success');
-    state.hp = Math.min(stats.maxHp, state.hp + Math.floor(stats.maxHp * 0.6));
-    state.mp = Math.min(stats.maxMp, state.mp + Math.floor(stats.maxMp * 0.6));
+    state.hp = Math.min(stats.maxHp, state.hp + Math.floor(stats.maxHp * 0.7));
+    state.mp = Math.min(stats.maxMp, state.mp + Math.floor(stats.maxMp * 0.7));
     state.flags.cursed = 0;
-    showResultAndNext(`🔥 따뜻한 온기에 피로와 저주가 씻겨 내려갔습니다. (HP/MP 대폭 회복)`);
-  } else if (mode === 'mercenary') {
-    SFX.play('success');
-    state.rep += 10;
-    state.flags.companion = true;
-    const expG = 35 + state.depth * 12;
-    gainExp(expG);
-    showResultAndNext(`🛡️ 용병이 감사를 표하며 당신의 여정에 합류합니다! (동료 효과 활성화, 평판 +10, EXP +${fmt(expG)})`);
+    playCombatAnim('enemy', '+HEAL', '#4cd964');
+    advanceNodeAndShowNext(`🔥 화톳불에서 휴식을 취해 컨디션을 대폭 회복했습니다.`);
   } else {
-    if (Math.random() * 100 < prob) {
-      SFX.play('legend');
-      state.statPts += 1;
-      const expG = 50 + state.depth * 15;
-      gainExp(expG);
-      showResultAndNext(`📖 고대 비석의 비기를 깨우쳤습니다! <strong>보너스 스탯 포인트 +1</strong>, EXP +${fmt(expG)} 획득!`);
-    } else {
-      SFX.play('fail');
-      showResultAndNext(`비석의 난해한 문자를 해독하다가 두통만 얻었습니다.`);
-    }
+    state.flags.companion = true;
+    state.statPts += 1;
+    advanceNodeAndShowNext(`🛡️ 정예 용병이 합류하고 전술 훈련으로 <strong>스탯 포인트 +1</strong>을 얻었습니다!`);
   }
 }
 
 // =========================================================================
-// 선택지 기반 전투 시스템
+// 전투 루프 (일반 / 정예 / 10층 보스)
 // =========================================================================
-const MONSTER_NAMES = [
-  { name: '해골 기사', icon: '💀' },
-  { name: '심연의 가고일', icon: '🦇' },
-  { name: '타락한 성전사', icon: '🩸' },
-  { name: '맹독 아라크네', icon: '🕷️' },
-  { name: '지옥불 수문장', icon: '👹' },
-  { name: '공허의 망령', icon: '👻' }
-];
-
-function startCombat(tier, place) {
-  const mBase = MONSTER_NAMES[Math.floor(Math.random() * MONSTER_NAMES.length)];
+function startCombat(tier, placeName) {
+  const mBase = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
   const mult = tier === 'boss' ? 2.8 : tier === 'elite' ? 1.6 : 1.0;
-  const scale = (1 + state.depth * 0.18) * (1 + state.lv * 0.08) * mult;
+  const ngMult = 1 + (state.ngPlus || 0) * 0.35;
+  const scale = (1 + state.depth * 0.18) * (1 + state.lv * 0.07) * mult * ngMult;
+
   const maxHp = Math.floor(55 * scale);
   const atk = Math.floor(9 * scale);
+  const prefix = tier === 'boss' ? '👑 [계층군주] ' : tier === 'elite' ? '⚡ [정예] ' : '';
 
-  const prefix = tier === 'boss' ? '👑 [계층 군주] ' : tier === 'elite' ? '⚡ [정예] ' : '';
   currentEnemy = {
     name: prefix + mBase.name,
     icon: mBase.icon,
@@ -1665,154 +2123,157 @@ function startCombat(tier, place) {
     maxHp,
     atk,
     intent: 'normal',
+    intentShort: '⚠️ 일반 공격',
     stunned: false
   };
 
   rollEnemyIntent();
+  updateBattleStage(currentEnemy.icon, currentEnemy.name, true);
 
-  document.getElementById('ev-emoji').textContent = mBase.icon;
-  document.getElementById('ev-title').textContent = `${currentEnemy.name} 출현!`;
+  document.getElementById('ev-title').textContent = `${currentEnemy.name} 조우!`;
   document.getElementById('ev-tag').textContent = tier === 'boss' ? '보스전' : '전투';
-  typeStoryText(`${place} 어둠 속에서 살기를 띤 ${currentEnemy.name}이(가) 길을 가로막습니다!`);
+  document.getElementById('ev-text').textContent = `${placeName}에서 ${currentEnemy.name}이(가) 살기를 뿜으며 가로막습니다!`;
 
-  renderCombatUI();
+  renderCombatChoices();
 }
 
 function rollEnemyIntent() {
   if (!currentEnemy) return;
   const r = Math.random();
-  if (r < 0.55) {
+  if (r < 0.58) {
     currentEnemy.intent = 'normal';
-    currentEnemy.intentTxt = `⚠️ 적 예고: 일반 공격 (예상 피해 ${fmt(currentEnemy.atk)})`;
-  } else if (r < 0.85) {
+    currentEnemy.intentShort = `⚔️ 공격 (${fmt(currentEnemy.atk)})`;
+  } else if (r < 0.86) {
     currentEnemy.intent = 'heavy';
-    currentEnemy.intentTxt = `🔥 적 예고: 치명적인 강타 준비 중! (예상 피해 ${fmt(Math.floor(currentEnemy.atk * 1.65))})`;
+    currentEnemy.intentShort = `🔥 강타 (${fmt(Math.floor(currentEnemy.atk * 1.6))})`;
   } else {
     currentEnemy.intent = 'guard';
-    currentEnemy.intentTxt = `🛡️ 적 예고: 방어 태세 및 체력 회복 준비`;
+    currentEnemy.intentShort = `🛡️ 방어/재생`;
   }
 }
 
-function renderCombatUI() {
-  const eb = document.getElementById('enemy-box');
-  eb.classList.add('show');
-  document.getElementById('enemy-name').textContent = currentEnemy.name;
-  document.getElementById('enemy-hp-txt').textContent = `HP ${fmt(currentEnemy.hp)} / ${fmt(currentEnemy.maxHp)}`;
-  const pct = Math.max(0, Math.min(100, (currentEnemy.hp / currentEnemy.maxHp) * 100));
-  document.getElementById('enemy-hp-bar').style.width = pct + '%';
-  document.getElementById('enemy-intent').textContent = currentEnemy.stunned
-    ? '💫 상태: 기절함 (이번 턴 행동 불가!)'
-    : currentEnemy.intentTxt;
-
+function renderCombatChoices() {
+  if (!currentEnemy) return;
+  updateBattleStage(currentEnemy.icon, currentEnemy.name, true);
   const c = CLASSES[state.classKey];
-  const pTac = calcStatProb('dex', 1.0);
-  const skillMp = c.skillMp;
+  const s1 = c.skills[0];
+  const s3 = c.skills[2];
+  const s4 = c.skills[3];
 
-  document.getElementById('choices-wrap').innerHTML = `
-    <button class="choice-btn" onclick="combatAction('attack')">
+  let html = `
+    <button class="choice-btn" data-act="attack" onclick="combatAction('attack')">
       <div class="choice-left">
-        <span class="choice-title">⚔️ 정면 공격</span>
-        <span class="choice-desc">공격력 100% 피해 + MP 6 회복</span>
+        <span class="choice-title">⚔️ 기본 공격</span>
+        <span class="choice-desc">공격력 100% 피해 + MP 8 회복</span>
       </div>
-      <span class="choice-prob">명중 100%</span>
+      <span class="choice-prob">MP +8</span>
     </button>
-    <button class="choice-btn class-special" onclick="combatAction('skill')">
+    <button class="choice-btn class-special" data-act="s1" data-mp="${s1.mp}" onclick="combatAction('s1')">
       <div class="choice-left">
-        <span class="choice-title">${c.icon} ${c.skillName} (Lv.${state.skillLv})</span>
-        <span class="choice-desc">${c.skillDesc}</span>
+        <span class="choice-title">${c.icon} ${s1.name} (Lv.${state.skills.s1 || 1})</span>
+        <span class="choice-desc">${s1.desc}</span>
       </div>
-      <span class="choice-prob">MP ${skillMp}</span>
+      <span class="choice-prob">MP ${s1.mp}</span>
     </button>
-    <button class="choice-btn" onclick="combatAction('tactic', ${pTac})">
+  `;
+
+  if (state.lv >= s3.reqLv) {
+    html += `
+      <button class="choice-btn class-special" data-act="s3" data-mp="${s3.mp}" onclick="combatAction('s3')">
+        <div class="choice-left">
+          <span class="choice-title">⚡ ${s3.name} (Lv.${state.skills.s3 || 1})</span>
+          <span class="choice-desc">${s3.desc}</span>
+        </div>
+        <span class="choice-prob">MP ${s3.mp}</span>
+      </button>
+    `;
+  }
+
+  if (state.lv >= s4.reqLv) {
+    html += `
+      <button class="choice-btn class-special" data-act="s4" data-mp="${s4.mp}" style="border-color:#ff9f1a;" onclick="combatAction('s4')">
+        <div class="choice-left">
+          <span class="choice-title">🌟 [궁극기] ${s4.name} (Lv.${state.skills.s4 || 1})</span>
+          <span class="choice-desc">${s4.desc}</span>
+        </div>
+        <span class="choice-prob" style="color:#ff9f1a;">MP ${s4.mp}</span>
+      </button>
+    `;
+  }
+
+  html += `
+    <button class="choice-btn" data-act="heal" onclick="combatAction('heal')">
       <div class="choice-left">
-        <span class="choice-title">⚡ 약점 간파 & 회피 반격</span>
-        <span class="choice-desc">[민첩 판정] 성공 시 적 공격 완전 회피 + 치명타 반격!</span>
-      </div>
-      <span class="choice-prob">민첩 ${pTac}%</span>
-    </button>
-    <button class="choice-btn" onclick="combatAction('flee')">
-      <div class="choice-left">
-        <span class="choice-title">🧪 응급 회복 / 전술적 후퇴</span>
-        <span class="choice-desc">체력 35% 즉시 회복 (50 골드 소모)</span>
+        <span class="choice-title">🧪 응급 비약 복용</span>
+        <span class="choice-desc">체력 40% & 마나 30% 즉시 회복</span>
       </div>
       <span class="choice-prob">50 G</span>
     </button>
   `;
+
+  document.getElementById('choices-wrap').innerHTML = html;
 }
 
-function combatAction(act, prob = 100) {
+function combatAction(act) {
   if (!currentEnemy) return;
   const { stats } = getTotalStats();
   const c = CLASSES[state.classKey];
   let logMsg = '';
-  let evaded = false;
 
-  if (act === 'flee') {
+  if (act === 'heal') {
     if (state.gold < 50) {
       SFX.play('fail');
-      addLog(`골드가 부족해 응급 물약을 사용할 수 없습니다!`);
+      addLog('골드가 부족해 비약을 사용할 수 없습니다!');
       return;
     }
     state.gold -= 50;
-    const heal = Math.floor(stats.maxHp * 0.35);
-    state.hp = Math.min(stats.maxHp, state.hp + heal);
+    const h = Math.floor(stats.maxHp * 0.4);
+    state.hp = Math.min(stats.maxHp, state.hp + h);
+    state.mp = Math.min(stats.maxMp, state.mp + Math.floor(stats.maxMp * 0.3));
     SFX.play('success');
-    logMsg += `🧪 응급 비약을 마셔 HP +${fmt(heal)} 회복했습니다.<br>`;
-  } else if (act === 'skill') {
-    if (state.mp < c.skillMp) {
-      SFX.play('fail');
-      addLog(`MP가 부족합니다! 일반 공격으로 마나를 회복하세요.`);
-      return;
-    }
-    state.mp -= c.skillMp;
-    SFX.play('hit');
-    const skillScale = c.skillMult + (state.skillLv - 1) * 0.25;
-    let dmg = Math.floor(stats.atk * skillScale);
-    const isCrit = state.classKey === 'rogue' || (Math.random() * 100 < stats.crit);
-    if (isCrit) dmg = Math.floor(dmg * (stats.critDmg / 100));
-
-    currentEnemy.hp -= dmg;
-    logMsg += `💥 <strong>[${c.skillName}]</strong> 적중! ${isCrit ? '치명타! ' : ''}<strong>${fmt(dmg)}</strong> 피해!<br>`;
-
-    if (state.classKey === 'warrior' && Math.random() < 0.35) {
-      currentEnemy.stunned = true;
-      logMsg += `💫 강렬한 충격으로 적이 기절했습니다!<br>`;
-    }
-    if (state.classKey === 'cleric') {
-      const h = Math.floor(stats.maxHp * 0.2);
-      state.hp = Math.min(stats.maxHp, state.hp + h);
-      logMsg += `✨ 신성력으로 HP +${fmt(h)} 회복!<br>`;
-    }
-  } else if (act === 'tactic') {
-    if (Math.random() * 100 < prob) {
-      SFX.play('hit');
-      evaded = true;
-      const dmg = Math.floor(stats.atk * (stats.critDmg / 100) * 1.25);
-      currentEnemy.hp -= dmg;
-      logMsg += `⚡ 적의 빈틈을 완벽히 파고들어 공격을 흘리고 <strong>${fmt(dmg)}</strong> 치명타 반격!<br>`;
-    } else {
-      SFX.play('fail');
-      logMsg += `❌ 약점 간파에 실패하여 자세가 무너졌습니다!<br>`;
-    }
+    playCombatAnim('enemy', `+${fmt(h)}`, '#4cd964');
+    logMsg += `🧪 비약을 마셔 HP +${fmt(h)} 회복!<br>`;
   } else {
-    // 일반 공격
+    let mult = 1.0;
+    let skillName = '기본 공격';
+    if (act === 'attack') {
+      state.mp = Math.min(stats.maxMp, state.mp + 8);
+    } else {
+      const skObj = c.skills.find(x => x.id === act);
+      if (!skObj || state.mp < skObj.mp) {
+        // 마나 부족 시 평타로 자동 전환
+        state.mp = Math.min(stats.maxMp, state.mp + 8);
+      } else {
+        state.mp -= skObj.mp;
+        const sLv = state.skills[act] || 1;
+        mult = skObj.mult + (sLv - 1) * 0.35;
+        skillName = skObj.name;
+
+        if (act === 's4' || (state.classKey === 'warrior' && Math.random() < 0.35) || (state.classKey === 'mage' && act === 's3' && Math.random() < 0.4)) {
+          currentEnemy.stunned = true;
+        }
+        if (state.classKey === 'cleric') {
+          const healAmt = Math.floor(stats.maxHp * (act === 's4' ? 0.5 : 0.2));
+          state.hp = Math.min(stats.maxHp, state.hp + healAmt);
+        }
+      }
+    }
+
     SFX.play('hit');
-    state.mp = Math.min(stats.maxMp, state.mp + 6);
-    let dmg = stats.atk;
-    const isCrit = Math.random() * 100 < stats.crit;
+    const isCrit = act === 's4' || (state.classKey === 'rogue' && act !== 'attack') || (Math.random() * 100 < stats.crit);
+    let dmg = Math.floor(stats.atk * mult);
     if (isCrit) dmg = Math.floor(dmg * (stats.critDmg / 100));
     if (currentEnemy.intent === 'guard') dmg = Math.floor(dmg * 0.65);
+
     currentEnemy.hp -= dmg;
-    logMsg += `⚔️ 공격 적중! ${isCrit ? '치명타! ' : ''}<strong>${fmt(dmg)}</strong> 피해! (MP +6)<br>`;
+    if (stats.vamp > 0) {
+      state.hp = Math.min(stats.maxHp, state.hp + Math.max(1, Math.floor(dmg * (stats.vamp / 100))));
+    }
+
+    playCombatAnim('hero', `${isCrit ? '💥' : ''}-${fmt(dmg)}`, isCrit ? '#ffd180' : '#ffffff', isCrit);
+    logMsg += `⚔️ <strong>[${skillName}]</strong> ${isCrit ? '치명타! ' : ''}<strong>${fmt(dmg)}</strong> 피해!<br>`;
   }
 
-  // 생명력 흡수 반영
-  if (stats.vamp > 0 && (act === 'attack' || act === 'skill' || evaded)) {
-    const vHeal = Math.max(1, Math.floor(stats.atk * (stats.vamp / 100)));
-    state.hp = Math.min(stats.maxHp, state.hp + vHeal);
-  }
-
-  // 적 처치 판정
   if (currentEnemy.hp <= 0) {
     winCombat(logMsg);
     return;
@@ -1820,32 +2281,28 @@ function combatAction(act, prob = 100) {
 
   // 적 턴 행동
   if (currentEnemy.stunned) {
-    logMsg += `💫 적이 기절해 공격하지 못했습니다!`;
+    logMsg += `💫 적이 기절하여 행동하지 못했습니다!`;
     currentEnemy.stunned = false;
-  } else if (!evaded) {
+  } else {
     if (currentEnemy.intent === 'guard') {
-      const eHeal = Math.floor(currentEnemy.maxHp * 0.08);
-      currentEnemy.hp = Math.min(currentEnemy.maxHp, currentEnemy.hp + eHeal);
-      logMsg += `🛡️ 적이 방어 태세로 HP +${fmt(eHeal)} 회복했습니다.`;
+      const eh = Math.floor(currentEnemy.maxHp * 0.08);
+      currentEnemy.hp = Math.min(currentEnemy.maxHp, currentEnemy.hp + eh);
+      logMsg += `🛡️ 적이 방어 태세로 HP +${fmt(eh)} 회복했습니다.`;
     } else {
-      const eDmg = currentEnemy.intent === 'heavy'
-        ? Math.floor(currentEnemy.atk * 1.65)
-        : currentEnemy.atk;
+      const eDmg = currentEnemy.intent === 'heavy' ? Math.floor(currentEnemy.atk * 1.6) : currentEnemy.atk;
       state.hp -= eDmg;
-      logMsg += `🩸 적의 반격! <strong>HP -${fmt(eDmg)}</strong> 피해!`;
+      setTimeout(() => playCombatAnim('enemy', `-${fmt(eDmg)}`, '#ff5252'), 180);
+      logMsg += `🩸 적의 공격! <strong>HP -${fmt(eDmg)}</strong> 피해!`;
     }
   }
 
-  // 플레이어 사망 체크 (무한 성장 구조이므로 패널티 후 부활)
   if (state.hp <= 0) {
     SFX.play('fail');
-    state.hp = Math.floor(stats.maxHp * 0.5);
-    const lostGold = Math.floor(state.gold * 0.15);
+    state.hp = Math.floor(stats.maxHp * 0.6);
+    const lostGold = Math.floor(state.gold * 0.1);
     state.gold -= lostGold;
-    state.depth = Math.max(1, state.depth - 1);
     currentEnemy = null;
-    document.getElementById('enemy-box').classList.remove('show');
-    showResultAndNext(`${logMsg}<br><br>💀 쓰러졌으나 수호성의 가호로 부활했습니다. (골드 -${fmt(lostGold)}, 심연 1층 후퇴)`);
+    advanceNodeAndShowNext(`${logMsg}<br><br>💀 쓰러졌으나 수호성의 가호로 즉시 부활했습니다! (골드 -${fmt(lostGold)})`);
     return;
   }
 
@@ -1854,7 +2311,7 @@ function combatAction(act, prob = 100) {
   rb.classList.add('show');
 
   rollEnemyIntent();
-  renderCombatUI();
+  renderCombatChoices();
   updateHUD();
 }
 
@@ -1862,39 +2319,43 @@ function winCombat(logMsg) {
   const { stats } = getTotalStats();
   const isBoss = currentEnemy.tier === 'boss';
   const isElite = currentEnemy.tier === 'elite';
-  const mult = isBoss ? 4.0 : isElite ? 2.0 : 1.0;
+  const mult = isBoss ? 4.2 : isElite ? 2.0 : 1.0;
 
-  const goldGain = Math.floor((15 + state.depth * 6) * mult * (1 + stats.goldPct / 100));
-  const expGain = Math.floor((22 + state.depth * 8) * (isBoss ? 3.5 : isElite ? 1.8 : 1.0));
+  const goldGain = Math.floor((18 + state.depth * 7) * mult * (1 + stats.goldPct / 100));
+  const expGain = Math.floor((24 + state.depth * 9) * (isBoss ? 3.8 : isElite ? 1.8 : 1.0) * (1 + (state.relics.compass || 0) * 0.3));
 
   state.gold += goldGain;
+  state.records.kills = (state.records.kills || 0) + 1;
+  if (state.quests && state.quests[0]) state.quests[0].prog++;
+  if (isBoss) {
+    state.soulStones += 1 + Math.floor(state.depth / 10);
+    state.dungeonTickets = Math.min(5, (state.dungeonTickets || 0) + 1);
+  }
+
   gainExp(expGain);
 
   let dropHtml = '';
-  const dropChance = isBoss ? 1.0 : isElite ? 0.75 : 0.42;
+  const dropChance = isBoss ? 1.0 : isElite ? 0.78 : 0.45;
   if (Math.random() < dropChance) {
     const minGrade = isBoss ? 3 : isElite ? 1 : 0;
-    const itm = generateItem(state.depth, minGrade, Math.random() < 0.2);
-    acquireItemWithChest(itm, isBoss); // 보스는 상자 모달 오픈
-    dropHtml = `<br>🎁 전리품 획득: <span class="${itm.gradeCls}">[${itm.gradeName}] ${itm.unidentified ? '미감정 ' + itm.slotName : itm.name}</span>`;
+    const itm = generateItem(state.depth, minGrade, Math.random() < 0.18);
+    acquireItemWithChest(itm, isBoss);
+    dropHtml = `<br>🎁 전리품: <span class="${itm.gradeCls}">[${itm.gradeName}] ${itm.unidentified ? '미감정 ' + itm.slotName : itm.name}</span>`;
   }
 
-  const enemyName = currentEnemy.name;
+  const eName = currentEnemy.name;
   currentEnemy = null;
-  document.getElementById('enemy-box').classList.remove('show');
-
-  addLog(`🏆 ${enemyName} 처치! (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)`);
-  showResultAndNext(`${logMsg}<br>🏆 <strong>${enemyName} 처치!</strong><br>🪙 골드 +${fmt(goldGain)} / ✨ 경험치 +${fmt(expGain)}${dropHtml}`);
+  updateBattleStage('🏆', '전투 승리!', false);
+  advanceNodeAndShowNext(`${logMsg}🏆 <strong>${eName} 처치!</strong> (+${fmt(goldGain)}G, +${fmt(expGain)}EXP)${isBoss ? '<br>💎 보스 처치 보상: 영혼석 & 던전 티켓 획득!' : ''}${dropHtml}`);
 }
 
-// 경험치 및 레벨업 처리
 function gainExp(amount) {
   state.exp += amount;
   while (state.exp >= state.reqExp) {
     state.exp -= state.reqExp;
     state.lv++;
     state.statPts += 4;
-    state.reqExp = Math.floor(50 * Math.pow(state.lv, 1.65));
+    state.reqExp = Math.floor(48 * Math.pow(state.lv, 1.62));
     const { stats } = getTotalStats();
     state.hp = stats.maxHp;
     state.mp = stats.maxMp;
@@ -1912,39 +2373,43 @@ function addLog(msg) {
 }
 
 // =========================================================================
-// UI 렌더링 (HUD, 캐릭터, 인벤토리, 강화/감정 모달, 상점)
+// 탭 UI 렌더링 (캐릭터/전직, 인벤토리/합성, 스킬/환생, 던전/상점, 도감/업적)
 // =========================================================================
 function updateHUD() {
   if (!state) return;
-  const { stats } = getTotalStats();
+  const { stats, promo } = getTotalStats();
   state.hp = Math.min(stats.maxHp, state.hp);
   state.mp = Math.min(stats.maxMp, state.mp);
 
   const c = CLASSES[state.classKey];
   document.getElementById('hud-class-icon').textContent = c.icon;
   document.getElementById('hud-lv').textContent = `Lv.${state.lv}`;
-  document.getElementById('hud-title').textContent = c.title;
-  document.getElementById('hud-depth').textContent = `심연 ${state.depth}층`;
+  document.getElementById('hud-title').textContent = promo.title;
+  document.getElementById('hud-tier').textContent = `${state.jobTier}차`;
+  document.getElementById('hud-depth').textContent = `${state.ngPlus > 0 ? 'NG+' + state.ngPlus + ' ' : ''}심연 ${state.depth}층`;
 
   document.getElementById('hud-hp-bar').style.width = `${(state.hp / stats.maxHp) * 100}%`;
   document.getElementById('hud-hp-txt').textContent = `HP ${fmt(state.hp)}/${fmt(stats.maxHp)}`;
-
   document.getElementById('hud-mp-bar').style.width = `${(state.mp / stats.maxMp) * 100}%`;
   document.getElementById('hud-mp-txt').textContent = `MP ${fmt(state.mp)}/${fmt(stats.maxMp)}`;
-
   document.getElementById('hud-exp-bar').style.width = `${Math.min(100, (state.exp / state.reqExp) * 100)}%`;
 
   document.getElementById('hud-gold').textContent = fmt(state.gold);
   document.getElementById('hud-dust').textContent = fmt(state.dust);
+  document.getElementById('hud-soul').textContent = fmt(state.soulStones);
   document.getElementById('hud-rep').textContent = state.rep;
 
   let flagsTxt = '';
   if (state.flags.blessed > 0) flagsTxt += `✨축복(${state.flags.blessed}) `;
   if (state.flags.cursed > 0)  flagsTxt += `💀저주(${state.flags.cursed}) `;
-  if (state.flags.companion)   flagsTxt += `🛡️용병동행`;
+  if (state.flags.companion)   flagsTxt += `🛡️용병`;
   document.getElementById('hud-status-flags').textContent = flagsTxt;
 
-  document.getElementById('dot-char').classList.toggle('show', state.statPts > 0);
+  // 전직 가능 알림 도트
+  const nextPromo = c.promotions[state.jobTier];
+  const canPromote = nextPromo && state.lv >= nextPromo.reqLv;
+  document.getElementById('dot-char').classList.toggle('show', state.statPts > 0 || canPromote);
+  document.getElementById('dot-skill').classList.toggle('show', state.lv >= 20 || state.depth >= 15);
 }
 
 function switchTab(tabId, btn) {
@@ -1964,10 +2429,30 @@ function switchTab(tabId, btn) {
   if (tabId === 'codex') renderCodexTab();
 }
 
+// 캐릭터 & 전직 탭
 function renderCharTab() {
-  const { stats, setCounts } = getTotalStats();
-  document.getElementById('stat-pts').textContent = state.statPts;
+  const { stats, setCounts, promo } = getTotalStats();
+  const c = CLASSES[state.classKey];
+  document.getElementById('job-tier-txt').textContent = `${state.jobTier}차: ${promo.title}`;
 
+  const nextPromo = c.promotions[state.jobTier];
+  const promoBox = document.getElementById('promotion-box');
+  if (!nextPromo) {
+    promoBox.innerHTML = `<div style="font-size:12px; color:#00f5d4; font-weight:700;">🌟 최종 5차 신화 전직을 모두 달성했습니다! (모든 능력치 극대화)</div>`;
+  } else {
+    const canP = state.lv >= nextPromo.reqLv;
+    promoBox.innerHTML = `
+      <div class="item-row" style="cursor:default;">
+        <div>
+          <div style="font-weight:700; color:var(--border-bright);">${nextPromo.tier}차 전직: [${nextPromo.title}]</div>
+          <div style="font-size:11px; color:var(--text-muted);">요구 레벨: Lv.${nextPromo.reqLv} | 보상: 올스탯 +${nextPromo.allStat}, 공/체 x${nextPromo.atkMult}배, 전용 오라</div>
+        </div>
+        <button class="btn-sm" ${!canP ? 'disabled' : ''} onclick="promoteJob()">전직 돌파</button>
+      </div>
+    `;
+  }
+
+  document.getElementById('stat-pts').textContent = state.statPts;
   const statNames = [
     { k: 'str', label: '💪 힘 (STR)' },
     { k: 'dex', label: '🏃 민첩 (DEX)' },
@@ -1975,10 +2460,9 @@ function renderCharTab() {
     { k: 'cha', label: '👑 매력 (CHA)' },
     { k: 'luk', label: '🍀 행운 (LUK)' }
   ];
-
   document.getElementById('stat-grid').innerHTML = statNames.map(st => `
     <div class="stat-item">
-      <span>${st.label}: <strong>${stats[st.k]}</strong> <span style="color:#777">(${state.stats[st.k]})</span></span>
+      <span>${st.label}: <strong>${stats[st.k]}</strong></span>
       <button class="btn-sm" ${state.statPts <= 0 ? 'disabled' : ''} onclick="investStat('${st.k}')">+1</button>
     </div>
   `).join('');
@@ -1989,31 +2473,34 @@ function renderCharTab() {
     <div class="stat-item"><span>⚡ 치명타 확률</span><strong>${stats.crit}%</strong></div>
     <div class="stat-item"><span>💥 치명타 피해</span><strong>${stats.critDmg}%</strong></div>
     <div class="stat-item"><span>🩸 생명력 흡수</span><strong>${stats.vamp}%</strong></div>
-    <div class="stat-item"><span>🪙 골드 획득량</span><strong>+${stats.goldPct}%</strong></div>
+    <div class="stat-item"><span>🪙 골드 보너스</span><strong>+${stats.goldPct}%</strong></div>
   `;
 
-  // 세트 효과 표시
   let setHtml = '';
   SETS.forEach(st => {
     const cnt = setCounts[st.id] || 0;
-    if (cnt > 0) {
-      setHtml += `<div>• [${st.name}] (${cnt}/4장착) ${cnt >= 2 ? '✅2세트: ' + st.bonus2 : ''} ${cnt >= 4 ? ' / ✅4세트: ' + st.bonus4 : ''}</div>`;
-    }
+    if (cnt > 0) setHtml += `<div>• [${st.name}] (${cnt}/4) ${cnt >= 2 ? '✅' + st.bonus2 : ''} ${cnt >= 4 ? ' / ✅' + st.bonus4 : ''}</div>`;
   });
-  document.getElementById('active-sets-box').innerHTML = setHtml || '<span style="color:#777">활성화된 세트 효과가 없습니다.</span>';
+  document.getElementById('active-sets-box').innerHTML = setHtml || '<span style="color:#777">장착 중인 세트 효과 없음</span>';
 
-  // 장착 슬롯 렌더링
   document.getElementById('equipped-grid').innerHTML = SLOTS.map(sl => {
     const itm = state.equipped[sl.id];
-    if (!itm) {
-      return `<div class="item-row" style="opacity:0.5;"><span>${sl.icon} ${sl.name}: 비어있음</span></div>`;
-    }
-    return `
-      <div class="item-row" onclick="openItemDetail('${itm.uid}', true)">
-        <span class="${itm.gradeCls}">${itm.icon} ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''}</span>
-      </div>
-    `;
+    if (!itm) return `<div class="item-row" style="opacity:0.45;"><span>${sl.icon} ${sl.name}: 비어있음</span></div>`;
+    return `<div class="item-row" onclick="openItemDetail('${itm.uid}', true)"><span class="${itm.gradeCls}">${itm.icon} ${itm.name} ${itm.enhance ? '+' + itm.enhance : ''}</span></div>`;
   }).join('');
+}
+
+function promoteJob() {
+  const c = CLASSES[state.classKey];
+  const nextPromo = c.promotions[state.jobTier];
+  if (!nextPromo || state.lv < nextPromo.reqLv) return;
+  state.jobTier++;
+  triggerScreenFlash('#00f5d4');
+  SFX.play('legend');
+  addLog(`👑 축하합니다! ${state.jobTier}차 전직 [${nextPromo.title}] 달성!`);
+  updateHUD();
+  renderCharTab();
+  saveGame();
 }
 
 function investStat(k) {
@@ -2026,14 +2513,14 @@ function investStat(k) {
   saveGame();
 }
 
+// 인벤토리 & 동일등급 3개 합성
 function renderInvTab() {
   document.getElementById('inv-count').textContent = state.inventory.length;
   const list = document.getElementById('inv-list');
   if (state.inventory.length === 0) {
-    list.innerHTML = `<div class="card" style="text-align:center; color:#777;">보유 중인 장비가 없습니다. 모험에서 전리품을 획득하세요!</div>`;
+    list.innerHTML = `<div class="card" style="text-align:center; color:#777;">보유 중인 장비가 없습니다.</div>`;
     return;
   }
-
   list.innerHTML = state.inventory.map(itm => {
     const title = itm.unidentified
       ? `<span style="color:#ffd180">❓ 미감정 ${itm.slotName} (Lv.${itm.lv})</span>`
@@ -2042,17 +2529,46 @@ function renderInvTab() {
       <div class="item-row" onclick="openItemDetail('${itm.uid}', false)">
         <div>
           <div style="font-weight:700;">${title}</div>
-          <div style="font-size:11px; color:var(--text-muted);">
+          <div style="font-size:10.5px; color:var(--text-muted);">
             ${itm.unidentified ? '클릭하여 감정하기' : `기본 ${itm.baseStat.toUpperCase()} +${Math.floor(itm.baseVal * (1 + (itm.enhance || 0) * 0.12))} | 옵션 ${itm.options.length}줄`}
           </div>
         </div>
-        <span class="btn-sm">상세/강화</span>
+        <span class="btn-sm">관리</span>
       </div>
     `;
   }).join('');
 }
 
-// 아이템 상세 / 장착 / 강화 / 옵션 재설정 / 감정 모달
+function synthesizeAll() {
+  let synthCount = 0;
+  for (let gIdx = 0; gIdx < GRADES.length - 1; gIdx++) {
+    while (true) {
+      const candidates = state.inventory.filter(x => !x.unidentified && x.gradeIdx === gIdx);
+      if (candidates.length < 3) break;
+      const toRemove = candidates.slice(0, 3).map(x => x.uid);
+      state.inventory = state.inventory.filter(x => !toRemove.includes(x.uid));
+      const newItem = generateItem(state.depth + 1, gIdx + 1, false);
+      newItem.gradeIdx = gIdx + 1;
+      newItem.gradeId = GRADES[gIdx + 1].id;
+      newItem.gradeName = GRADES[gIdx + 1].name;
+      newItem.gradeCls = GRADES[gIdx + 1].cls;
+      state.inventory.unshift(newItem);
+      synthCount++;
+    }
+  }
+  if (synthCount > 0) {
+    SFX.play('legend');
+    addLog(`⚗️ 장비 합성으로 상위 등급 장비 ${synthCount}개를 연성했습니다!`);
+    renderInvTab();
+    updateHUD();
+    saveGame();
+  } else {
+    SFX.play('fail');
+    alert('동일한 등급의 감정된 장비가 최소 3개 필요합니다.');
+  }
+}
+
+// 아이템 상세 / 강화 / 리롤 / 감정 모달
 function openItemDetail(uid, isEquipped) {
   SFX.play('click');
   let item = isEquipped
@@ -2068,13 +2584,10 @@ function openItemDetail(uid, isEquipped) {
     const idCost = 25 + item.lv * 8;
     content.innerHTML = `
       <div style="text-align:center;">
-        <div style="font-size:40px;">❓</div>
-        <div style="font-size:16px; font-weight:700; color:#ffd180;">미감정 ${item.slotName} (Lv.${item.lv})</div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">마력이 봉인되어 있어 진정한 등급과 옵션을 알 수 없습니다.</div>
+        <div style="font-size:38px;">❓</div>
+        <div style="font-size:15px; font-weight:700; color:#ffd180;">미감정 ${item.slotName} (Lv.${item.lv})</div>
       </div>
-      <button class="choice-btn" style="justify-content:center;" onclick="identifyItem('${item.uid}', ${idCost})">
-        🔍 감정하기 (${fmt(idCost)} 골드)
-      </button>
+      <button class="choice-btn" style="justify-content:center;" onclick="identifyItem('${item.uid}', ${idCost})">🔍 감정하기 (${fmt(idCost)} G)</button>
       <button class="choice-btn" style="justify-content:center;" onclick="closeModal()">닫기</button>
     `;
     return;
@@ -2082,82 +2595,50 @@ function openItemDetail(uid, isEquipped) {
 
   const enh = item.enhance || 0;
   const curBase = Math.floor(item.baseVal * (1 + enh * 0.12));
-  const enhCost = Math.floor((35 + item.lv * 12) * Math.pow(1.35, enh));
-  const enhProb = enh < 5 ? 90 - enh * 5 : enh < 10 ? 60 - (enh - 5) * 4 : Math.max(12, 30 - (enh - 10) * 3);
+  const discount = Math.max(0.4, 1 - (state.relics.hammer || 0) * 0.05);
+  const enhCost = Math.floor((35 + item.lv * 12) * Math.pow(1.35, enh) * discount);
+  const enhProb = enh < 5 ? 90 - enh * 5 : enh < 10 ? 60 - (enh - 5) * 4 : Math.max(15, 32 - (enh - 10) * 3);
   const rerollCost = 5 + item.gradeIdx * 3;
 
   const optsHtml = item.options.map(o => `
-    <div style="font-size:12px; padding:2px 0;">
-      • <strong style="color:#e6c88a">[T${o.tier}]</strong> ${o.name} <strong>+${o.val}${o.unit}</strong>
-      <span style="color:#777">(${o.min}~${o.max}${o.unit})</span>
-    </div>
+    <div style="font-size:11.5px; padding:1px 0;">• <strong style="color:#e6c88a">[T${o.tier}]</strong> ${o.name} <strong>+${o.val}${o.unit}</strong> <span style="color:#777">(${o.min}~${o.max}${o.unit})</span></div>
   `).join('');
 
   content.innerHTML = `
     <div>
-      <div class="${item.gradeCls}" style="font-size:16px; font-weight:800;">
-        ${item.icon} [${item.gradeName}] ${item.name} ${enh ? '+' + enh : ''}
-      </div>
-      <div style="font-size:11px; color:var(--text-muted);">
-        슬롯: ${item.slotName} | 요구 제한 없음 (아이템 레벨 ${item.lv})
-        ${item.setName ? ` | <span style="color:#4cd964">세트: ${item.setName}</span>` : ''}
-      </div>
+      <div class="${item.gradeCls}" style="font-size:15px; font-weight:800;">${item.icon} [${item.gradeName}] ${item.name} ${enh ? '+' + enh : ''}</div>
+      <div style="font-size:11px; color:var(--text-muted);">슬롯: ${item.slotName} (Lv.${item.lv}) ${item.setName ? `| <span style="color:#4cd964">세트: ${item.setName}</span>` : ''}</div>
     </div>
-
     <div class="card">
-      <div style="font-size:13px; font-weight:700; margin-bottom:6px;">
-        기본 성능: ${item.baseStat.toUpperCase()} +${curBase} ${enh ? `<span style="color:#4cd964">(강화 +${enh * 12}%)</span>` : ''}
-      </div>
+      <div style="font-size:12px; font-weight:700; margin-bottom:4px;">기본: ${item.baseStat.toUpperCase()} +${curBase}</div>
       ${optsHtml}
     </div>
-
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-      <button class="choice-btn" style="justify-content:center;" onclick="toggleEquip('${item.uid}', ${isEquipped})">
-        ${isEquipped ? '📥 장착 해제' : '⚔️ 장착하기'}
-      </button>
-      <button class="choice-btn" style="justify-content:center;" onclick="enhanceItem('${item.uid}', ${isEquipped}, ${enhCost}, ${enhProb})">
-        🔨 강화 (+${enh + 1} / ${enhProb}%)<br><span style="font-size:10px; color:var(--accent-gold)">${fmt(enhCost)} G</span>
-      </button>
-      <button class="choice-btn" style="justify-content:center;" onclick="rerollItem('${item.uid}', ${isEquipped}, ${rerollCost})">
-        🎲 옵션 재설정<br><span style="font-size:10px; color:#b589ff">✨가루 ${rerollCost}개</span>
-      </button>
-      ${!isEquipped ? `
-      <button class="choice-btn" style="justify-content:center; border-color:#802f2f;" onclick="salvageSingle('${item.uid}')">
-        ♻️ 분해 (가루 +${(item.gradeIdx + 1) * 4})
-      </button>` : `<button class="choice-btn" style="justify-content:center;" onclick="closeModal()">닫기</button>`}
+      <button class="choice-btn" style="justify-content:center;" onclick="toggleEquip('${item.uid}', ${isEquipped})">${isEquipped ? '📥 장착 해제' : '⚔️ 장착하기'}</button>
+      <button class="choice-btn" style="justify-content:center;" onclick="enhanceItem('${item.uid}', ${isEquipped}, ${enhCost}, ${enhProb})">🔨 강화 (+${enh + 1} / ${enhProb}%)<br><span style="font-size:10px; color:var(--accent-gold)">${fmt(enhCost)} G</span></button>
+      <button class="choice-btn" style="justify-content:center;" onclick="rerollItem('${item.uid}', ${isEquipped}, ${rerollCost})">🎲 옵션 재설정<br><span style="font-size:10px; color:#c08cff">✨가루 ${rerollCost}</span></button>
+      ${!isEquipped ? `<button class="choice-btn" style="justify-content:center; border-color:#802f2f;" onclick="salvageSingle('${item.uid}')">♻️ 분해 (+${(item.gradeIdx + 1) * 4}가루)</button>` : `<button class="choice-btn" style="justify-content:center;" onclick="closeModal()">닫기</button>`}
     </div>
-    ${!isEquipped ? `<button class="btn-sm" style="padding:8px;" onclick="closeModal()">닫기</button>` : ''}
+    ${!isEquipped ? `<button class="btn-sm" style="padding:7px;" onclick="closeModal()">닫기</button>` : ''}
   `;
 }
 
 function identifyItem(uid, cost) {
-  if (state.gold < cost) {
-    SFX.play('fail');
-    alert('골드가 부족합니다!');
-    return;
-  }
+  if (state.gold < cost) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
   state.gold -= cost;
   const item = state.inventory.find(x => x.uid === uid);
   if (!item) return;
   item.unidentified = false;
-  if (item.gradeIdx >= 4) {
-    triggerScreenFlash(GRADES[item.gradeIdx].color);
-    SFX.play('legend');
-  } else {
-    SFX.play('success');
-  }
-  updateHUD();
-  renderInvTab();
-  openItemDetail(uid, false);
-  saveGame();
+  if (item.gradeIdx >= 4) { triggerScreenFlash(GRADES[item.gradeIdx].color); SFX.play('legend'); }
+  else SFX.play('success');
+  updateHUD(); renderInvTab(); openItemDetail(uid, false); saveGame();
 }
 
 function toggleEquip(uid, isEquipped) {
   SFX.play('click');
   if (isEquipped) {
     const slotKey = Object.keys(state.equipped).find(k => state.equipped[k] && state.equipped[k].uid === uid);
-    if (!slotKey) return;
-    if (state.inventory.length >= 30) { alert('인벤토리가 가득 찼습니다.'); return; }
+    if (!slotKey || state.inventory.length >= 35) return;
     state.inventory.unshift(state.equipped[slotKey]);
     state.equipped[slotKey] = null;
   } else {
@@ -2169,67 +2650,35 @@ function toggleEquip(uid, isEquipped) {
     state.inventory.splice(idx, 1);
     if (prev) state.inventory.unshift(prev);
   }
-  closeModal();
-  updateHUD();
-  renderCharTab();
-  renderInvTab();
-  saveGame();
+  closeModal(); updateHUD(); renderCharTab(); renderInvTab(); saveGame();
 }
 
 function enhanceItem(uid, isEquipped, cost, prob) {
-  if (state.gold < cost) {
-    SFX.play('fail');
-    alert('강화 골드가 부족합니다!');
-    return;
-  }
+  if (state.gold < cost) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
   state.gold -= cost;
-  let item = isEquipped
-    ? Object.values(state.equipped).find(x => x && x.uid === uid)
-    : state.inventory.find(x => x.uid === uid);
+  let item = isEquipped ? Object.values(state.equipped).find(x => x && x.uid === uid) : state.inventory.find(x => x.uid === uid);
   if (!item) return;
 
   if (Math.random() * 100 < prob) {
     item.enhance = (item.enhance || 0) + 1;
+    if (item.enhance > (state.records.maxEnh || 0)) state.records.maxEnh = item.enhance;
     SFX.play('success');
     addLog(`🔨 [${item.name}] +${item.enhance} 강화 성공!`);
   } else {
     SFX.play('fail');
-    if ((item.enhance || 0) >= 11 && Math.random() < 0.1) {
-      // 파괴
-      const dustGain = (item.gradeIdx + 1) * 12;
-      state.dust += dustGain;
-      if (isEquipped) state.equipped[item.slotId] = null;
-      else state.inventory = state.inventory.filter(x => x.uid !== uid);
-      addLog(`💥 강화 실패로 [${item.name}]이(가) 파괴되어 마력 가루 +${dustGain}개가 되었습니다...`);
-      closeModal();
-      updateHUD(); renderCharTab(); renderInvTab(); saveGame();
-      return;
-    } else if ((item.enhance || 0) >= 6 && Math.random() < 0.35) {
+    if ((item.enhance || 0) >= 6 && Math.random() < 0.3) {
       item.enhance--;
-      addLog(`📉 강화 실패로 [${item.name}] 등급이 +${item.enhance}(으)로 하락했습니다.`);
-    } else {
-      addLog(`💦 [${item.name}] 강화에 실패했으나 수치는 유지되었습니다.`);
+      addLog(`📉 강화 실패로 [${item.name}] 수치가 +${item.enhance}(으)로 하락했습니다.`);
     }
   }
-  updateHUD();
-  renderCharTab();
-  renderInvTab();
-  openItemDetail(uid, isEquipped);
-  saveGame();
+  updateHUD(); renderCharTab(); renderInvTab(); openItemDetail(uid, isEquipped); saveGame();
 }
 
 function rerollItem(uid, isEquipped, dustCost) {
-  if (state.dust < dustCost) {
-    SFX.play('fail');
-    alert('마력 가루가 부족합니다! (불필요한 장비를 분해해 획득하세요)');
-    return;
-  }
+  if (state.dust < dustCost) { SFX.play('fail'); alert('마력 가루가 부족합니다!'); return; }
   state.dust -= dustCost;
-  let item = isEquipped
-    ? Object.values(state.equipped).find(x => x && x.uid === uid)
-    : state.inventory.find(x => x.uid === uid);
+  let item = isEquipped ? Object.values(state.equipped).find(x => x && x.uid === uid) : state.inventory.find(x => x.uid === uid);
   if (!item) return;
-
   SFX.play('success');
   item.options = item.options.map(() => {
     const raw = OPT_POOL[Math.floor(Math.random() * OPT_POOL.length)];
@@ -2238,26 +2687,17 @@ function rerollItem(uid, isEquipped, dustCost) {
     const tier = rollRatio >= 0.85 ? 1 : rollRatio >= 0.65 ? 2 : rollRatio >= 0.45 ? 3 : rollRatio >= 0.25 ? 4 : 5;
     return { id: raw.id, name: raw.name, val, unit: raw.unit, min: raw.min, max: raw.max, tier };
   });
-
-  updateHUD();
-  openItemDetail(uid, isEquipped);
-  saveGame();
+  updateHUD(); openItemDetail(uid, isEquipped); saveGame();
 }
 
 function salvageSingle(uid) {
   const idx = state.inventory.findIndex(x => x.uid === uid);
   if (idx === -1) return;
   const itm = state.inventory[idx];
-  const dustGain = (itm.gradeIdx + 1) * 4;
-  const goldGain = itm.lv * 10;
-  state.dust += dustGain;
-  state.gold += goldGain;
+  state.dust += (itm.gradeIdx + 1) * 4;
+  state.gold += itm.lv * 10;
   state.inventory.splice(idx, 1);
-  SFX.play('click');
-  closeModal();
-  updateHUD();
-  renderInvTab();
-  saveGame();
+  closeModal(); updateHUD(); renderInvTab(); saveGame();
 }
 
 function salvageBelow(maxGradeId) {
@@ -2265,92 +2705,219 @@ function salvageBelow(maxGradeId) {
   let count = 0, dustG = 0, goldG = 0;
   state.inventory = state.inventory.filter(itm => {
     if (!itm.unidentified && itm.gradeIdx <= maxIdx) {
-      count++;
-      dustG += (itm.gradeIdx + 1) * 4;
-      goldG += itm.lv * 10;
+      count++; dustG += (itm.gradeIdx + 1) * 4; goldG += itm.lv * 10;
       return false;
     }
     return true;
   });
   if (count > 0) {
     SFX.play('success');
-    state.dust += dustG;
-    state.gold += goldG;
-    addLog(`♻️ 장비 ${count}개 일괄 분해 완료! (가루 +${dustG}, 골드 +${fmt(goldG)})`);
-    updateHUD();
-    renderInvTab();
-    saveGame();
+    state.dust += dustG; state.gold += goldG;
+    addLog(`♻️ 장비 ${count}개 일괄 분해 완료! (가루 +${dustG})`);
+    updateHUD(); renderInvTab(); saveGame();
   }
 }
 
-// 스킬 탭 렌더링
+// =========================================================================
+// 스킬 트리 & 차원 환생(프레스티지) 탭
+// =========================================================================
 function renderSkillTab() {
   const c = CLASSES[state.classKey];
-  const cost = Math.floor(80 * Math.pow(1.55, state.skillLv - 1));
-  const curMult = Math.round((c.skillMult + (state.skillLv - 1) * 0.25) * 100);
-  document.getElementById('skill-list').innerHTML = `
-    <div class="item-row" style="cursor:default;">
-      <div>
-        <div style="font-weight:700; color:var(--border-bright);">${c.icon} ${c.skillName} (Lv.${state.skillLv})</div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-          현재 위력: 공격력의 <strong>${curMult}%</strong> (소모 MP ${c.skillMp})
+  document.getElementById('skill-tree-list').innerHTML = c.skills.map(sk => {
+    const unlocked = state.lv >= sk.reqLv;
+    const sLv = state.skills[sk.id] || 1;
+    const cost = Math.floor(90 * Math.pow(1.5, sLv - 1));
+    return `
+      <div class="item-row" style="cursor:default; ${!unlocked ? 'opacity:0.45;' : ''}">
+        <div>
+          <div style="font-weight:700; color:var(--border-bright);">
+            [${sk.type === 'passive' ? '패시브' : sk.type === 'ult' ? '궁극기' : '액티브'}] ${sk.name} (Lv.${sLv})
+          </div>
+          <div style="font-size:11px; color:var(--text-muted);">${unlocked ? sk.desc : `🔒 캐릭터 Lv.${sk.reqLv} 달성 시 해금`}</div>
         </div>
+        <button class="btn-sm" ${!unlocked ? 'disabled' : ''} onclick="upgradeSkillTree('${sk.id}', ${cost})">강화 (${fmt(cost)}G)</button>
       </div>
-      <button class="btn-sm" onclick="upgradeSkill(${cost})">강화 (${fmt(cost)} G)</button>
+    `;
+  }).join('');
+
+  // 환생 계산
+  document.getElementById('ng-plus-txt').textContent = state.ngPlus || 0;
+  document.getElementById('soul-stone-txt').textContent = fmt(state.soulStones);
+  const canPrestige = state.lv >= 20 || state.depth >= 15;
+  const estSoul = Math.max(5, Math.floor((state.depth * 1.5 + state.lv * 0.8) * (1 + (state.ngPlus || 0) * 0.25)));
+
+  document.getElementById('prestige-action-box').innerHTML = `
+    <div class="item-row" style="cursor:default; border-color:#00a8cc;">
+      <div>
+        <div style="font-weight:700;">🌌 심연 차원 환생 (요구: Lv.20 또는 15층)</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">장비/유물/도감을 모두 유지한 채 Lv.1부터 더 강하게 시작하며 💎영혼석 <strong>+${estSoul}개</strong>를 획득합니다!</div>
+      </div>
+      <button class="btn-sm" style="background:#0f3c4c; border-color:#00e5ff;" ${!canPrestige ? 'disabled' : ''} onclick="doPrestige(${estSoul})">환생 실행</button>
     </div>
   `;
+
+  document.getElementById('relic-list').innerHTML = RELICS.map(r => {
+    const rLv = state.relics[r.id] || 0;
+    const cost = r.baseCost + rLv * 4;
+    return `
+      <div class="item-row" style="cursor:default;">
+        <div>
+          <div style="font-weight:700;">${r.name} <span style="color:var(--accent-soul)">(Lv.${rLv})</span></div>
+          <div style="font-size:10.5px; color:var(--text-muted);">${r.desc}</div>
+        </div>
+        <button class="btn-sm" onclick="upgradeRelic('${r.id}', ${cost})">💎 ${cost}</button>
+      </div>
+    `;
+  }).join('');
 }
 
-function upgradeSkill(cost) {
+function upgradeSkillTree(skId, cost) {
   if (state.gold < cost) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
   state.gold -= cost;
-  state.skillLv++;
+  state.skills[skId] = (state.skills[skId] || 1) + 1;
   SFX.play('success');
+  updateHUD(); renderSkillTab(); saveGame();
+}
+
+function doPrestige(soulGain) {
+  if (!confirm(`차원 환생을 진행하시겠습니까?\n장비·유물·도감은 그대로 유지되며 💎영혼석 +${soulGain}개를 획득합니다!`)) return;
+  SFX.play('legend');
+  triggerScreenFlash('#00e5ff');
+  state.soulStones += soulGain;
+  state.ngPlus = (state.ngPlus || 0) + 1;
+  state.lv = 1;
+  state.exp = 0;
+  state.reqExp = 48;
+  state.depth = 1 + (state.relics.hammer || 0);
+  state.statPts = state.ngPlus * 5;
+  state.gold = 200;
+  generateFloorNodes();
+  const { stats } = getTotalStats();
+  state.hp = stats.maxHp;
+  state.mp = stats.maxMp;
+  addLog(`🌌 [NG+${state.ngPlus}] 차원 환생 완료! 영혼석 +${soulGain}개 및 보너스 스탯을 획득했습니다!`);
   updateHUD();
   renderSkillTab();
   saveGame();
 }
 
-// 상점 탭 렌더링
+function upgradeRelic(rId, cost) {
+  if (state.soulStones < cost) { SFX.play('fail'); alert('영혼석이 부족합니다! (보스 처치 또는 환생으로 획득)'); return; }
+  state.soulStones -= cost;
+  state.relics[rId] = (state.relics[rId] || 0) + 1;
+  SFX.play('success');
+  updateHUD(); renderSkillTab(); saveGame();
+}
+
+// =========================================================================
+// 특수 던전 3종 & 일일 퀘스트 & 상점 탭
+// =========================================================================
 function renderShopTab() {
+  document.getElementById('dungeon-tickets').textContent = state.dungeonTickets || 0;
+  const dScale = state.depth + state.lv;
+
+  document.getElementById('special-dungeon-list').innerHTML = `
+    <div class="item-row" onclick="runSpecialDungeon('gold')">
+      <div>
+        <div style="font-weight:700; color:var(--accent-gold);">🪙 황금 고블린 비밀금고</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌 보상: 약 ${fmt(dScale * 95)} 골드 대량 획득</div>
+      </div>
+      <span class="btn-sm">입장권 1장</span>
+    </div>
+    <div class="item-row" onclick="runSpecialDungeon('dust')">
+      <div>
+        <div style="font-weight:700; color:#c08cff;">✨ 고대 마력 수정 광산</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌 보상: 마력 가루 +${25 + state.depth * 3}개 & 경험치</div>
+      </div>
+      <span class="btn-sm">입장권 1장</span>
+    </div>
+    <div class="item-row" onclick="runSpecialDungeon('gear')">
+      <div>
+        <div style="font-weight:700; color:#ff9f1a;">👑 심연 군주의 무기고</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">즉시 토벌 보상: 영웅~창조 등급 장비 1개 확정 드롭!</div>
+      </div>
+      <span class="btn-sm">입장권 1장</span>
+    </div>
+  `;
+
+  document.getElementById('daily-quest-list').innerHTML = (state.quests || []).map((q, idx) => {
+    const done = q.prog >= q.goal;
+    return `
+      <div class="item-row" style="cursor:default;">
+        <div>
+          <div style="font-weight:700;">${q.name} (${Math.min(q.goal, q.prog)}/${q.goal})</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">보상: 🪙${fmt(q.rewardGold)} 골드 + 💎영혼석 ${q.rewardSoul}개</div>
+        </div>
+        <button class="btn-sm" ${!done ? 'disabled' : ''} onclick="claimQuest(${idx})">보상 수령</button>
+      </div>
+    `;
+  }).join('');
+
   const gachaCost = Math.floor(90 + state.depth * 25);
   const highGachaCost = Math.floor(320 + state.depth * 85);
   document.getElementById('shop-list').innerHTML = `
-    <div class="item-row" onclick="buyPotion()">
+    <div class="item-row" onclick="buyTicket()">
       <div>
-        <div style="font-weight:700;">🧪 성소의 완전 치유 비약</div>
-        <div style="font-size:11px; color:var(--text-muted);">HP 및 MP 100% 즉시 회복 + 저주 해제</div>
+        <div style="font-weight:700; color:#ffd180;">🎟️ 특수 던전 입장권 구매</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">특수 비경 즉시 토벌용 입장권 +1장</div>
       </div>
-      <span class="btn-sm">80 G</span>
+      <span class="btn-sm">250 G</span>
     </div>
     <div class="item-row" onclick="buyMysteryBox(0, ${gachaCost})">
       <div>
-        <div style="font-weight:700; color:#4cd964;">🧰 방랑 상인의 미감정 보물상자</div>
-        <div style="font-size:11px; color:var(--text-muted);">현재 심연 층수(Lv.${state.depth}) 기준 랜덤 장비 1개</div>
+        <div style="font-weight:700; color:#4cd964;">🧰 방랑 상인의 장비 상자</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">현재 층수 기준 랜덤 장비 1개</div>
       </div>
       <span class="btn-sm">${fmt(gachaCost)} G</span>
     </div>
     <div class="item-row" onclick="buyMysteryBox(2, ${highGachaCost})">
       <div>
-        <div style="font-weight:700; color:#ff9f1a;">👑 고대 왕가의 황금 상자</div>
-        <div style="font-size:11px; color:var(--text-muted);">희귀~창조 등급 확정! 전설/신화 확률 대폭 상승</div>
+        <div style="font-weight:700; color:#ff9f1a;">👑 왕가의 황금 유물 상자</div>
+        <div style="font-size:10.5px; color:var(--text-muted);">희귀~창조 등급 확정!</div>
       </div>
       <span class="btn-sm">${fmt(highGachaCost)} G</span>
     </div>
   `;
 }
 
-function buyPotion() {
-  if (state.gold < 80) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
-  state.gold -= 80;
-  const { stats } = getTotalStats();
-  state.hp = stats.maxHp;
-  state.mp = stats.maxMp;
-  state.flags.cursed = 0;
+function runSpecialDungeon(type) {
+  if ((state.dungeonTickets || 0) <= 0) { SFX.play('fail'); alert('입장권이 부족합니다! (보스 처치 또는 상점에서 구매)'); return; }
+  state.dungeonTickets--;
+  SFX.play('legend');
+  if (type === 'gold') {
+    const g = (state.depth + state.lv) * 95;
+    state.gold += g;
+    addLog(`🏰 황금 고블린 금고 토벌 완료! (+${fmt(g)} 골드)`);
+  } else if (type === 'dust') {
+    const d = 25 + state.depth * 3;
+    state.dust += d;
+    gainExp(state.depth * 35);
+    addLog(`🏰 마력 수정 광산 토벌 완료! (가루 +${d}개)`);
+  } else {
+    const itm = generateItem(state.depth + 2, 3, false);
+    acquireItemWithChest(itm, true);
+  }
+  updateHUD(); renderShopTab(); saveGame();
+}
+
+function claimQuest(idx) {
+  const q = state.quests[idx];
+  if (!q || q.prog < q.goal) return;
+  SFX.play('legend');
+  state.gold += q.rewardGold;
+  state.soulStones += q.rewardSoul;
+  q.prog = 0;
+  q.goal = Math.floor(q.goal * 1.4);
+  q.rewardGold = Math.floor(q.rewardGold * 1.5);
+  updateHUD(); renderShopTab(); saveGame();
+}
+
+function buyTicket() {
+  if (state.gold < 250) { SFX.play('fail'); alert('골드가 부족합니다!'); return; }
+  state.gold -= 250;
+  state.dungeonTickets = (state.dungeonTickets || 0) + 1;
   SFX.play('success');
-  addLog(`🧪 상점에서 완전 치유 비약을 마셔 컨디션을 회복했습니다.`);
-  updateHUD();
-  saveGame();
+  updateHUD(); renderShopTab(); saveGame();
 }
 
 function buyMysteryBox(minGrade, cost) {
@@ -2361,20 +2928,32 @@ function buyMysteryBox(minGrade, cost) {
   renderShopTab();
 }
 
-// 도감 & 설정 탭
+// 도감 & 업적 탭
 function renderCodexTab() {
-  const gradeSummary = GRADES.map(g => {
-    const cnt = state.codexGrades[g.id] || 0;
-    return `<span class="${g.cls}" style="margin-right:10px;">• ${g.name}: ${cnt}회</span>`;
-  }).join('<br>');
+  const { codexBonus, achBonus } = getTotalStats();
+  document.getElementById('ach-bonus-txt').textContent = `영구 공격력 +${achBonus}%`;
+  document.getElementById('codex-bonus-txt').textContent = `영구 공격력 +${codexBonus}%`;
 
-  const uList = state.codexUniques.length > 0
-    ? state.codexUniques.join(', ')
-    : '아직 발견한 고유(Unique) 장비가 없습니다.';
+  document.getElementById('achievement-list').innerHTML = ACHIEVEMENTS.map(a => {
+    const cur = state.records[a.key] || 0;
+    const done = cur >= a.goal;
+    return `
+      <div class="item-row" style="cursor:default;">
+        <div>
+          <div style="font-weight:700; color:${done ? '#4cd964' : 'var(--text-main)'}">${done ? '✅' : '⏳'} ${a.name} (${cur}/${a.goal})</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">${a.desc} — 보상: ${a.bonusTxt}</div>
+        </div>
+        <span style="font-size:11px; font-weight:700; color:${done ? '#4cd964' : '#777'}">${done ? '달성 완료' : '진행 중'}</span>
+      </div>
+    `;
+  }).join('');
+
+  const gradeSummary = GRADES.map(g => `<span class="${g.cls}" style="margin-right:8px;">• ${g.name}: ${state.codexGrades[g.id] || 0}</span>`).join(' ');
+  const uList = state.codexUniques.length > 0 ? state.codexUniques.join(', ') : '아직 발견한 고유(Unique) 장비가 없습니다.';
 
   document.getElementById('codex-summary').innerHTML = `
-    <div style="margin-bottom:8px;"><strong>[등급별 획득 누적 기록]</strong><br>${gradeSummary}</div>
-    <div><strong>[수집한 고유 유니크 명칭 (${state.codexUniques.length}종)]</strong><br><span style="color:var(--border-bright)">${uList}</span></div>
+    <div style="margin-bottom:6px;"><strong>[등급별 획득 기록]</strong><br>${gradeSummary}</div>
+    <div><strong>[발견한 고유 유니크 (${state.codexUniques.length}종)]</strong><br><span style="color:var(--border-bright)">${uList}</span></div>
   `;
 }
 
@@ -2385,18 +2964,19 @@ function toggleSound() {
 
 function exportSave() {
   saveGame();
-  const raw = localStorage.getItem('ABYSS_RPG_SAVE_V1');
+  const raw = localStorage.getItem('ABYSS_RPG_SAVE_V2');
   navigator.clipboard?.writeText(raw);
   alert('세이브 데이터가 클립보드에 복사되었습니다!');
 }
 
 function resetGame() {
-  if (!confirm('정말 모든 진행 데이터를 초기화하고 처음부터 시작하시겠습니까?')) return;
+  if (!confirm('정말 모든 진행 데이터를 초기화하시겠습니까?')) return;
+  localStorage.removeItem('ABYSS_RPG_SAVE_V2');
   localStorage.removeItem('ABYSS_RPG_SAVE_V1');
   location.reload();
 }
 
-// 시작 시 직업 선택 모달 또는 오프라인 보상 체크
+// 신규 시작 직업 선택 모달
 function showClassSelectModal() {
   const overlay = document.getElementById('modal-overlay');
   const content = document.getElementById('modal-content');
@@ -2405,8 +2985,8 @@ function showClassSelectModal() {
   const cards = Object.entries(CLASSES).map(([k, c]) => `
     <button class="choice-btn" onclick="startNewGame('${k}')">
       <div class="choice-left">
-        <span class="choice-title">${c.icon} ${c.name} <span style="font-size:11px; color:var(--border-bright);">(${c.title})</span></span>
-        <span class="choice-desc">고유 스킬: [${c.skillName}] - ${c.skillDesc}</span>
+        <span class="choice-title">${c.sprite} ${c.name} <span style="font-size:11px; color:var(--border-bright);">(${c.promotions[0].title})</span></span>
+        <span class="choice-desc">주력기: [${c.skills[0].name}] / 궁극기: [${c.skills[3].name}]</span>
       </div>
       <span class="choice-prob">선택</span>
     </button>
@@ -2414,41 +2994,34 @@ function showClassSelectModal() {
 
   content.innerHTML = `
     <div style="text-align:center;">
-      <div style="font-size:18px; font-weight:800; color:var(--border-bright);">⚔️ 운명의 직업을 선택하십시오</div>
-      <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">선택한 직업에 따라 고유 스킬과 전용 선택지가 해금됩니다.</div>
+      <div style="font-size:17px; font-weight:800; color:var(--border-bright);">⚔️ 운명의 클래스를 선택하십시오</div>
+      <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">2차~5차 전직과 전용 스킬 트리, 오라 연출이 해금됩니다.</div>
     </div>
-    <div style="display:flex; flex-direction:column; gap:8px;">${cards}</div>
+    <div style="display:flex; flex-direction:column; gap:7px;">${cards}</div>
   `;
 }
 
 function startNewGame(classKey) {
   SFX.play('legend');
   state = createNewState(classKey);
-  // 시작 기본 무기 지급
+  generateFloorNodes();
   const starterWeapon = generateItem(1, 1, false);
-  starterWeapon.slotId = 'weapon';
-  starterWeapon.slotName = '무기';
-  starterWeapon.icon = '⚔️';
-  starterWeapon.baseStat = 'atk';
+  starterWeapon.slotId = 'weapon'; starterWeapon.slotName = '무기'; starterWeapon.icon = '⚔️'; starterWeapon.baseStat = 'atk';
   state.equipped.weapon = starterWeapon;
 
   closeModal();
-  addLog(`🚩 [${CLASSES[classKey].name}] 클래스로 심연의 모험을 시작합니다!`);
+  addLog(`🚩 [${CLASSES[classKey].name}] 클래스로 심연 원정을 시작합니다!`);
   updateHUD();
   nextTurnEvent();
 }
 
-// 오프라인 방치 보상 계산
 function checkOfflineReward() {
   const now = Date.now();
   const diffSec = Math.floor((now - (state.lastSaveTime || now)) / 1000);
-  if (diffSec < 60) return; // 1분 이상부터 정산
-
-  const cappedSec = Math.min(diffSec, 86400); // 최대 24시간
-  const mins = Math.floor(cappedSec / 60);
-  const goldG = mins * (8 + state.depth * 3);
-  const expG = mins * (10 + state.depth * 4);
-
+  if (diffSec < 60) return;
+  const mins = Math.floor(Math.min(diffSec, 86400) / 60);
+  const goldG = mins * (10 + state.depth * 4);
+  const expG = mins * (12 + state.depth * 5);
   state.gold += goldG;
   gainExp(expG);
   saveGame();
@@ -2458,19 +3031,17 @@ function checkOfflineReward() {
   overlay.classList.add('show');
   content.innerHTML = `
     <div style="text-align:center;">
-      <div style="font-size:36px;">⏳</div>
-      <div style="font-size:16px; font-weight:800; color:var(--border-bright);">오프라인 원정 보상</div>
-      <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">접속하지 않은 ${mins}분 동안 캐릭터가 심연을 탐색했습니다.</div>
+      <div style="font-size:34px;">⏳</div>
+      <div style="font-size:15px; font-weight:800; color:var(--border-bright);">오프라인 자동 원정 보상 (${mins}분)</div>
     </div>
-    <div class="card" style="text-align:center; font-size:14px;">
+    <div class="card" style="text-align:center; font-size:13px;">
       🪙 획득 골드: <strong style="color:var(--accent-gold)">+${fmt(goldG)}</strong><br>
       ✨ 획득 경험치: <strong>+${fmt(expG)}</strong>
     </div>
-    <button class="choice-btn" style="justify-content:center;" onclick="closeModal()">보상 수령</button>
+    <button class="choice-btn" data-autoclose="true" style="justify-content:center;" onclick="closeModal()">보상 수령</button>
   `;
 }
 
-// 초기화 실행
 window.addEventListener('DOMContentLoaded', () => {
   if (loadGame()) {
     updateHUD();
