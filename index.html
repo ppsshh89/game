@@ -1,1741 +1,1119 @@
 <!DOCTYPE html>
 <html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>아르카디아: 심리스 (Arcadia: Seamless)</title>
 <!-- ... existing code ... -->
-    .boss-pulse {
-      animation: pulseBorder 1.4s infinite;
+    .goldrush-tint {
+      background: radial-gradient(circle at center, transparent 52%, rgba(202, 138, 4, 0.28) 100%);
     }
-
-    /* Auto-Hunt Active Glow & Awakening Ultimate Pulse */
-    @keyframes autoSpinGlow {
-      0%, 100% { box-shadow: 0 0 12px rgba(52, 211, 153, 0.75), inset 0 0 10px rgba(52, 211, 153, 0.45); border-color: #34d399; }
-      50% { box-shadow: 0 0 24px rgba(56, 189, 248, 0.95), inset 0 0 16px rgba(56, 189, 248, 0.65); border-color: #7dd3fc; }
+    .pixelated {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
-    .auto-active {
-      background: linear-gradient(135deg, #059669 0%, #0284c7 100%) !important;
-      animation: autoSpinGlow 1.5s ease-in-out infinite;
-    }
-    @keyframes ultReadyPulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(250, 204, 21, 0.85), inset 0 0 12px rgba(254, 240, 138, 0.6); }
-      50% { transform: scale(1.07); box-shadow: 0 0 28px rgba(249, 115, 22, 1), inset 0 0 18px rgba(254, 240, 138, 0.9); }
-    }
-    .ult-ready {
-      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 55%, #ec4899 100%) !important;
-      border-color: #fef08a !important;
-      animation: ultReadyPulse 1.1s ease-in-out infinite;
-    }
-    @keyframes comboPop {
-      0% { transform: scale(1.38) rotate(-3deg); }
-      100% { transform: scale(1) rotate(0deg); }
-    }
-    .combo-pop {
-      animation: comboPop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <!-- ... existing code ... -->
-          <div id="bossHpText" class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white drop-shadow">100%</div>
-        </div>
-      </div>
+  const ITEM_TEMPLATES = {
+    rusty_sword:    { id: 'rusty_sword',    name: '수련생의 철검',    slot: 'WEAPON',   rarity: 'COMMON',    reqLv: 1,  atk: 12, def: 0,  hp: 0,   unique: null,             desc: '기본에 충실한 초보 모험가의 검.' },
+    leather_armor:  { id: 'leather_armor',  name: '초원의 가죽갑옷',  slot: 'ARMOR',    rarity: 'COMMON',    reqLv: 1,  atk: 0,  def: 10, hp: 60,  unique: null,             desc: '가볍고 튼튼한 가죽 갑옷.' },
+    wood_helm:      { id: 'wood_helm',      name: '모험가의 깃털모자',slot: 'HELM',     rarity: 'COMMON',    reqLv: 1,  atk: 2,  def: 8,  hp: 40,  unique: null,             desc: '초록 깃털이 달린 가벼운 여행자 모자.' },
+    cloth_cloak:    { id: 'cloth_cloak',    name: '숲바람 여행망토',  slot: 'CLOAK',    rarity: 'UNCOMMON',  reqLv: 1,  atk: 2,  def: 9,  hp: 45,  unique: null,             desc: '초록빛 숲의 기운이 깃든 여행자 망토.' },
+    iron_gloves:    { id: 'iron_gloves',    name: '강철 건틀릿',      slot: 'GLOVES',   rarity: 'UNCOMMON',  reqLv: 2,  atk: 8,  def: 12, hp: 35,  unique: null,             desc: '단단한 철판으로 제작된 전투용 장갑.' },
+    hunter_neck:    { id: 'hunter_neck',    name: '사냥꾼의 목걸이',  slot: 'NECKLACE', rarity: 'UNCOMMON',  reqLv: 1,  atk: 4,  def: 2,  hp: 90,  unique: 'HUNTER_NECK',    desc: '고유: 몬스터 처치 경험치 +15%, 일반 몹 피해 +8%' },
+    swift_boots:    { id: 'swift_boots',    name: '신속의 신발',      slot: 'BOOTS',    rarity: 'RARE',      reqLv: 3,  atk: 0,  def: 18, hp: 50,  unique: 'SWIFT_BOOTS',    desc: '고유: 이동속도 +30%, 회피 쿨타임 -15% (청록 잔상)' },
+    vampire_ring:   { id: 'vampire_ring',   name: '흡혈의 반지',      slot: 'RING',     rarity: 'RARE',      reqLv: 5,  atk: 14, def: 4,  hp: 110, unique: 'VAMPIRE_RING',   desc: '고유: 가한 피해의 6% 체력 흡수' },
+    greed_cloak:    { id: 'greed_cloak',    name: '탐욕의 망토',      slot: 'CLOAK',    rarity: 'RARE',      reqLv: 4,  atk: 6,  def: 20, hp: 60,  unique: 'GREED_CLOAK',    desc: '고유: 드롭률 +20%, 골드 +25% (방어력 -10%)' },
+    flame_sword:    { id: 'flame_sword',    name: '화염의 검',        slot: 'WEAPON',   rarity: 'EPIC',      reqLv: 6,  atk: 46, def: 0,  hp: 0,   unique: 'FLAME_SWORD',    desc: '고유: 기본 공격 시 35% 확률 관통 화염파 발사 (120%)' },
+    lightning_glv:  { id: 'lightning_glv',  name: '번개의 장갑',      slot: 'GLOVES',   rarity: 'EPIC',      reqLv: 8,  atk: 24, def: 28, hp: 80,  unique: 'LIGHTNING_GLV',  desc: '고유: 공격 시 주변 3명에게 연쇄 번개 전이 (55%)' },
+    guardian_armor: { id: 'guardian_armor', name: '수호자의 갑옷',    slot: 'ARMOR',    rarity: 'EPIC',      reqLv: 10, atk: 0,  def: 68, hp: 360, unique: 'GUARDIAN_ARMOR', desc: '고유: 15초마다 최대체력 18% 육각 보호막 생성' },
+    frost_sword:    { id: 'frost_sword',    name: '빙결의 검',        slot: 'WEAPON',   rarity: 'EPIC',      reqLv: 12, atk: 62, def: 6,  hp: 0,   unique: 'FROST_SWORD',    desc: '고유: 공격 시 15% 확률로 적 2초 빙결' },
+    berserker_helm: { id: 'berserker_helm', name: '광전사의 투구',    slot: 'HELM',     rarity: 'EPIC',      reqLv: 10, atk: 18, def: 38, hp: 140, unique: 'BERSERKER_HELM', desc: '고유: HP 50% 이하 시 공속 +25%, 치명타 피해 +30%' },
+    ignis_sword:    { id: 'ignis_sword',    name: '이그니스의 심장검',slot: 'WEAPON',   rarity: 'LEGENDARY', reqLv: 14, atk: 84, def: 8,  hp: 120, unique: 'IGNIS_SWORD',    desc: '보스 전용: 공격 시 화염파 3발 부채꼴 관통 발사!' },
+    rift_sword:     { id: 'rift_sword',     name: '균열의 대검',      slot: 'WEAPON',   rarity: 'LEGENDARY', reqLv: 16, atk: 98, def: 10, hp: 160, unique: 'RIFT_SWORD',     desc: '전설 고유: 스킬 3회 사용 시 공간 균열 생성 (끌어당김+광역딜)' }
+  };
 
-      <!-- Active Ancient Rune Buff & Multi-Kill Combo Fever Strip -->
-      <div class="flex items-center justify-center gap-2 flex-wrap">
-        <div id="runeBuffBadge" class="hidden rpg-panel rounded-full px-3 py-1 text-[11px] font-black text-amber-200 border border-amber-400/70 shadow-lg flex items-center gap-1.5">
-          <span id="runeBuffIcon">⚡</span>
-          <span id="runeBuffText">광풍의 룬 20s</span>
-        </div>
-        <div id="comboBadge" class="hidden rpg-panel rounded-full px-3 py-1 text-xs font-black border-2 border-orange-400/80 bg-gradient-to-r from-orange-600/80 to-rose-600/80 text-white shadow-lg flex items-center gap-1.5">
-          <span class="text-yellow-300">🔥</span>
-          <span id="comboCountText">10 COMBO</span>
-          <span id="comboBonusText" class="text-[10px] text-amber-200">+4%</span>
-        </div>
-      </div>
-    </div>
-<!-- ... existing code ... -->
-    <!-- RIGHT ACTION WHEEL (Mobile Touch + Mouse Clickable) -->
-    <div id="actionCluster" class="fixed right-3 bottom-3 w-[198px] h-[206px] sm:w-[218px] sm:h-[222px] pointer-events-auto z-30">
-      <!-- Smart AUTO-HUNT Toggle (Top-Right above Attack) -->
-      <button id="btnAuto" class="action-btn absolute right-1 top-0 w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-slate-400/70 text-slate-100" title="스마트 자동사냥 (Z)">
-        <span class="text-base leading-none">🤖</span>
-        <span id="autoBtnLabel" class="text-[9px] font-black mt-0.5">AUTO</span>
-        <span class="hidden sm:block text-[8px] text-slate-300/80">Z</span>
-      </button>
-
-      <!-- Awakening Overdrive Ultimate (Left-Top arc) -->
-      <button id="btnUlt" class="action-btn absolute left-[52px] top-[2px] w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-slate-800 to-slate-950 border-2 border-amber-400/45 text-amber-200 overflow-hidden" title="에테르 각성 궁극기 (R)">
-        <div id="ultFillBar" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-amber-500/80 via-orange-400/70 to-yellow-300/60 transition-all duration-150 pointer-events-none" style="height:0%"></div>
-        <span class="relative z-10 text-base leading-none">🌟</span>
-        <span id="ultLabel" class="relative z-10 text-[9px] font-black">0%</span>
-        <span class="relative z-10 hidden sm:block text-[8px] text-amber-100/80">R</span>
-      </button>
-
-      <!-- Primary Basic Attack (Bottom-Right Large) -->
-      <button id="btnAtk" class="action-btn absolute right-1 bottom-1 w-[74px] h-[74px] sm:w-[82px] sm:h-[82px] bg-gradient-to-br from-rose-500 to-red-800 border-2 border-rose-300/80 text-white">
-        <span class="text-2xl leading-none">⚔️</span>
-        <span class="text-[10px] font-black mt-0.5">공격</span>
-        <span class="hidden sm:block text-[8px] text-rose-200/80">SPACE</span>
-      </button>
-
-      <!-- Skill 1: Whirlwind (Arc Left-Top of Attack) -->
-      <button id="btnSkill1" class="action-btn absolute left-[46px] bottom-[64px] w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-amber-500 to-orange-700 border-2 border-amber-200/80 text-white">
-        <span class="text-lg leading-none">🌪️</span>
-        <span class="text-[9px] font-bold">회전베기</span>
-        <span class="hidden sm:block text-[8px] text-amber-100/80">J</span>
-        <div id="cdSkill1" class="cd-overlay hidden"></div>
-      </button>
-
-      <!-- Skill 2: Piercing Dash (Arc Top of Attack) -->
-      <button id="btnSkill2" class="action-btn absolute right-[64px] top-[52px] w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-violet-500 to-indigo-800 border-2 border-violet-300/80 text-white">
-        <span class="text-lg leading-none">⚡</span>
-        <span class="text-[9px] font-bold">질풍참</span>
-        <span class="hidden sm:block text-[8px] text-violet-200/80">K</span>
-        <div id="cdSkill2" class="cd-overlay hidden"></div>
-      </button>
-
-      <!-- Dodge Roll (Left-Bottom of Attack) -->
-      <button id="btnDodge" class="action-btn absolute left-[42px] bottom-1 w-[50px] h-[50px] sm:w-[54px] sm:h-[54px] bg-gradient-to-br from-cyan-500 to-blue-800 border-2 border-cyan-200/80 text-white">
-        <span class="text-base leading-none">💨</span>
-        <span class="text-[9px] font-bold">회피</span>
-        <span class="hidden sm:block text-[8px] text-cyan-100/80">SHIFT</span>
-        <div id="cdDodge" class="cd-overlay hidden"></div>
-      </button>
-
-      <!-- Health Potion (Far Left) -->
-      <button id="btnPotion" class="action-btn absolute left-0 bottom-[52px] w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] bg-gradient-to-br from-emerald-500 to-teal-800 border-2 border-emerald-200/80 text-white">
-        <span class="text-sm leading-none">🧪</span>
-        <span id="hudPotionCount" class="text-[10px] font-black">5</span>
-        <div id="cdPotion" class="cd-overlay hidden"></div>
-      </button>
-    </div>
-<!-- ... existing code ... -->
-    rift() {
-      this.tone(190, 0.45, 'sawtooth', 0.12, 65);
-      this.tone(620, 0.4, 'sine', 0.09, 140, 0.05);
+  /* ============================================================================
+     2.5. 2D PIXEL ART ENGINE & LIVE CHARACTER PAPERDOLL SYSTEM
+     - Every item has a handcrafted 2D pixel icon AND a wearable hero layer.
+     - Zero base64 / zero external URLs: crisp offscreen canvases + inline SVG.
+     ============================================================================ */
+  const PixelArt = {
+    PALETTE: {
+      k: '#181425', // Deep pixel outline
+      w: '#ffffff', // Pure white shine
+      s: '#ffdfb8', // Skin light
+      S: '#f4b982', // Skin shade
+      h: '#f472b6', // Rosy blush
+      b: '#3b82f6', // Royal blue
+      B: '#1d4ed8', // Dark blue
+      n: '#1e3a8a', // Navy shadow
+      c: '#38bdf8', // Sky cyan
+      C: '#0284c7', // Deep cyan
+      i: '#e0f2fe', // Ice highlight
+      t: '#2dd4bf', // Swift teal
+      T: '#0f766e', // Dark teal
+      g: '#facc15', // Bright gold
+      G: '#ca8a04', // Deep gold
+      y: '#fef08a', // Pale yellow
+      o: '#f97316', // Flame orange
+      O: '#c2410c', // Deep ember
+      r: '#ef4444', // Crimson red
+      R: '#991b1b', // Dark crimson
+      p: '#c084fc', // Arcane purple
+      P: '#7e22ce', // Deep violet
+      m: '#f0abfc', // Rift magenta
+      e: '#4ade80', // Leaf green
+      E: '#15803d', // Forest green
+      l: '#b45309', // Leather tan
+      L: '#78350f', // Dark leather
+      a: '#e2e8f0', // Silver steel
+      A: '#94a3b8', // Steel shade
+      d: '#475569'  // Dark iron
     },
-    awaken() {
-      [440, 554.37, 659.25, 880, 1108.73].forEach((f, i) => this.tone(f, 0.42, 'sawtooth', 0.12, f * 1.12, i * 0.055));
+
+    /* Individual 12x12 2D Pixel Art Icons (Inventory, Bag, Shop & Ground Drops) */
+    ITEM_ICONS: {
+      rusty_sword: [
+        '.........kk.',
+        '........kak.',
+        '.......kawk.',
+        '......kaak..',
+        '.....kaAk...',
+        '....kaAk....',
+        '..kkaAk.....',
+        '..kGgk......',
+        '...kGk......',
+        '..kLkGk.....',
+        '.kLk..kk....',
+        '.kk.........'
+      ],
+      flame_sword: [
+        '........yok.',
+        '.......koyk.',
+        '......koryk.',
+        '.....korok..',
+        '....korOk...',
+        '...korOk....',
+        '.kkorOk.....',
+        '.kgGgk......',
+        '..kgk.......',
+        '.kLkGk......',
+        'kLk..k......',
+        'kk..........'
+      ],
+      frost_sword: [
+        '........iwk.',
+        '.......kicwk',
+        '......kicik.',
+        '.....kicCk..',
+        '....kicCk...',
+        '...kicCk....',
+        '.kkicCk.....',
+        '.kccck......',
+        '..kCk.......',
+        '.kBkck......',
+        'kBk..k......',
+        'kk..........'
+      ],
+      ignis_sword: [
+        '.......yyok.',
+        '......koyyyk',
+        '.....koryok.',
+        '....kOroyk..',
+        '...kOroOk...',
+        '..kOroOk....',
+        'kkOrrOk.....',
+        'kgrygk......',
+        '.kGgk.......',
+        'kRkGk.......',
+        'kRk.........',
+        'kk..........'
+      ],
+      rift_sword: [
+        '.......mwpk.',
+        '......kpmwmk',
+        '.....kPpmpk.',
+        '....kPpmPk..',
+        '...kPpmPk...',
+        '..kPpmPk....',
+        'kkPpmPk.....',
+        'kmpPmk......',
+        '.kPPk.......',
+        'kdkPk.......',
+        'kdk.........',
+        'kk..........'
+      ],
+      leather_armor: [
+        '..kkk..kkk..',
+        '.kllk..kllk.',
+        'klllkkkklllk',
+        'klLllllllLlk',
+        'klllGggGlllk',
+        '.kllLllLllk.',
+        '.kllllllllk.',
+        '.kLLGGGGLLk.',
+        '.kllllllllk.',
+        '.kllLllLllk.',
+        '.kLLk..kLLk.',
+        '..kk....kk..'
+      ],
+      guardian_armor: [
+        '.kkkk..kkkk.',
+        'kccck..kccck',
+        'kicckkkkcick',
+        'kcCCcggcCCck',
+        'kccCgwwgCcck',
+        '.kcCgwwgCck.',
+        '.kccCggCcck.',
+        '.kCCGGGGCCk.',
+        '.kcccccccck.',
+        '.kCCc..cCCk.',
+        '.kBBk..kBBk.',
+        '..kk....kk..'
+      ],
+      wood_helm: [
+        '.......kegk.',
+        '......keee..',
+        '...kkkkek...',
+        '..kllllllk..',
+        '.kllLllLllk.',
+        'kllllllllllk',
+        'klGGGGGGGGkk',
+        'kLLLLLLLLLLk',
+        '.kkkkkkkkkk.',
+        '............',
+        '............',
+        '............'
+      ],
+      berserker_helm: [
+        'k..........k',
+        'kyk......kyk',
+        '.kyk.kk.kyk.',
+        '.kRykRRkyRk.',
+        '..kRRRRRRk..',
+        '..kRrrrrRk..',
+        '..kRkyykRk..',
+        '..kRRkkRRk..',
+        '..kRrkkrRk..',
+        '...kk..kk...',
+        '............',
+        '............'
+      ],
+      cloth_cloak: [
+        '....kkkk....',
+        '...kggggk...',
+        '..kEeeeeEk..',
+        '..kEeeeeEk..',
+        '.kEeeeeeeEk.',
+        '.kEeeEeeeEk.',
+        '.kEeeeeeeEk.',
+        'kEeeEeeEeeEk',
+        'kEeeeeeeeeEk',
+        'kEEeEEeeEEEk',
+        '.kk..kk..kk.',
+        '............'
+      ],
+      greed_cloak: [
+        '....kkkk....',
+        '...krrrrk...',
+        '..kGggggGk..',
+        '..kGgyygGk..',
+        '.kGgyggygGk.',
+        '.kGggggggGk.',
+        '.kGgyggygGk.',
+        'kGggggggggGk',
+        'kGgGggggGgGk',
+        'kGGyGGGGyGGk',
+        '.kk..kk..kk.',
+        '............'
+      ],
+      iron_gloves: [
+        '..kk....kk..',
+        '.kaak..kaak.',
+        '.kaAk..kaAk.',
+        'kaAAk..kaAAk',
+        'kaAAk..kaAAk',
+        'kAAdk..kAAdk',
+        'kdddk..kdddk',
+        '.kkk....kkk.',
+        '............',
+        '............',
+        '............',
+        '............'
+      ],
+      lightning_glv: [
+        '..ky....yk..',
+        '.kcck..kcck.',
+        '.kcyk..kyck.',
+        'kcyCk..kCycK'.toLowerCase(),
+        'kccCk..kCcck',
+        'kCgyk..kygCk',
+        'kCCCk..kCCCk',
+        '.kkk....kkk.',
+        '............',
+        '............',
+        '............',
+        '............'
+      ],
+      swift_boots: [
+        '............',
+        '.kk......kk.',
+        'kttk....kttk',
+        'kwtk....kwtk',
+        'ktTk....ktTk',
+        'ktttk..ktttk',
+        'ktttTkktTTtk',
+        'kTTTTkkTTTTk',
+        '.kkkk..kkkk.',
+        '............',
+        '............',
+        '............'
+      ],
+      hunter_neck: [
+        '...kkkkkk...',
+        '..kG....Gk..',
+        '.kG......Gk.',
+        '.kG......Gk.',
+        '..kG....Gk..',
+        '...kGggGk...',
+        '....kaak....',
+        '....kawk....',
+        '....kaAk....',
+        '.....kAk....',
+        '......kk....',
+        '............'
+      ],
+      vampire_ring: [
+        '....kkkk....',
+        '...krrrrk...',
+        '..krwrrrRk..',
+        '..krrrrRRk..',
+        '...kGRRGk...',
+        '..kG....Gk..',
+        '.kG......Gk.',
+        '.kG......Gk.',
+        '..kG....Gk..',
+        '...kGGGGk...',
+        '....kkkk....',
+        '............'
+      ]
     },
-    rune() {
-      [587.33, 739.99, 880, 1174.66].forEach((f, i) => this.tone(f, 0.32, 'sine', 0.13, null, i * 0.06));
+
+    /* Wearable 16x20 Paperdoll Layers (Aligned pixel-for-pixel on the hero!) */
+    LAYERS: {
+      // Base Chibi Hero Body (Head + Eyes + Torso + Arms + Default Pants)
+      hero_base: [
+        '................',
+        '................',
+        '................',
+        '....kkkkkkkk....',
+        '...kssssssssk...',
+        '...kssssssssk...',
+        '...kssssssssk...',
+        '...kskksskksk...',
+        '...kskwsskWSk...'.replace('W', 'w').replace('S', 's'),
+        '...khsssssshk...',
+        '....kSSSSSSk....',
+        '...kskbbbbksk...',
+        '...kskbbbbksk...',
+        '...kskbbbbksk...',
+        '...kSkBBBBkSk...',
+        '....kkBBBBkk....',
+        '....kddkkddk....',
+        '....kddkkddk....',
+        '....kLLkkLLk....',
+        '....kkkkkkkk....'
+      ],
+      // Default Hero Spiky Hair (shown when no helm equipped)
+      hair_default: [
+        '................',
+        '.....kk..kk.....',
+        '...kkbbkkbbkk...',
+        '..kbbbbbbbbbbk..',
+        '..kBBbbbbbbBBk..',
+        '..kBbk.kk.kbBk..',
+        '..kk........kk..',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      hair_awakened: [
+        '................',
+        '.....kk..kk.....',
+        '...kkyykkyykk...',
+        '..kgyyyyyyyygk..',
+        '..kGggggggggGk..',
+        '..kGgk.kk.kgGk..',
+        '..kk........kk..',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      // HELM OVERLAYS
+      helm_wood_helm: [
+        '..........keek..',
+        '.........keee...',
+        '...kkkkkkkkk....',
+        '..kllllllllllk..',
+        '.klllGGGGGGlllk.',
+        '.kLLLLLLLLLLLLk.',
+        '..kkkkkkkkkkkk..',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      helm_berserker_helm: [
+        '.kk..........kk.',
+        'kyyk........kyyk',
+        '.kRyk.kkkk.kyRk.',
+        '..kRRkRRRRkRRk..',
+        '..kRRRRRRRRRRk..',
+        '..kRrrrrrrrrRk..',
+        '..kRRk....kRRk..',
+        '..kRk......kRk..',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      // ARMOR OVERLAYS
+      armor_leather_armor: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '....kkllllkk....',
+        '....kllGGllk....',
+        '....kllllllk....',
+        '....kLLGGLLk....',
+        '....kLLLLLLk....',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      armor_guardian_armor: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '...kckicickck...',
+        '...kCkcggckCk...',
+        '....kCgwwgCk....',
+        '....kCCGGCCk....',
+        '....kBBBBBBk....',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      // BACK CLOAK OVERLAYS (Drawn behind hero)
+      cloak_cloth_cloak: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '..kEeeeeeeeeEk..',
+        '..kEeeeeeeeeEk..',
+        '.kEeeeeeeeeeeEk.',
+        '.kEeeEeeeeEeeEk.',
+        '.kEeeeeeeeeeeEk.',
+        '.kEEeeEEEEeeEEk.',
+        '..kkk..kk..kkk..',
+        '................',
+        '................'
+      ],
+      cloak_greed_cloak: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '..kGggggggggGk..',
+        '..kGgyggggygGk..',
+        '.kGggggggggggGk.',
+        '.kGgyggggggygGk.',
+        '.kGggggggggggGk.',
+        '.kGGyyGGGGyyGGk.',
+        '..kkk..kk..kkk..',
+        '................',
+        '................'
+      ],
+      // GLOVES OVERLAYS
+      gloves_iron_gloves: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '..kaak....kaak..',
+        '..kAAk....kAAk..',
+        '...kk......kk...',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      gloves_lightning_glv: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '..ky........yk..',
+        '..kcyk....kyck..',
+        '..kCCk....kCCk..',
+        '...kk......kk...',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      // BOOTS OVERLAYS
+      boots_swift_boots: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '...kwk....kwk...',
+        '...kttkkkkttk...',
+        '...kTTkkkkTTk...'
+      ],
+      // NECKLACE OVERLAY
+      neck_hunter_neck: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '......g..g......',
+        '.......aw.......',
+        '.......aa.......',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................'
+      ],
+      // RING OVERLAY
+      ring_vampire_ring: [
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '..r.............',
+        '.krk............',
+        '..r.............',
+        '................',
+        '................',
+        '................',
+        '................'
+      ]
     },
-    chestBurst() {
-      [660, 880, 1046.5, 1318.5].forEach((f, i) => this.tone(f, 0.25, 'triangle', 0.14, null, i * 0.05));
+
+    _canvasCache: {},
+
+    buildCanvas(cacheKey, grid) {
+      if (this._canvasCache[cacheKey]) return this._canvasCache[cacheKey];
+      const h = grid.length;
+      const w = grid[0].length;
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const g = c.getContext('2d');
+      for (let y = 0; y < h; y++) {
+        const row = grid[y];
+        for (let x = 0; x < w; x++) {
+          const ch = row[x];
+          if (ch === '.' || !this.PALETTE[ch]) continue;
+          g.fillStyle = this.PALETTE[ch];
+          g.fillRect(x, y, 1, 1);
+        }
+      }
+      this._canvasCache[cacheKey] = c;
+      return c;
+    },
+
+    getItemCanvas(tplId) {
+      const grid = this.ITEM_ICONS[tplId] || this.ITEM_ICONS.rusty_sword;
+      return this.buildCanvas('item_' + tplId, grid);
+    },
+
+    getLayerCanvas(layerKey) {
+      const grid = this.LAYERS[layerKey];
+      if (!grid) return null;
+      return this.buildCanvas('layer_' + layerKey, grid);
+    },
+
+    /* Generates crisp inline SVG pixel art for HTML Inventory / Bag / Shop UI */
+    toSvg(tplId, size = 34) {
+      const grid = this.ITEM_ICONS[tplId] || this.ITEM_ICONS.rusty_sword;
+      const h = grid.length;
+      const w = grid[0].length;
+      let rects = '';
+      for (let y = 0; y < h; y++) {
+        const row = grid[y];
+        for (let x = 0; x < w; x++) {
+          const col = this.PALETTE[row[x]];
+          if (col) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${col}"/>`;
+        }
+      }
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${size}" height="${size}" shape-rendering="crispEdges" class="shrink-0 block">${rects}</svg>`;
+    },
+
+    /* Renders the complete layered 2D Pixel-Art Character Paperdoll */
+    drawHeroPaperdoll(ctx, equip, opts = {}) {
+      const scale = opts.scale || 2.6;
+      const faceLeft = !!opts.faceLeft;
+      const walkBob = opts.walkBob || 0;
+      const elapsed = opts.elapsed || 0;
+      const isAwakened = !!opts.isAwakened;
+      const weaponAngle = opts.weaponAngle !== undefined ? opts.weaponAngle : -0.35;
+      const swingProg = opts.swingProg || 0; // 0..1 during sword slash
+
+      const w = 16 * scale;
+      const h = 20 * scale;
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.translate(0, -walkBob);
+
+      // 1) Awakening Golden Pixel Wings (Behind Cloak)
+      if (isAwakened) {
+        const wf = Math.sin(elapsed * 12) * 4;
+        ctx.fillStyle = 'rgba(254,240,138,0.88)';
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-6, -2); ctx.quadraticCurveTo(-30, -22 + wf, -24, 6); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(6, -2); ctx.quadraticCurveTo(30, -22 + wf, 24, 6); ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
+
+      // 2) Layered Pixel Paperdoll (Flips horizontally when facing left)
+      ctx.save();
+      if (faceLeft) ctx.scale(-1, 1);
+
+      const drawL = (key, dx = 0, dy = 0) => {
+        const img = this.getLayerCanvas(key);
+        if (img) ctx.drawImage(img, -w / 2 + dx, -h * 0.72 + dy, w, h);
+      };
+
+      // Back Cloak Layer (with subtle sway)
+      if (equip.CLOAK) {
+        const cloakKey = 'cloak_' + equip.CLOAK.tplId;
+        const sway = Math.sin(elapsed * 7) * (scale * 0.45);
+        drawL(this.LAYERS[cloakKey] ? cloakKey : 'cloak_cloth_cloak', sway, 0);
+      }
+
+      // Base Pixel Hero Body
+      drawL('hero_base');
+
+      // Boots Layer
+      if (equip.BOOTS) {
+        const bootsKey = 'boots_' + equip.BOOTS.tplId;
+        if (this.LAYERS[bootsKey]) drawL(bootsKey);
+      }
+
+      // Armor Layer
+      if (equip.ARMOR) {
+        const armorKey = 'armor_' + equip.ARMOR.tplId;
+        if (this.LAYERS[armorKey]) drawL(armorKey);
+      }
+
+      // Necklace Layer
+      if (equip.NECKLACE) {
+        const neckKey = 'neck_' + equip.NECKLACE.tplId;
+        if (this.LAYERS[neckKey]) drawL(neckKey);
+      }
+
+      // Gloves Layer
+      if (equip.GLOVES) {
+        const gloveKey = 'gloves_' + equip.GLOVES.tplId;
+        if (this.LAYERS[gloveKey]) drawL(gloveKey);
+      }
+
+      // Ring Layer (pulsing crimson ruby sparkle)
+      if (equip.RING) {
+        const ringKey = 'ring_' + equip.RING.tplId;
+        if (this.LAYERS[ringKey]) drawL(ringKey);
+      }
+
+      // Helm OR Default Hair Layer
+      if (equip.HELM && this.LAYERS['helm_' + equip.HELM.tplId]) {
+        drawL('helm_' + equip.HELM.tplId);
+      } else {
+        drawL(isAwakened ? 'hair_awakened' : 'hair_default');
+      }
+
+      ctx.restore(); // Restore horizontal flip before rotating weapon
+
+      // 3) Equipped Pixel Weapon Sprite held in Hand (Rotates & Swings!)
+      if (equip.WEAPON) {
+        const wImg = this.getItemCanvas(equip.WEAPON.tplId);
+        const wSize = 12 * scale * 1.15;
+        ctx.save();
+        ctx.translate(faceLeft ? -scale * 3.8 : scale * 3.8, scale * 0.5);
+        const swingOffset = swingProg > 0 ? Math.sin(swingProg * Math.PI) * 1.65 : 0;
+        if (opts.previewMode) {
+          ctx.rotate(-0.18 + Math.sin(elapsed * 3) * 0.08);
+        } else {
+          // Weapon pixel sprite points at -45 deg (top-right), align to facing + slash swing
+          ctx.rotate(weaponAngle + Math.PI * 0.25 + swingOffset);
+        }
+        // Subtle elemental glow for Epic / Legendary blades
+        const wTpl = ITEM_TEMPLATES[equip.WEAPON.tplId];
+        if (wTpl && (wTpl.rarity === 'EPIC' || wTpl.rarity === 'LEGENDARY' || isAwakened)) {
+          ctx.shadowColor = isAwakened ? '#fde047' : RARITY_INFO[wTpl.rarity].color;
+          ctx.shadowBlur = 10;
+        }
+        // Pivot at sword hilt (bottom-left of the 12x12 sprite)
+        ctx.drawImage(wImg, -wSize * 0.16, -wSize * 0.84, wSize, wSize);
+        ctx.restore();
+      }
+
+      ctx.restore();
     }
   };
-
-  /* Ancient Field Runes (MapleStory-inspired World Buffs) */
-  const RUNE_TYPES = {
-    STORM:    { id: 'STORM',    name: '광풍의 룬', icon: '⚡', color: '#38bdf8', dur: 20, desc: '공속+45% · 이속+25% · 주기 낙뢰 타격!' },
-    METEOR:   { id: 'METEOR',   name: '파멸의 룬', icon: '☄️', color: '#f97316', dur: 20, desc: '주변 몬스터에게 화염 운석 지원 폭격!' },
-    BLESSING: { id: 'BLESSING', name: '축복의 룬', icon: '💎', color: '#a855f7', dur: 25, desc: '경험치 2배 · 아이템 드롭률 +60%!' }
-  };
 <!-- ... existing code ... -->
-    particles: [],
-    floatingTexts: [],
-    rifts: [],
-    zoneSpawners: {},
-
-    // === 60,000x FUN SYSTEMS: Auto-Hunt, Combo Fever, Field Runes, Treasure Chests, AmbientFX ===
-    autoHunt: { enabled: false, targetUid: null, roamX: 1650, roamY: 2350, roamTimer: 0, status: '' },
-    combo: { count: 0, timer: 0, maxTimer: 6.5 },
-    runes: [],
-    activeRune: null, // { type, timer, tick }
-    runeSpawnTimer: 6,
-    chests: [],
-    ambientParticles: [],
-    hitStop: 0,
-
-    // Field Boss Scheduler (90s cycle for fun prototype testing)
-<!-- ... existing code ... -->
-        // Unique item internal cooldowns & counters
+        atkCd: 0, skill1Cd: 0, skill2Cd: 0, dodgeCd: 0, potionCd: 0, invulnTimer: 0,
         flameIcd: 0, lightningIcd: 0, frostIcd: 0, riftIcd: 0, riftSkillStack: 0,
-        lifestealWindow: 0, lifestealAccum: 0,
-        // Awakening Ultimate Gauge (0~100) & Timer
-        ultGauge: 0, awakeningTimer: 0,
-        // Equipment & Bag
-<!-- ... existing code ... -->
-      if (uniques.has('BERSERKER_HELM') && p.hp <= maxHp * 0.5) {
-        atkSpeedMult *= 1.25;
-        critMult += 0.30;
-      }
-      if (defPenalty > 0) def = Math.round(def * (1 - defPenalty));
-
-      // Combo Fever Resonance (+1% XP/Drop & +0.5% Move Speed per 5 combo, capped at +20%)
-      const comboSteps = Math.min(20, Math.floor(this.combo.count / 5));
-      if (comboSteps > 0) {
-        xpBonus += comboSteps * 0.01;
-        dropBonus += comboSteps * 0.01;
-        moveSpeed *= (1 + comboSteps * 0.005);
-      }
-
-      // Active Ancient Field Rune Buffs
-      if (this.activeRune) {
-        if (this.activeRune.type === 'STORM') { atkSpeedMult *= 1.45; moveSpeed *= 1.25; }
-        else if (this.activeRune.type === 'BLESSING') { xpBonus += 1.0; dropBonus += 0.60; }
-      }
-
-      // Awakening Overdrive Mode (10s Golden Hero Mode)
-      if (p.awakeningTimer > 0) {
-        atk = Math.round(atk * 1.32);
-        atkSpeedMult *= 1.40;
-        moveSpeed *= 1.20;
-        critChance += 0.15;
-      }
-
-      const stats = {
-        maxHp, atk, def, moveSpeed, atkSpeedMult, critChance, critMult,
-        dropBonus, goldBonus, xpBonus, normalDmgBonus, dodgeCdMult, uniques
+        ultGauge: 0, awakeningTimer: 0, swingTimer: 0,
+        equip: {
+          WEAPON: this.makeItem('rusty_sword', 0),
+          ARMOR:  this.makeItem('leather_armor', 0),
+          HELM: null, GLOVES: null, BOOTS: null, CLOAK: null, NECKLACE: null, RING: null
+        },
+        bag: [
+          this.makeItem('hunter_neck', 0),
+          this.makeItem('cloth_cloak', 0),
+          this.makeItem('wood_helm', 0)
+        ],
+        codex: { zones: ['greenhaven'], monsters: {}, items: ['rusty_sword', 'leather_armor', 'hunter_neck', 'cloth_cloak', 'wood_helm'] }
       };
-      stats.cp = Balance.computeCP(stats, uniques.size);
-      return stats;
     },
 <!-- ... existing code ... -->
-      this.initZoneSpawners();
-      this.initAiPlayers();
-      this.initAmbientParticles();
-      this.spawnInitialRunes();
-      this.bindInputs();
-      this.resize();
-      window.addEventListener('resize', () => this.resize());
-
-      this.pet.x = this.player.x - 35;
-      this.pet.y = this.player.y - 25;
-      this.camera.x = this.player.x - this.vw / 2;
-      this.camera.y = this.player.y - this.vh / 2;
-
-      UI.log('🌍 아르카디아 심리스 오픈월드에 접속했습니다. 로딩 없이 대륙을 탐험하세요!', '#38bdf8');
-      UI.log('🤖 팁: 우측 [AUTO (Z)] 버튼으로 스마트 자동사냥을 켤 수 있고, [R]로 에테르 각성을 발동합니다!', '#34d399');
-      this.updateHUD();
-
-      this.lastTime = performance.now();
-      requestAnimationFrame((t) => this.loop(t));
-    },
-<!-- ... existing code ... -->
-      const nearest = this.findNearestMonster(p.x, p.y, 260);
-      if (nearest) p.facing = Math.atan2(nearest.y - p.y, nearest.x - p.x);
-
-      // Visual slash arc (larger golden arc during Awakening!)
-      const isAwakened = p.awakeningTimer > 0;
-      this.particles.push({
-        type: 'slash', x: p.x, y: p.y, angle: p.facing,
-        radius: isAwakened ? 92 : 70,
-        color: isAwakened ? '#fde047' : stats.uniques.has('RIFT_SWORD') ? '#c084fc' : stats.uniques.has('FROST_SWORD') ? '#7dd3fc' : stats.uniques.has('FLAME_SWORD') || stats.uniques.has('IGNIS_SWORD') ? '#fb923c' : '#f1f5f9',
-        life: 0.2, maxLife: 0.2
-      });
-
-      // Check Legendary Rift Greatsword proc (after 3 skill casts)
-      if (stats.uniques.has('RIFT_SWORD') && p.riftSkillStack >= 3 && p.riftIcd <= 0) {
-        p.riftSkillStack = 0;
-        p.riftIcd = 12.0;
-        const rx = p.x + Math.cos(p.facing) * 110;
-        const ry = p.y + Math.sin(p.facing) * 110;
-        this.spawnSpatialRift(rx, ry, stats);
-      }
-
-      // Unique Weapons: Flame Sword / Ignis Heart Sword projectiles (boosted proc during Awakening)
-      const procBoost = isAwakened ? 1.45 : 1.0;
-      if (p.flameIcd <= 0 && Math.random() < 0.35 * procBoost) {
-        if (stats.uniques.has('IGNIS_SWORD')) {
-          p.flameIcd = 1.5;
-          SFX.fire();
-          [-0.26, 0, 0.26].forEach(offset => {
-            this.projectiles.push({
-              owner: 'player', kind: 'flame_wave', x: p.x, y: p.y,
-              vx: Math.cos(p.facing + offset) * 430, vy: Math.sin(p.facing + offset) * 430,
-              radius: 16, mult: 1.05, pierce: 3, hitSet: new Set(), life: 0.65, color: '#f97316'
-            });
-          });
-        } else if (stats.uniques.has('FLAME_SWORD')) {
-          p.flameIcd = 1.5;
-          SFX.fire();
-          this.projectiles.push({
-            owner: 'player', kind: 'flame_wave', x: p.x, y: p.y,
-            vx: Math.cos(p.facing) * 440, vy: Math.sin(p.facing) * 440,
-            radius: 18, mult: 1.20, pierce: 3, hitSet: new Set(), life: 0.68, color: '#fb923c'
-          });
-        }
-      }
-
-      // Awakening Bonus Golden Crescent Wave
-      if (isAwakened && Math.random() < 0.5) {
-        this.projectiles.push({
-          owner: 'player', kind: 'aether_wave', x: p.x, y: p.y,
-          vx: Math.cos(p.facing) * 470, vy: Math.sin(p.facing) * 470,
-          radius: 18, mult: 0.85, pierce: 4, hitSet: new Set(), life: 0.55, color: '#fde047'
-        });
-      }
-
-      // Hit Treasure Pinata Chests in melee range
-      for (let ci = this.chests.length - 1; ci >= 0; ci--) {
-        const ch = this.chests[ci];
-        if (Math.hypot(ch.x - p.x, ch.y - p.y) <= (isAwakened ? 105 : 85)) {
-          this.hitTreasureChest(ch);
-        }
-      }
-
-      // Hit monsters in melee cone
-      const reach = isAwakened ? 96 : 78;
-      for (const m of this.monsters) {
-        if (m.hp <= 0 || m.spawnAnim > 0) continue;
-        const dx = m.x - p.x, dy = m.y - p.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist <= reach + m.radius) {
-          const ang = Math.atan2(dy, dx);
-          let diff = ang - p.facing;
-          while (diff > Math.PI) diff -= Math.PI * 2;
-          while (diff < -Math.PI) diff += Math.PI * 2;
-          if (Math.abs(diff) <= 1.32 || dist < 38) {
-            this.damageMonster(m, 1.0, stats, 'player');
-          }
-        }
-      }
-    },
-
-    /* ------------------------------------------------------------------------
-       AWAKENING OVERDRIVE ULTIMATE (R Key / Button)
-       ------------------------------------------------------------------------ */
-    useAwakening() {
-      const p = this.player;
-      if (p.ultGauge < 100 || p.awakeningTimer > 0) return;
-      p.ultGauge = 0;
-      p.awakeningTimer = 10.0;
-      p.invulnTimer = Math.max(p.invulnTimer, 0.8);
       const stats = this.getPlayerStats();
-
-      SFX.awaken();
-      this.camera.shake = 14;
-      this.hitStop = 0.05;
-      UI.banner('🌟 에테르 각성 발동!!', '10초간 공격력+32% · 공속+40% · 이속+20% · 황금 검기 방출!', '#facc15');
-      UI.log('🌟 [에테르 각성] 폭발적인 고대 마력이 해방되었습니다!', '#fde047');
-
-      this.particles.push({ type: 'ring', x: p.x, y: p.y, r: 16, maxR: 230, color: '#fde047', life: 0.55, maxLife: 0.55 });
-      this.particles.push({ type: 'ring', x: p.x, y: p.y, r: 10, maxR: 170, color: '#f97316', life: 0.42, maxLife: 0.42 });
-      for (let i = 0; i < 20; i++) {
-        const a = (Math.PI * 2 * i) / 20;
-        this.particles.push({
-          type: 'dot', x: p.x, y: p.y, vx: Math.cos(a) * 220, vy: Math.sin(a) * 220,
-          r: 5.5, color: i % 2 === 0 ? '#fef08a' : '#f97316', life: 0.5, maxLife: 0.5
-        });
-      }
-
-      // Massive Awakening AoE Burst (280% ATK)
-      for (const m of this.monsters) {
-        if (m.hp <= 0 || m.spawnAnim > 0) continue;
-        if (Math.hypot(m.x - p.x, m.y - p.y) <= 230 + m.radius) {
-          this.damageMonster(m, 2.8, stats, 'player', false);
-        }
-      }
-      for (let ci = this.chests.length - 1; ci >= 0; ci--) {
-        if (Math.hypot(this.chests[ci].x - p.x, this.chests[ci].y - p.y) <= 230) {
-          this.hitTreasureChest(this.chests[ci], 3);
-        }
-      }
+      p.atkCd = 0.44 / stats.atkSpeedMult;
+      p.swingTimer = 0.22;
+      SFX.swing();
+<!-- ... existing code ... -->
+      this.saveGame();
+      UI.openModal('inventory');
     },
 
-    /* ------------------------------------------------------------------------
-       SMART AUTO-HUNT AI CONTROLLER (Toggleable via Z / AUTO Button)
-       ------------------------------------------------------------------------ */
-    toggleAutoHunt() {
-      this.autoHunt.enabled = !this.autoHunt.enabled;
-      const btn = document.getElementById('btnAuto');
-      const lbl = document.getElementById('autoBtnLabel');
-      if (this.autoHunt.enabled) {
-        btn.classList.add('auto-active');
-        lbl.textContent = 'ON';
-        SFX.rune();
-        UI.log('🤖 스마트 자동사냥 ON — 적정 사냥터 이동 · 스킬 연계 · 장판 자동 회피 · 룬 획득 가동!', '#34d399');
-        this.addFloatingText(this.player.x, this.player.y - 44, '🤖 AUTO ON', '#34d399', 14);
-      } else {
-        btn.classList.remove('auto-active');
-        lbl.textContent = 'AUTO';
-        this.autoHunt.status = '';
-        SFX.loot();
-        UI.log('🎮 자동사냥 OFF — 수동 조작 모드로 전환했습니다.', '#94a3b8');
-        this.addFloatingText(this.player.x, this.player.y - 44, '🎮 수동 모드', '#cbd5e1', 13);
-      }
-    },
-
-    getBestAutoZoneForLevel(lv) {
-      // Pick the highest combat zone where player isn't under-leveled
-      if (lv >= 22) return ZONES.find(z => z.id === 'frost_tundra');
-      if (lv >= 12) return ZONES.find(z => z.id === 'redcliff');
-      if (lv >= 6)  return ZONES.find(z => z.id === 'wolf_woods');
-      return ZONES.find(z => z.id === 'dawn_fields');
-    },
-
-    computeAutoHuntIntent(stats, dt) {
+    unequipSlot(slot) {
       const p = this.player;
-      const curZone = this.getZoneAt(p.x, p.y);
-
-      // 1) Smart Auto-Potion when HP < 48%
-      if (p.hp < stats.maxHp * 0.48 && p.potions > 0 && p.potionCd <= 0) {
-        this.usePotion();
-      }
-
-      // 2) Smart Auto-Dodge against incoming monster red telegraphs!
-      if (p.dodgeCd <= 0 && p.invulnTimer <= 0) {
-        for (const m of this.monsters) {
-          if (!m.telegraph) continue;
-          const tg = m.telegraph;
-          if (tg.t / tg.dur < 0.45) continue; // React right before impact
-          let inDanger = false;
-          let escX = p.x - m.x, escY = p.y - m.y;
-          if (tg.kind === 'circle' && Math.hypot(p.x - tg.x, p.y - tg.y) <= tg.r + p.radius + 14) {
-            inDanger = true; escX = p.x - tg.x; escY = p.y - tg.y;
-          } else if (tg.kind === 'meteors') {
-            for (const pt of tg.pts) {
-              if (Math.hypot(p.x - pt.x, p.y - pt.y) <= tg.r + p.radius + 14) {
-                inDanger = true; escX = p.x - pt.x; escY = p.y - pt.y; break;
-              }
-            }
-          } else if (tg.kind === 'line') {
-            const dx = p.x - tg.x, dy = p.y - tg.y;
-            const proj = dx * Math.cos(tg.ang) + dy * Math.sin(tg.ang);
-            const perp = -dx * Math.sin(tg.ang) + dy * Math.cos(tg.ang);
-            if (proj >= -10 && proj <= tg.len + 15 && Math.abs(perp) <= tg.width * 0.55 + p.radius) {
-              inDanger = true;
-              const side = perp >= 0 ? 1 : -1;
-              escX = -Math.sin(tg.ang) * side; escY = Math.cos(tg.ang) * side;
-            }
-          } else if (tg.kind === 'cone' && Math.hypot(p.x - tg.x, p.y - tg.y) <= tg.r + p.radius + 10) {
-            inDanger = true;
-          }
-          if (inDanger) {
-            const len = Math.hypot(escX, escY) || 1;
-            p.vx = (escX / len) * stats.moveSpeed;
-            p.vy = (escY / len) * stats.moveSpeed;
-            p.facing = Math.atan2(escY, escX);
-            this.useDodge();
-            return { ix: escX / len, iy: escY / len };
-          }
-        }
-      }
-
-      // 3) Brief safe heal in town if critically low HP and out of potions
-      if (curZone.safe && p.hp < stats.maxHp * 0.85 && p.potions === 0) {
-        this.autoHunt.status = '마을 회복 중';
-        return { ix: 0, iy: 0 };
-      }
-
-      // 4) Priority 1: Nearby Ancient Field Rune (within 460px)
-      let nearRune = null, rBest = 460;
-      for (const r of this.runes) {
-        const d = Math.hypot(r.x - p.x, r.y - p.y);
-        if (d < rBest) { rBest = d; nearRune = r; }
-      }
-      if (nearRune) {
-        this.autoHunt.status = '고대 룬 획득';
-        const dx = nearRune.x - p.x, dy = nearRune.y - p.y, d = Math.hypot(dx, dy) || 1;
-        return { ix: dx / d, iy: dy / d };
-      }
-
-      // 5) Priority 2: Nearby Treasure Pinata Chest (within 420px)
-      let nearChest = null, cBest = 420;
-      for (const ch of this.chests) {
-        const d = Math.hypot(ch.x - p.x, ch.y - p.y);
-        if (d < cBest) { cBest = d; nearChest = ch; }
-      }
-      if (nearChest) {
-        this.autoHunt.status = '보물상자 개봉';
-        const dx = nearChest.x - p.x, dy = nearChest.y - p.y, d = Math.hypot(dx, dy) || 1;
-        if (d <= 68) {
-          p.facing = Math.atan2(dy, dx);
-          this.performBasicAttack();
-          return { ix: 0, iy: 0 };
-        }
-        return { ix: dx / d, iy: dy / d };
-      }
-
-      // 6) Priority 3: Active Field Boss if player is strong enough (lv >= boss.lv - 4)
-      const boss = this.bossState.activeBoss;
-      let target = null;
-      if (boss && boss.hp > 0 && p.lv >= boss.lv - 4 && Math.hypot(boss.x - p.x, boss.y - p.y) < 1600) {
-        target = boss;
-        this.autoHunt.status = `보스 토벌: ${boss.name}`;
-      }
-
-      // 7) Priority 4: Best suitable monster nearby (prioritize Rare/Elite, avoid +6 level walls)
-      if (!target) {
-        let bestScore = Infinity;
-        for (const m of this.monsters) {
-          if (m.hp <= 0 || m.spawnAnim > 0) continue;
-          if (m.lv > p.lv + 5) continue; // Respect anti-inflation level cap
-          const d = Math.hypot(m.x - p.x, m.y - p.y);
-          if (d > 820) continue;
-          const tierBonus = m.tier === 'RARE' ? -240 : m.tier === 'ELITE' ? -120 : 0;
-          const score = d + tierBonus;
-          if (score < bestScore) { bestScore = score; target = m; }
-        }
-      }
-
-      if (target) {
-        const dx = target.x - p.x, dy = target.y - p.y;
-        const d = Math.hypot(dx, dy) || 1;
-        p.facing = Math.atan2(dy, dx);
-        this.autoHunt.status = `사냥: ${target.name}`;
-
-        // Trigger Awakening when full near Elites/Bosses or 2+ mobs
-        if (p.ultGauge >= 100 && p.awakeningTimer <= 0) {
-          const nearbyCount = this.monsters.filter(mm => mm.hp > 0 && Math.hypot(mm.x - p.x, mm.y - p.y) < 220).length;
-          if (target.tier !== 'NORMAL' || nearbyCount >= 2) this.useAwakening();
-        }
-
-        // Skill 2 Dash Strike gap closer
-        if (d <= 170 && d >= 65 && p.skill2Cd <= 0) {
-          this.useSkill2();
-        }
-        // Skill 1 Whirlwind AoE
-        if (d <= 112 + target.radius && p.skill1Cd <= 0) {
-          this.useSkill1();
-        }
-        // Basic Attack in melee reach
-        const attackRange = (p.awakeningTimer > 0 ? 84 : 68) + target.radius;
-        if (d <= attackRange) {
-          this.performBasicAttack();
-          return { ix: 0, iy: 0 };
-        }
-        return { ix: dx / d, iy: dy / d };
-      }
-
-      // 8) No monster nearby: navigate smoothly to recommended hunting ground
-      const idealZone = this.getBestAutoZoneForLevel(p.lv);
-      this.autoHunt.status = `${idealZone.name} 이동 중`;
-      this.autoHunt.roamTimer -= dt;
-      if (this.autoHunt.roamTimer <= 0 || Math.hypot(this.autoHunt.roamX - p.x, this.autoHunt.roamY - p.y) < 55) {
-        this.autoHunt.roamTimer = 4.0;
-        this.autoHunt.roamX = idealZone.x + idealZone.w * (0.25 + Math.random() * 0.5);
-        this.autoHunt.roamY = idealZone.y + idealZone.h * (0.25 + Math.random() * 0.5);
-      }
-      const dx = this.autoHunt.roamX - p.x, dy = this.autoHunt.roamY - p.y, d = Math.hypot(dx, dy) || 1;
-      return { ix: dx / d, iy: dy / d };
+      if (!p.equip[slot]) return;
+      p.bag.push(p.equip[slot]);
+      p.equip[slot] = null;
+      SFX.loot();
+      this.saveGame();
+      UI.openModal('inventory');
     },
 
-    /* ------------------------------------------------------------------------
-       ANCIENT FIELD RUNES & GOLDEN TREASURE CHESTS (60,000x Fun Events)
-       ------------------------------------------------------------------------ */
-    spawnInitialRunes() {
-      const combatZones = ZONES.filter(z => !z.safe && !z.hidden);
-      combatZones.slice(0, 3).forEach(z => this.spawnRuneInZone(z));
-    },
-
-    spawnRuneInZone(zone) {
-      const keys = Object.keys(RUNE_TYPES);
-      const tKey = keys[Math.floor(Math.random() * keys.length)];
-      this.runes.push({
-        uid: ++this.uidCounter,
-        type: tKey,
-        zoneId: zone.id,
-        x: zone.x + 160 + Math.random() * (zone.w - 320),
-        y: zone.y + 160 + Math.random() * (zone.h - 320),
-        life: 120
-      });
-    },
-
-    spawnTreasureChest(x, y, mobLv) {
-      this.chests.push({
-        uid: ++this.uidCounter,
-        x: Math.max(80, Math.min(WORLD_W - 80, x + (Math.random() - 0.5) * 40)),
-        y: Math.max(80, Math.min(WORLD_H - 80, y + (Math.random() - 0.5) * 40)),
-        lv: mobLv,
-        hp: 4, maxHp: 4, hitFlash: 0, shake: 0, life: 40
-      });
-      SFX.rune();
-      UI.banner('🎁 차원의 보물상자 출현!', '공격해서 부수면 골드와 희귀 장비가 쏟아집니다!', '#facc15');
-      UI.log('🎁 [보물 이벤트] 필드에 [차원의 보물상자]가 나타났습니다! 때려서 열어보세요!', '#fde047');
-    },
-
-    hitTreasureChest(ch, power = 1) {
-      if (ch.hp <= 0) return;
-      ch.hp -= power;
-      ch.hitFlash = 0.14;
-      ch.shake = 7;
-      SFX.hit(true);
-      this.addFloatingText(ch.x, ch.y - 26, '💥 쾅!', '#fde047', 14);
-      for (let i = 0; i < 6; i++) {
-        const a = Math.random() * Math.PI * 2;
-        this.particles.push({
-          type: 'dot', x: ch.x, y: ch.y, vx: Math.cos(a) * 110, vy: Math.sin(a) * 110,
-          r: 4, color: '#fde047', life: 0.35, maxLife: 0.35
-        });
-      }
-      if (ch.hp <= 0) {
-        const idx = this.chests.indexOf(ch);
-        if (idx !== -1) this.chests.splice(idx, 1);
-        SFX.chestBurst();
-        this.camera.shake = 9;
-        // Fountain of Loot!
-        for (let g = 0; g < 5; g++) {
-          this.spawnLoot(ch.x, ch.y, { kind: 'gold', amount: 60 + ch.lv * 18, rarity: 'COMMON', name: `${60 + ch.lv * 18}G` });
-        }
-        this.spawnLoot(ch.x, ch.y, { kind: 'stone', amount: 3, rarity: 'RARE', name: '강화석 x3' });
-        const rarity = Math.random() < 0.22 ? 'EPIC' : Math.random() < 0.65 ? 'RARE' : 'UNCOMMON';
-        this.dropRandomRarityItem(ch.x, ch.y, ch.lv + 2, rarity);
-      }
-    },
-
-    updateRunesAndChests(dt) {
+    buyPixelGear(tplId, price) {
       const p = this.player;
-      const stats = this.getPlayerStats();
-
-      // Combo decay
-      if (this.combo.count > 0) {
-        this.combo.timer -= dt;
-        if (this.combo.timer <= 0) this.combo.count = 0;
-      }
-
-      // Respawn field runes up to 4
-      this.runeSpawnTimer -= dt;
-      if (this.runeSpawnTimer <= 0) {
-        this.runeSpawnTimer = 26;
-        if (this.runes.length < 4) {
-          const combatZones = ZONES.filter(z => !z.safe && !z.hidden);
-          const z = combatZones[Math.floor(Math.random() * combatZones.length)];
-          this.spawnRuneInZone(z);
-        }
-      }
-
-      // Check player activation of runes
-      for (let i = this.runes.length - 1; i >= 0; i--) {
-        const r = this.runes[i];
-        r.life -= dt;
-        if (r.life <= 0) { this.runes.splice(i, 1); continue; }
-        if (Math.hypot(r.x - p.x, r.y - p.y) < 46) {
-          const info = RUNE_TYPES[r.type];
-          this.activeRune = { type: r.type, timer: info.dur, tick: 0.4 };
-          this.runes.splice(i, 1);
-          SFX.rune();
-          this.camera.shake = 7;
-          UI.banner(`${info.icon} [${info.name}] 해방!`, info.desc, info.color);
-          UI.log(`${info.icon} 고대 룬 [${info.name}] 발동! (${info.dur}초간 ${info.desc})`, info.color);
-          this.particles.push({ type: 'ring', x: p.x, y: p.y, r: 14, maxR: 150, color: info.color, life: 0.45, maxLife: 0.45 });
-        }
-      }
-
-      // Active Rune combat triggers (Storm Lightning / Meteor Shower!)
-      if (this.activeRune) {
-        this.activeRune.timer -= dt;
-        this.activeRune.tick -= dt;
-        if (this.activeRune.tick <= 0) {
-          if (this.activeRune.type === 'STORM') {
-            this.activeRune.tick = 1.1;
-            const target = this.findNearestMonster(p.x, p.y, 320);
-            if (target) {
-              SFX.lightning();
-              this.particles.push({ type: 'lightning', x1: target.x, y1: target.y - 160, x2: target.x, y2: target.y, color: '#38bdf8', life: 0.25, maxLife: 0.25 });
-              this.particles.push({ type: 'ring', x: target.x, y: target.y, r: 8, maxR: 54, color: '#7dd3fc', life: 0.26, maxLife: 0.26 });
-              this.damageMonster(target, 1.35, stats, 'player', true);
-            }
-          } else if (this.activeRune.type === 'METEOR') {
-            this.activeRune.tick = 1.25;
-            const nearMobs = this.monsters.filter(m => m.hp > 0 && Math.hypot(m.x - p.x, m.y - p.y) < 340);
-            if (nearMobs.length > 0) {
-              const target = nearMobs[Math.floor(Math.random() * nearMobs.length)];
-              SFX.fire();
-              this.particles.push({ type: 'line', x1: target.x - 75, y1: target.y - 190, x2: target.x, y2: target.y, color: '#fb923c', width: 12, life: 0.25, maxLife: 0.25 });
-              this.particles.push({ type: 'ring', x: target.x, y: target.y, r: 10, maxR: 92, color: '#f97316', life: 0.35, maxLife: 0.35 });
-              for (const m of nearMobs) {
-                if (Math.hypot(m.x - target.x, m.y - target.y) <= 92 + m.radius) {
-                  this.damageMonster(m, 1.5, stats, 'player', true);
-                }
-              }
-            }
-          }
-        }
-        if (this.activeRune.timer <= 0) this.activeRune = null;
-      }
-
-      // Update Treasure Chests
-      for (let i = this.chests.length - 1; i >= 0; i--) {
-        const ch = this.chests[i];
-        ch.life -= dt;
-        if (ch.hitFlash > 0) ch.hitFlash -= dt;
-        if (ch.shake > 0) ch.shake = Math.max(0, ch.shake - dt * 28);
-        if (ch.life <= 0) this.chests.splice(i, 1);
-      }
+      if (p.gold < price) { UI.banner('⚠️ 골드 부족', `${price}G가 필요합니다.`, '#fb7185'); return; }
+      const tpl = ITEM_TEMPLATES[tplId];
+      if (!tpl) return;
+      p.gold -= price;
+      const item = this.makeItem(tplId, 0);
+      if (!p.equip[tpl.slot]) p.equip[tpl.slot] = item;
+      else p.bag.push(item);
+      if (!p.codex.items.includes(tplId)) p.codex.items.push(tplId);
+      SFX.loot();
+      UI.banner(`🎨 픽셀 장비 구매: ${tpl.name}`, '장비창에서 착용하여 캐릭터 외형 변화를 확인하세요!', RARITY_INFO[tpl.rarity].color);
+      this.saveGame();
+      UI.openModal('shop');
     },
 
-    /* Ambient MapleStory-style Biome Particles (Leaves, Fireflies, Embers, Snow) */
-    initAmbientParticles() {
-      this.ambientParticles = [];
-      for (let i = 0; i < 42; i++) {
-        this.ambientParticles.push({
-          rx: Math.random(), ry: Math.random(),
-          vx: (Math.random() - 0.5) * 24, vy: 12 + Math.random() * 24,
-          size: 2 + Math.random() * 3.5, phase: Math.random() * Math.PI * 2
-        });
-      }
-    },
-
-    updateAmbientParticles(dt) {
-      for (const ap of this.ambientParticles) {
-        ap.rx += (ap.vx * dt) / Math.max(400, this.vw);
-        ap.ry += (ap.vy * dt) / Math.max(400, this.vh);
-        if (ap.ry > 1.05) { ap.ry = -0.05; ap.rx = Math.random(); }
-        if (ap.rx < -0.05) ap.rx = 1.05;
-        if (ap.rx > 1.05) ap.rx = -0.05;
-      }
-    },
+    sellFromBag(uid) {
 <!-- ... existing code ... -->
-      if (source === 'player') {
-        SFX.hit(res.isCrit);
-        if (res.isCrit) this.hitStop = Math.max(this.hitStop, 0.022);
-        // Charge Awakening Ultimate Gauge
-        if (p.awakeningTimer <= 0) {
-          p.ultGauge = Math.min(100, p.ultGauge + (res.isCrit ? 4.5 : 2.8));
-        }
-        this.addFloatingText(
-          m.x + (Math.random() - 0.5) * 20, m.y - m.radius - 12,
-          res.isCrit ? `💥 ${res.dmg}!` : `${res.dmg}`,
-          res.isCrit ? '#fde047' : (res.isUnderLeveled ? '#94a3b8' : '#ffffff'),
-          res.isCrit ? 19 : 14,
-          res.isCrit
-        );
-        if (res.isUnderLeveled) {
-<!-- ... existing code ... -->
-      // Track codex & kill telemetry
-      p.codex.monsters[m.tplId] = (p.codex.monsters[m.tplId] || 0) + 1;
-      this.killTimes.push(Date.now());
-      if (this.killTimes.length > 40) this.killTimes.shift();
-
-      // Multi-Kill Combo Fever & Awakening Charge
-      this.combo.count++;
-      this.combo.timer = this.combo.maxTimer;
-      if (p.awakeningTimer <= 0) p.ultGauge = Math.min(100, p.ultGauge + (m.tier === 'NORMAL' ? 8 : 25));
-      if ([10, 25, 50, 100].includes(this.combo.count)) {
-        SFX.rune();
-        this.addFloatingText(p.x, p.y - 54, `🔥 ${this.combo.count} COMBO!!`, '#fb923c', 18, true);
-      }
-      // Chance to spawn Golden Treasure Pinata Chest right on the field!
-      if ((m.tier === 'NORMAL' && Math.random() < 0.065) || m.tier === 'RARE' || (m.tier === 'ELITE' && Math.random() < 0.45)) {
-        if (this.chests.length < 3) this.spawnTreasureChest(m.x, m.y, m.lv);
-      }
-
-      // XP with ±5 level scaling & Hunter's Necklace bonus
-<!-- ... existing code ... -->
-    addFloatingText(x, y, text, color = '#fff', size = 13, isCrit = false) {
-      this.floatingTexts.push({ x, y, text, color, size, isCrit, life: isCrit ? 1.05 : 0.9, maxLife: isCrit ? 1.05 : 0.9 });
-    },
-<!-- ... existing code ... -->
-    loop(now) {
-      const rawDt = Math.min(0.05, (now - this.lastTime) / 1000);
-      this.lastTime = now;
-
-      // Crisp ARPG Hit-Stop micro-freeze on heavy crits / awakening
-      if (this.hitStop > 0) {
-        this.hitStop = Math.max(0, this.hitStop - rawDt);
-        this.render();
-        requestAnimationFrame((t) => this.loop(t));
-        return;
-      }
-
-      const dt = rawDt;
-      this.elapsed += dt;
-
-      this.updatePlayer(dt);
-      this.updateRunesAndChests(dt);
-      this.updateSpawners(dt);
-      this.updateFieldBoss(dt);
-      this.updateMonsters(dt);
-      this.updateAiPlayers(dt);
-      this.updatePet(dt);
-      this.updateProjectilesAndEffects(dt);
-      this.updateAmbientParticles(dt);
-<!-- ... existing code ... -->
-      // Cooldowns
       ['atkCd', 'skill1Cd', 'skill2Cd', 'dodgeCd', 'potionCd', 'invulnTimer',
-       'flameIcd', 'lightningIcd', 'frostIcd', 'riftIcd', 'awakeningTimer'].forEach(k => {
+       'flameIcd', 'lightningIcd', 'frostIcd', 'riftIcd', 'awakeningTimer', 'swingTimer'].forEach(k => {
         if (p[k] > 0) p[k] = Math.max(0, p[k] - dt);
       });
-
-      // Awakening golden aura sparkles
-      if (p.awakeningTimer > 0 && Math.random() < 0.55) {
-        this.particles.push({
-          type: 'dot', x: p.x + (Math.random() - 0.5) * 28, y: p.y + (Math.random() - 0.5) * 22,
-          vx: (Math.random() - 0.5) * 25, vy: -35 - Math.random() * 35,
-          r: 3.5, color: Math.random() < 0.5 ? '#fde047' : '#fb923c', life: 0.4, maxLife: 0.4
-        });
-      }
 <!-- ... existing code ... -->
-      // Movement Input (Keyboard + Virtual Joystick, with Seamless Smart Auto-Hunt fallback)
-      let ix = 0, iy = 0;
-      if (this.keys['KeyW'] || this.keys['ArrowUp']) iy -= 1;
-      if (this.keys['KeyS'] || this.keys['ArrowDown']) iy += 1;
-      if (this.keys['KeyA'] || this.keys['ArrowLeft']) ix -= 1;
-      if (this.keys['KeyD'] || this.keys['ArrowRight']) ix += 1;
-      if (this.joystick.active) { ix = this.joystick.dx; iy = this.joystick.dy; }
-
-      const manualMove = Math.hypot(ix, iy) > 0.08;
-      if (!manualMove && this.autoHunt.enabled) {
-        const aiMove = this.computeAutoHuntIntent(stats, dt);
-        ix = aiMove.ix;
-        iy = aiMove.iy;
-      }
-<!-- ... existing code ... -->
-    /* ------------------------------------------------------------------------
-       RENDERING PIPELINE (MapleStory-Level 2.5D Cartoon Fantasy Canvas Art)
-       ------------------------------------------------------------------------ */
-    render() {
-      const ctx = this.ctx;
-      const cam = this.camera;
-      const sx = cam.shake > 0 ? (Math.random() - 0.5) * cam.shake : 0;
-      const sy = cam.shake > 0 ? (Math.random() - 0.5) * cam.shake : 0;
-
-      ctx.clearRect(0, 0, this.vw, this.vh);
-      ctx.save();
-      ctx.translate(-Math.round(cam.x + sx), -Math.round(cam.y + sy));
-
-      // 1) Lush Maple-style Layered Terrain Zones
-      ctx.fillStyle = '#1f3622';
-      ctx.fillRect(0, 0, WORLD_W, WORLD_H);
-
-      ZONES.forEach(z => {
-        if (z.id === 'secret_cave') return;
-        if (z.x + z.w < cam.x || z.x > cam.x + this.vw || z.y + z.h < cam.y || z.y > cam.y + this.vh) return;
-        const tGrad = ctx.createLinearGradient(z.x, z.y, z.x, z.y + z.h);
-        if (z.id === 'greenhaven')       { tGrad.addColorStop(0, '#3e7a43'); tGrad.addColorStop(1, '#2f6138'); }
-        else if (z.id === 'dawn_fields') { tGrad.addColorStop(0, '#4f9642'); tGrad.addColorStop(1, '#3c7a38'); }
-        else if (z.id === 'wolf_woods')  { tGrad.addColorStop(0, '#224a38'); tGrad.addColorStop(1, '#1b3a2e'); }
-        else if (z.id === 'silverbrook') { tGrad.addColorStop(0, '#5a687c'); tGrad.addColorStop(1, '#475366'); }
-        else if (z.id === 'redcliff')    { tGrad.addColorStop(0, '#6e3426'); tGrad.addColorStop(1, '#4d2219'); }
-        else                             { tGrad.addColorStop(0, '#a8cbe6'); tGrad.addColorStop(1, '#79a7cc'); }
-        ctx.fillStyle = tGrad;
-        ctx.fillRect(z.x, z.y, z.w, z.h);
-
-        // Stylized cobblestone / grass tuft repeating motif (frustum-clipped)
-        const step = 140;
-        const startX = Math.max(z.x + 20, Math.floor(cam.x / step) * step);
-        const startY = Math.max(z.y + 20, Math.floor(cam.y / step) * step);
-        ctx.fillStyle = z.id === 'silverbrook' ? 'rgba(255,255,255,0.08)' : z.id === 'frost_tundra' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.065)';
-        for (let gx = startX; gx < z.x + z.w - 20 && gx < cam.x + this.vw + step; gx += step) {
-          for (let gy = startY; gy < z.y + z.h - 20 && gy < cam.y + this.vh + step; gy += step) {
-            if (z.id === 'silverbrook') {
-              ctx.fillRect(gx, gy, 42, 22);
-              ctx.fillRect(gx + 54, gy + 30, 38, 20);
-            } else {
-              ctx.beginPath();
-              ctx.ellipse(gx + ((gy * 7) % 45), gy + ((gx * 3) % 35), 24, 11, 0, 0, Math.PI * 2);
-              ctx.fill();
-            }
-          }
-        }
-      });
-
-      // Secret Cave glowing amethyst floor
-      const cave = ZONES.find(z => z.id === 'secret_cave');
-      const cGrad = ctx.createRadialGradient(cave.x + cave.w / 2, cave.y + cave.h / 2, 20, cave.x + cave.w / 2, cave.y + cave.h / 2, 260);
-      cGrad.addColorStop(0, '#3b2563'); cGrad.addColorStop(1, '#1e1633');
-      ctx.fillStyle = cGrad;
-      ctx.fillRect(cave.x, cave.y, cave.w, cave.h);
-      ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 4;
-      ctx.strokeRect(cave.x, cave.y, cave.w, cave.h);
-
-      // 2) Warm Storybook Dirt Roads, Sparkling River, Stone Bridge & Battlements
-      ctx.fillStyle = '#a48358';
-      ctx.fillRect(690, 2315, 3450, 90);
-      ctx.fillRect(1820, 820, 76, 1520);
-      ctx.fillRect(3000, 920, 76, 1450);
-      ctx.fillStyle = '#c5a273';
-      ctx.fillRect(690, 2327, 3450, 66);
-      ctx.fillRect(1830, 820, 56, 1520);
-      ctx.fillRect(3010, 920, 56, 1450);
-
-      // Sparkling Silver River
-      const rGrad = ctx.createLinearGradient(2530, 0, 2640, 0);
-      rGrad.addColorStop(0, '#1e40af'); rGrad.addColorStop(0.5, '#38bdf8'); rGrad.addColorStop(1, '#1d4ed8');
-      ctx.fillStyle = rGrad;
-      ctx.fillRect(2530, 1680, 110, 1600);
-      ctx.fillStyle = 'rgba(224, 242, 254, 0.45)';
-      const waveOff = (this.elapsed * 42) % 72;
-      for (let ry = 1700 + waveOff; ry < 3250; ry += 72) {
-        ctx.beginPath(); ctx.roundRect(2548, ry, 74, 8, 4); ctx.fill();
-      }
-
-      // Detailed Arched Stone Bridge
-      ctx.fillStyle = '#cbd5e1';
-      ctx.fillRect(2512, 2292, 146, 136);
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillRect(2512, 2292, 146, 16);
-      ctx.fillRect(2512, 2412, 146, 16);
-      ctx.strokeStyle = '#334155'; ctx.lineWidth = 4;
-      ctx.strokeRect(2512, 2292, 146, 136);
-
-      // Town Walls with Cartoon Outline
-      ctx.strokeStyle = '#44403c'; ctx.lineWidth = 18; ctx.strokeRect(180, 1880, 1000, 1040);
-      ctx.strokeStyle = '#a8a29e'; ctx.lineWidth = 11; ctx.strokeRect(180, 1880, 1000, 1040);
-      ctx.fillStyle = '#c5a273'; ctx.fillRect(1165, 2295, 32, 130);
-
-      ctx.strokeStyle = '#334155'; ctx.lineWidth = 16; ctx.strokeRect(2640, 1940, 740, 860);
-      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 10; ctx.strokeRect(2640, 1940, 740, 860);
-      ctx.fillStyle = '#c5a273';
-      ctx.fillRect(2625, 2298, 30, 124);
-      ctx.fillRect(3366, 2298, 30, 124);
-
-      // Animated Sparkling Waterfall hiding Secret Cave
-      const wfX = 1260, wfY = 440, wfW = 240, wfH = 46;
-      ctx.fillStyle = 'rgba(14, 165, 233, 0.8)';
-      ctx.fillRect(wfX, wfY, wfW, wfH);
-      ctx.fillStyle = 'rgba(224, 242, 254, 0.85)';
-      for (let i = 0; i < 9; i++) {
-        const wy = wfY + ((this.elapsed * 85 + i * 19) % wfH);
-        ctx.beginPath(); ctx.roundRect(wfX + 10 + i * 26, wy, 14, 12, 5); ctx.fill();
-      }
-      ctx.font = 'bold 12px "Noto Sans KR"'; ctx.textAlign = 'center';
-      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-      const wfLabel = this.player.codex.zones.includes('secret_cave') ? '🗝️ 고블린 은신처 입구' : '💧 수상한 폭포...';
-      ctx.strokeText(wfLabel, wfX + wfW / 2, wfY - 8);
-      ctx.fillStyle = '#e0f2fe'; ctx.fillText(wfLabel, wfX + wfW / 2, wfY - 8);
-
-      // 3) MapleStory-Style World Props (Frustum Culled)
-      for (const pr of WORLD_PROPS) {
-        if (pr.x + 160 < cam.x || pr.x - 160 > cam.x + this.vw || pr.y + 160 < cam.y || pr.y - 160 > cam.y + this.vh) continue;
-        this.drawMapleProp(ctx, pr);
-      }
-
-      // 4) Ancient Field Runes (Glowing Maple-style Floating Runestones)
-      for (const r of this.runes) {
-        if (r.x + 90 < cam.x || r.x - 90 > cam.x + this.vw || r.y + 90 < cam.y || r.y - 90 > cam.y + this.vh) continue;
-        const info = RUNE_TYPES[r.type];
-        const bob = Math.sin(this.elapsed * 3.8 + r.uid) * 6;
-        ctx.save();
-        // Ground magic circle
-        ctx.strokeStyle = info.color; ctx.lineWidth = 2.5;
-        ctx.globalAlpha = 0.55 + Math.sin(this.elapsed * 5) * 0.2;
-        ctx.beginPath(); ctx.ellipse(r.x, r.y + 16, 28, 13, 0, 0, Math.PI * 2); ctx.stroke();
-        ctx.globalAlpha = 1;
-        // Floating crystal diamond
-        ctx.fillStyle = info.color;
-        ctx.shadowColor = info.color; ctx.shadowBlur = 16;
-        ctx.beginPath();
-        ctx.moveTo(r.x, r.y - 24 + bob);
-        ctx.lineTo(r.x + 15, r.y - 4 + bob);
-        ctx.lineTo(r.x, r.y + 14 + bob);
-        ctx.lineTo(r.x - 15, r.y - 4 + bob);
-        ctx.closePath();
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
-        ctx.font = '14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(info.icon, r.x, r.y - 5 + bob);
-        ctx.font = 'bold 11px "Noto Sans KR"';
-        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-        ctx.strokeText(`✨ ${info.name}`, r.x, r.y - 34 + bob);
-        ctx.fillStyle = '#fef08a'; ctx.fillText(`✨ ${info.name}`, r.x, r.y - 34 + bob);
-        ctx.restore();
-      }
-
-      // 4.5) Golden Treasure Pinata Chests
-      for (const ch of this.chests) {
-        if (ch.x + 80 < cam.x || ch.x - 80 > cam.x + this.vw || ch.y + 80 < cam.y || ch.y - 80 > cam.y + this.vh) continue;
-        const jx = ch.shake > 0 ? (Math.random() - 0.5) * ch.shake : 0;
-        const bounce = Math.abs(Math.sin(this.elapsed * 5)) * 4;
-        ctx.save();
-        ctx.translate(ch.x + jx, ch.y - bounce);
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        ctx.beginPath(); ctx.ellipse(0, 18 + bounce, 22, 9, 0, 0, Math.PI * 2); ctx.fill();
-        // Chest body
-        ctx.fillStyle = ch.hitFlash > 0 ? '#ffffff' : '#b45309';
-        ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.roundRect(-20, -14, 40, 28, 6); ctx.fill(); ctx.stroke();
-        // Gold lid & bands
-        ctx.fillStyle = '#facc15';
-        ctx.fillRect(-20, -4, 40, 6);
-        ctx.fillRect(-5, -14, 10, 28);
-        ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2;
-        ctx.strokeRect(-5, -6, 10, 10);
-        // Chest HP pips
-        ctx.font = 'bold 11px "Noto Sans KR"'; ctx.textAlign = 'center';
-        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-        ctx.strokeText(`🎁 보물상자 (${ch.hp}/${ch.maxHp})`, 0, -24);
-        ctx.fillStyle = '#fde047'; ctx.fillText(`🎁 보물상자 (${ch.hp}/${ch.maxHp})`, 0, -24);
-        ctx.restore();
-      }
-
-      // 5) Spatial Rifts (Legendary Weapon VFX)
-      for (const rf of this.rifts) {
-        ctx.save();
-        ctx.translate(rf.x, rf.y);
-        ctx.rotate(this.elapsed * 3.5);
-        const grad = ctx.createRadialGradient(0, 0, 10, 0, 0, rf.r);
-        grad.addColorStop(0, 'rgba(192, 132, 252, 0.78)');
-        grad.addColorStop(0.6, 'rgba(109, 40, 217, 0.35)');
-        grad.addColorStop(1, 'rgba(109, 40, 217, 0)');
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(0, 0, rf.r, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#e879f9'; ctx.lineWidth = 2.5;
-        ctx.setLineDash([12, 10]);
-        ctx.beginPath(); ctx.arc(0, 0, rf.r * 0.75, 0, Math.PI * 2); ctx.stroke();
-        ctx.restore();
-      }
-
-      // 6) Town NPCs (Expressive Maple-style NPCs)
-      for (const n of NPCS) {
-        if (n.x + 80 < cam.x || n.x - 80 > cam.x + this.vw || n.y + 80 < cam.y || n.y - 80 > cam.y + this.vh) continue;
-        this.drawMapleNpc(ctx, n);
-      }
-
-      // 7) Dropped Loots with Rarity Vertical Light Beams & Sparkles
+      // 8) Loots & Rarity Light Beams (Dropped Items show their real 2D Pixel Art!)
       for (const l of this.loots) {
         if (l.x + 80 < cam.x || l.x - 80 > cam.x + this.vw || l.y + 140 < cam.y || l.y - 140 > cam.y + this.vh) continue;
-        const arcH = Math.sin(l.arcT * Math.PI) * 38;
+        const arcH = Math.sin(l.arcT * Math.PI) * 34;
         const lx = l.startX + (l.x - l.startX) * l.arcT;
         const ly = l.startY + (l.y - l.startY) * l.arcT - arcH;
-        const rColor = RARITY_INFO[l.rarity]?.color || '#fbbf24';
+        const rCol = RARITY_INFO[l.rarity]?.color || '#facc15';
 
         if (['RARE', 'EPIC', 'LEGENDARY'].includes(l.rarity)) {
-          const bh = l.rarity === 'LEGENDARY' ? 155 : l.rarity === 'EPIC' ? 115 : 76;
-          const bw = l.rarity === 'LEGENDARY' ? 28 : 16;
+          const bh = l.rarity === 'LEGENDARY' ? 140 : l.rarity === 'EPIC' ? 105 : 70;
           const grad = ctx.createLinearGradient(lx, ly, lx, ly - bh);
-          grad.addColorStop(0, rColor);
-          grad.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = grad;
-          ctx.globalAlpha = 0.6 + Math.sin(this.elapsed * 8) * 0.15;
-          ctx.fillRect(lx - bw / 2, ly - bh, bw, bh);
-          ctx.globalAlpha = 1;
+          grad.addColorStop(0, rCol); grad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = grad; ctx.globalAlpha = 0.65;
+          ctx.fillRect(lx - 9, ly - bh, 18, bh); ctx.globalAlpha = 1;
         }
-
-        // Cute Coin / Gem / Glowing Item Orb
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        ctx.beginPath(); ctx.ellipse(lx, ly + 8, 7, 3.5, 0, 0, Math.PI * 2); ctx.fill();
-        if (l.kind === 'gold') {
-          ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 2;
-          ctx.beginPath(); ctx.arc(lx, ly, 6.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-          ctx.fillStyle = '#fef9c3'; ctx.fillRect(lx - 1.5, ly - 3.5, 3, 7);
-        } else {
-          ctx.fillStyle = rColor; ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2.2;
-          ctx.beginPath(); ctx.arc(lx, ly, 9.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-          ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(lx - 3, ly - 3, 2.5, 0, Math.PI * 2); ctx.fill();
-        }
-
-        if (l.kind !== 'gold' || l.amount >= 200) {
-          ctx.font = 'bold 11px "Noto Sans KR"'; ctx.textAlign = 'center';
-          ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-          ctx.strokeText(l.name, lx, ly - 15);
-          ctx.fillStyle = rColor; ctx.fillText(l.name, lx, ly - 15);
-        }
-      }
-
-      // 8) Monster Telegraphs
-      for (const m of this.monsters) {
-        if (!m.telegraph) continue;
-        const tg = m.telegraph;
-        const ratio = Math.min(1, tg.t / tg.dur);
-        ctx.save();
-        if (tg.kind === 'circle') {
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
-          ctx.beginPath(); ctx.arc(tg.x, tg.y, tg.r, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.42)';
-          ctx.beginPath(); ctx.arc(tg.x, tg.y, tg.r * ratio, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.5; ctx.stroke();
-        } else if (tg.kind === 'meteors') {
-          tg.pts.forEach(pt => {
-            ctx.fillStyle = 'rgba(249, 115, 22, 0.24)';
-            ctx.beginPath(); ctx.arc(pt.x, pt.y, tg.r, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = 'rgba(239, 68, 68, 0.48)';
-            ctx.beginPath(); ctx.arc(pt.x, pt.y, tg.r * ratio, 0, Math.PI * 2); ctx.fill();
-            ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 2.5; ctx.stroke();
-          });
-        } else if (tg.kind === 'line') {
-          ctx.translate(tg.x, tg.y); ctx.rotate(tg.ang);
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.24)';
-          ctx.fillRect(0, -tg.width / 2, tg.len, tg.width);
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.48)';
-          ctx.fillRect(0, -tg.width / 2, tg.len * ratio, tg.width);
-          ctx.strokeStyle = '#f87171'; ctx.lineWidth = 2;
-          ctx.strokeRect(0, -tg.width / 2, tg.len, tg.width);
-        } else if (tg.kind === 'cone') {
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.28)';
-          ctx.beginPath(); ctx.moveTo(tg.x, tg.y);
-          ctx.arc(tg.x, tg.y, tg.r, tg.ang - tg.spread, tg.ang + tg.spread);
-          ctx.closePath(); ctx.fill();
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.5)';
-          ctx.beginPath(); ctx.moveTo(tg.x, tg.y);
-          ctx.arc(tg.x, tg.y, tg.r * ratio, tg.ang - tg.spread, tg.ang + tg.spread);
-          ctx.closePath(); ctx.fill();
-        }
-        ctx.restore();
-      }
-
-      // 9) MapleStory-Style Monsters (Custom Cartoon Sprites per Species)
-      for (const m of this.monsters) {
-        if (m.x + 110 < cam.x || m.x - 110 > cam.x + this.vw || m.y + 110 < cam.y || m.y - 110 > cam.y + this.vh) continue;
-        this.drawMapleMonster(ctx, m);
-      }
-
-      // 10) AI Adventurers (Chibi 2.5D Characters)
-      for (const ai of this.aiPlayers) {
-        if (ai.x + 70 < cam.x || ai.x - 70 > cam.x + this.vw || ai.y + 70 < cam.y || ai.y - 70 > cam.y + this.vh) continue;
-        this.drawMapleAiHero(ctx, ai);
-      }
-
-      // 11) MapleStory-Style Magnet Pet & Beams
-      this.drawMaplePet(ctx);
-
-      // 12) Player Character (Chibi 2.5D Hero with Visible Equipped Gear & Awakening Wings)
-      this.renderPlayer(ctx);
-
-      // 13) Projectiles & Particles
-      for (const pr of this.projectiles) {
-        ctx.save();
-        ctx.fillStyle = pr.color;
-        ctx.shadowColor = pr.color; ctx.shadowBlur = 14;
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.radius * 0.78, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.radius * 0.35, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      }
-
-      for (const pt of this.particles) {
-        const a = Math.max(0, pt.life / pt.maxLife);
-        ctx.save();
-        ctx.globalAlpha = a;
-        if (pt.type === 'dot' || pt.type === 'homing') {
-          ctx.fillStyle = pt.color;
-          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2); ctx.fill();
-        } else if (pt.type === 'ring') {
-          const curR = pt.r + (pt.maxR - pt.r) * (1 - a);
-          ctx.strokeStyle = pt.color; ctx.lineWidth = 5 * a;
-          ctx.beginPath(); ctx.arc(pt.x, pt.y, curR, 0, Math.PI * 2); ctx.stroke();
-        } else if (pt.type === 'slash') {
-          ctx.strokeStyle = pt.color; ctx.lineWidth = 13 * a; ctx.lineCap = 'round';
-          ctx.shadowColor = pt.color; ctx.shadowBlur = 10;
-          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.radius, pt.angle - 1.1, pt.angle + 1.1); ctx.stroke();
-          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4 * a;
-          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.radius - 3, pt.angle - 0.9, pt.angle + 0.9); ctx.stroke();
-        } else if (pt.type === 'line') {
-          ctx.strokeStyle = pt.color; ctx.lineWidth = pt.width * a; ctx.lineCap = 'round';
-          ctx.beginPath(); ctx.moveTo(pt.x1, pt.y1); ctx.lineTo(pt.x2, pt.y2); ctx.stroke();
-        } else if (pt.type === 'lightning') {
-          ctx.strokeStyle = pt.color; ctx.lineWidth = 3.5;
-          ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 10;
-          ctx.beginPath(); ctx.moveTo(pt.x1, pt.y1);
-          const mx = (pt.x1 + pt.x2) / 2 + (Math.random() - 0.5) * 32;
-          const my = (pt.y1 + pt.y2) / 2 + (Math.random() - 0.5) * 32;
-          ctx.lineTo(mx, my); ctx.lineTo(pt.x2, pt.y2); ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      // 14) MapleStory-Style Vibrant Gradient Damage & Drop Numbers
-      for (const ft of this.floatingTexts) {
-        ctx.save();
-        const prog = 1 - ft.life / ft.maxLife;
-        const popScale = prog < 0.18 ? (0.75 + (prog / 0.18) * 0.45) : 1.0;
-        ctx.globalAlpha = Math.min(1, ft.life / ft.maxLife * 1.5);
-        ctx.translate(ft.x, ft.y);
-        ctx.scale(popScale, popScale);
-        ctx.font = `900 ${ft.size}px "Noto Sans KR"`;
-        ctx.textAlign = 'center';
-        ctx.lineWidth = ft.isCrit ? 4.5 : 3.2;
-        ctx.strokeStyle = ft.isCrit ? '#7c2d12' : 'rgba(15, 23, 42, 0.9)';
-        ctx.strokeText(ft.text, 0, 0);
-        if (ft.isCrit) {
-          const g = ctx.createLinearGradient(0, -14, 0, 4);
-          g.addColorStop(0, '#fef08a'); g.addColorStop(0.55, '#fb923c'); g.addColorStop(1, '#ef4444');
-          ctx.fillStyle = g;
-        } else {
-          ctx.fillStyle = ft.color;
-        }
-        ctx.fillText(ft.text, 0, 0);
-        ctx.restore();
-      }
-
-      // 15) Active Field Boss Directional Compass Arrow
-      if (this.bossState.activeBoss) {
-        const b = this.bossState.activeBoss;
-        const dist = Math.hypot(b.x - this.player.x, b.y - this.player.y);
-        if (dist > 280) {
-          const ang = Math.atan2(b.y - this.player.y, b.x - this.player.x);
-          const ax = this.player.x + Math.cos(ang) * 66;
-          const ay = this.player.y + Math.sin(ang) * 66;
+        ctx.fillStyle = 'rgba(0,0,0,0.34)';
+        ctx.beginPath(); ctx.ellipse(lx, ly + 10, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
+        if (l.kind === 'item' && l.tplId) {
+          const sprite = PixelArt.getItemCanvas(l.tplId);
+          const hover = Math.sin(this.elapsed * 5 + l.uid) * 3;
           ctx.save();
-          ctx.translate(ax, ay); ctx.rotate(ang);
-          ctx.fillStyle = '#f43f5e'; ctx.strokeStyle = '#fef08a'; ctx.lineWidth = 2;
-          ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-9, -10); ctx.lineTo(-4, 0); ctx.lineTo(-9, 10); ctx.closePath();
-          ctx.fill(); ctx.stroke();
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(sprite, lx - 13, ly - 15 + hover, 26, 26);
           ctx.restore();
-        }
-      }
-
-      ctx.restore();
-
-      // 16) Screen-Space Ambient Biome Particles (Snow / Embers / Fireflies / Pollen)
-      const curZone = this.getZoneAt(this.player.x, this.player.y);
-      ctx.save();
-      for (const ap of this.ambientParticles) {
-        const px = ap.rx * this.vw + Math.sin(this.elapsed * 1.8 + ap.phase) * 14;
-        const py = ap.ry * this.vh;
-        if (curZone.id === 'frost_tundra') {
-          ctx.fillStyle = 'rgba(241, 245, 249, 0.78)';
-        } else if (curZone.id === 'redcliff') {
-          ctx.fillStyle = 'rgba(251, 146, 60, 0.75)';
-        } else if (curZone.id === 'wolf_woods' || curZone.id === 'secret_cave') {
-          ctx.fillStyle = `rgba(167, 243, 208, ${0.35 + Math.sin(this.elapsed * 4 + ap.phase) * 0.35})`;
         } else {
-          ctx.fillStyle = 'rgba(254, 240, 138, 0.55)';
+          ctx.fillStyle = l.kind === 'gold' ? '#facc15' : rCol;
+          ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(lx, ly, l.kind === 'gold' ? 6 : 8.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         }
-        ctx.beginPath(); ctx.arc(px, py, ap.size, 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.restore();
-    },
-
-    /* --- MapleStory-Level Procedural 2.5D Props --- */
-    drawMapleProp(ctx, pr) {
-      if (pr.type === 'house') {
-        ctx.fillStyle = 'rgba(0,0,0,0.32)';
-        ctx.beginPath(); ctx.roundRect(pr.x + 8, pr.y + 14, pr.w, pr.h, 8); ctx.fill();
-        // Timber wall with dark cartoon outline
-        ctx.fillStyle = '#fef3c7'; ctx.strokeStyle = '#292524'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.roundRect(pr.x, pr.y + 24, pr.w, pr.h - 24, 6); ctx.fill(); ctx.stroke();
-        // Wooden beams & warm glowing windows
-        ctx.fillStyle = '#78350f';
-        ctx.fillRect(pr.x + pr.w / 2 - 14, pr.y + pr.h - 32, 28, 32); // Door
-        ctx.fillStyle = '#fde047';
-        ctx.fillRect(pr.x + 16, pr.y + 42, 20, 18);
-        ctx.fillRect(pr.x + pr.w - 36, pr.y + 42, 20, 18);
-        ctx.strokeStyle = '#451a03'; ctx.lineWidth = 2;
-        ctx.strokeRect(pr.x + 16, pr.y + 42, 20, 18);
-        ctx.strokeRect(pr.x + pr.w - 36, pr.y + 42, 20, 18);
-        // Pitched Storybook Roof + Chimney
-        ctx.fillStyle = '#78716c'; ctx.fillRect(pr.x + pr.w - 30, pr.y - 22, 16, 26); ctx.strokeRect(pr.x + pr.w - 30, pr.y - 22, 16, 26);
-        ctx.fillStyle = pr.roof;
-        ctx.beginPath();
-        ctx.moveTo(pr.x - 14, pr.y + 30);
-        ctx.lineTo(pr.x + pr.w / 2, pr.y - 22);
-        ctx.lineTo(pr.x + pr.w + 14, pr.y + 30);
-        ctx.closePath();
-        ctx.fill(); ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 3; ctx.stroke();
-        // Signpost label
-        ctx.font = 'bold 12px "Noto Sans KR"'; ctx.textAlign = 'center';
-        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-        ctx.strokeText(pr.label, pr.x + pr.w / 2, pr.y + pr.h + 18);
-        ctx.fillStyle = '#fef08a'; ctx.fillText(pr.label, pr.x + pr.w / 2, pr.y + pr.h + 18);
-      } else if (pr.type === 'fountain') {
-        ctx.fillStyle = 'rgba(0,0,0,0.32)';
-        ctx.beginPath(); ctx.ellipse(pr.x, pr.y + 10, pr.r + 6, pr.r * 0.72, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#94a3b8'; ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        const wg = ctx.createRadialGradient(pr.x - 6, pr.y - 6, 4, pr.x, pr.y, pr.r - 8);
-        wg.addColorStop(0, '#bae6fd'); wg.addColorStop(1, '#0284c7');
-        ctx.fillStyle = wg;
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.r - 8, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#e0f2fe'; ctx.lineWidth = 2.5;
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, 12 + Math.sin(this.elapsed * 4.5) * 4, 0, Math.PI * 2); ctx.stroke();
-        ctx.font = 'bold 11px "Noto Sans KR"'; ctx.textAlign = 'center';
-        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-        ctx.strokeText('✨ 회복의 샘 (안전지대)', pr.x, pr.y + pr.r + 18);
-        ctx.fillStyle = '#a7f3d0'; ctx.fillText('✨ 회복의 샘 (안전지대)', pr.x, pr.y + pr.r + 18);
-      } else if (pr.type === 'tree' || pr.type === 'pine_dark' || pr.type === 'pine_snow') {
-        // 2.5D Shaded Tree with Trunk & Layered Canopy
-        ctx.fillStyle = 'rgba(0,0,0,0.28)';
-        ctx.beginPath(); ctx.ellipse(pr.x + 3, pr.y + pr.r * 0.72, pr.r * 0.95, pr.r * 0.45, 0, 0, Math.PI * 2); ctx.fill();
-        // Trunk
-        ctx.fillStyle = '#78350f'; ctx.strokeStyle = '#292524'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.roundRect(pr.x - 5, pr.y, 10, pr.r * 0.72, 3); ctx.fill(); ctx.stroke();
-        // Layered Leaves
-        const baseCol = pr.type === 'pine_snow' ? '#94a3b8' : pr.type === 'pine_dark' ? '#14532d' : '#15803d';
-        const midCol  = pr.type === 'pine_snow' ? '#e2e8f0' : pr.type === 'pine_dark' ? '#166534' : '#22c55e';
-        const hiCol   = pr.type === 'pine_snow' ? '#ffffff' : pr.type === 'pine_dark' ? '#22c55e' : '#86efac';
-        ctx.strokeStyle = '#14261c'; ctx.lineWidth = 2.5;
-        ctx.fillStyle = baseCol;
-        ctx.beginPath(); ctx.arc(pr.x, pr.y - 4, pr.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = midCol;
-        ctx.beginPath(); ctx.arc(pr.x - pr.r * 0.16, pr.y - pr.r * 0.28, pr.r * 0.72, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = hiCol;
-        ctx.beginPath(); ctx.arc(pr.x - pr.r * 0.32, pr.y - pr.r * 0.44, pr.r * 0.34, 0, Math.PI * 2); ctx.fill();
-      } else if (pr.type === 'lava_pool') {
-        ctx.fillStyle = '#7c2d12';
-        ctx.beginPath(); ctx.ellipse(pr.x, pr.y, pr.r * 1.38, pr.r * 0.88, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#f97316';
-        ctx.beginPath(); ctx.ellipse(pr.x, pr.y, pr.r * 1.15, pr.r * 0.72, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#fef08a';
-        const pulse = 0.55 + Math.sin(this.elapsed * 3 + pr.x) * 0.12;
-        ctx.beginPath(); ctx.ellipse(pr.x, pr.y, pr.r * pulse, pr.r * pulse * 0.55, 0, 0, Math.PI * 2); ctx.fill();
-      } else if (pr.type === 'red_rock' || pr.type === 'ice_crystal') {
-        ctx.fillStyle = 'rgba(0,0,0,0.28)';
-        ctx.beginPath(); ctx.ellipse(pr.x, pr.y + pr.r * 0.65, pr.r * 0.85, pr.r * 0.35, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = pr.type === 'ice_crystal' ? '#38bdf8' : '#9a3412';
-        ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(pr.x, pr.y - pr.r);
-        ctx.lineTo(pr.x + pr.r * 0.85, pr.y + pr.r * 0.55);
-        ctx.lineTo(pr.x - pr.r * 0.85, pr.y + pr.r * 0.55);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = pr.type === 'ice_crystal' ? '#e0f2fe' : '#fb923c';
-        ctx.beginPath();
-        ctx.moveTo(pr.x, pr.y - pr.r * 0.85);
-        ctx.lineTo(pr.x + pr.r * 0.18, pr.y + pr.r * 0.4);
-        ctx.lineTo(pr.x - pr.r * 0.45, pr.y + pr.r * 0.4);
-        ctx.closePath(); ctx.fill();
-      } else if (pr.type === 'flower') {
-        ctx.fillStyle = '#22c55e';
-        ctx.beginPath(); ctx.arc(pr.x, pr.y + 3, 5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = (Math.floor(pr.x) % 2 === 0) ? '#f472b6' : '#fef08a';
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, 4.5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, 1.8, 0, Math.PI * 2); ctx.fill();
-      }
-    },
-
-    /* --- MapleStory-Style Expressive NPCs --- */
-    drawMapleNpc(ctx, n) {
-      const bob = Math.sin(this.elapsed * 3 + n.x) * 2.5;
-      ctx.save();
-      ctx.translate(n.x, n.y);
-      ctx.fillStyle = 'rgba(0,0,0,0.38)';
-      ctx.beginPath(); ctx.ellipse(0, 18, 17, 7, 0, 0, Math.PI * 2); ctx.fill();
-      // Robe body
-      ctx.fillStyle = n.color; ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.roundRect(-12, -2 + bob, 24, 18, 8); ctx.fill(); ctx.stroke();
-      // Chibi Head
-      ctx.fillStyle = '#fde68a';
-      ctx.beginPath(); ctx.arc(0, -10 + bob, 13, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      // Eyes & happy blush
-      ctx.fillStyle = '#1e1b2e';
-      ctx.beginPath(); ctx.arc(-4.5, -10 + bob, 2, 0, Math.PI * 2); ctx.arc(4.5, -10 + bob, 2, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = 'rgba(244, 114, 182, 0.55)';
-      ctx.beginPath(); ctx.arc(-8, -7 + bob, 2.5, 0, Math.PI * 2); ctx.arc(8, -7 + bob, 2.5, 0, Math.PI * 2); ctx.fill();
-      // Role badge floating above
-      ctx.font = '15px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(n.icon, 0, -32 + bob);
-      ctx.font = 'bold 11px "Noto Sans KR"';
-      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-      ctx.strokeText(n.name, 0, -47 + bob);
-      ctx.fillStyle = '#fde047'; ctx.fillText(n.name, 0, -47 + bob);
-      ctx.restore();
-    },
-
-    /* --- MapleStory-Style Expressive Monsters & Epic Field Bosses --- */
-    drawMapleMonster(ctx, m) {
-      if (m.spawnAnim > 0) {
-        ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(m.x, m.y, m.radius * (1 + m.spawnAnim), 0, Math.PI * 2); ctx.stroke();
-        return;
-      }
-      const r = m.radius;
-      const bounce = Math.abs(Math.sin(this.elapsed * (m.tier === 'BOSS' ? 3.5 : 5.5) + m.uid)) * (m.tplId.includes('slime') ? 6 : 3);
-      const sqX = m.tplId.includes('slime') ? 1 + Math.sin(this.elapsed * 5.5 + m.uid) * 0.08 : 1;
-      const sqY = m.tplId.includes('slime') ? 1 - Math.sin(this.elapsed * 5.5 + m.uid) * 0.08 : 1;
-
-      ctx.save();
-      ctx.translate(m.x, m.y);
-      // Ground shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.38)';
-      ctx.beginPath(); ctx.ellipse(0, r * 0.78, r * 0.92, r * 0.42, 0, 0, Math.PI * 2); ctx.fill();
-
-      // Boss / Rare / Elite Ground Aura
-      if (m.tier !== 'NORMAL') {
-        ctx.strokeStyle = m.tier === 'BOSS' ? '#facc15' : m.tier === 'RARE' ? '#e879f9' : '#fb923c';
-        ctx.lineWidth = m.tier === 'BOSS' ? 3.5 : 2;
-        ctx.globalAlpha = 0.65;
-        ctx.beginPath(); ctx.ellipse(0, r * 0.74, r * 1.25, r * 0.56, 0, 0, Math.PI * 2); ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-
-      ctx.save();
-      ctx.translate(0, -bounce);
-      ctx.scale(sqX, sqY);
-
-      const bodyColor = m.hitFlash > 0 ? '#ffffff' : (m.freezeTimer > 0 ? '#7dd3fc' : m.color);
-      ctx.strokeStyle = '#1a1625';
-      ctx.lineWidth = m.tier === 'BOSS' ? 4 : 2.8;
-
-      if (m.tplId === 'slime' || m.tplId === 'golden_slime') {
-        // Glossy Maple Slime Dome
-        const g = ctx.createRadialGradient(-r * 0.25, -r * 0.35, 3, 0, 0, r * 1.1);
-        g.addColorStop(0, m.hitFlash > 0 ? '#fff' : (m.tplId === 'golden_slime' ? '#fef08a' : '#bbf7d0'));
-        g.addColorStop(1, bodyColor);
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(0, 2, r, Math.PI, 0);
-        ctx.quadraticCurveTo(r, r * 0.85, 0, r * 0.78);
-        ctx.quadraticCurveTo(-r, r * 0.85, -r, 2);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-        // Jelly specular shine
-        ctx.fillStyle = 'rgba(255,255,255,0.68)';
-        ctx.beginPath(); ctx.ellipse(-r * 0.36, -r * 0.35, r * 0.25, r * 0.14, -0.5, 0, Math.PI * 2); ctx.fill();
-        // Cute Maple Eyes & Blush
-        ctx.fillStyle = '#1e1b2e';
-        ctx.beginPath(); ctx.arc(-r * 0.3, 0, 2.8, 0, Math.PI * 2); ctx.arc(r * 0.3, 0, 2.8, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = 'rgba(244,114,182,0.55)';
-        ctx.beginPath(); ctx.arc(-r * 0.52, 4, 3, 0, Math.PI * 2); ctx.arc(r * 0.52, 4, 3, 0, Math.PI * 2); ctx.fill();
-        if (m.tplId === 'golden_slime') {
-          ctx.fillStyle = '#facc15';
-          ctx.beginPath(); ctx.moveTo(-10, -r + 2); ctx.lineTo(-7, -r - 10); ctx.lineTo(0, -r - 4); ctx.lineTo(7, -r - 10); ctx.lineTo(10, -r + 2); ctx.closePath();
-          ctx.fill(); ctx.stroke();
+        if (l.kind !== 'gold' || l.amount >= 200) {
+          ctx.font = 'bold 10.5px "Noto Sans KR"'; ctx.textAlign = 'center';
+          ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+          ctx.strokeText(l.name, lx, ly - 18); ctx.fillStyle = rCol; ctx.fillText(l.name, lx, ly - 18);
         }
-      } else if (m.tplId === 'boar') {
-        // Wild Boar with Ivory Tusks
-        ctx.fillStyle = bodyColor;
-        ctx.beginPath(); ctx.ellipse(0, 0, r * 1.1, r * 0.88, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        // Ears
-        ctx.beginPath(); ctx.moveTo(-12, -r * 0.6); ctx.lineTo(-16, -r * 1.15); ctx.lineTo(-4, -r * 0.78); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(12, -r * 0.6); ctx.lineTo(16, -r * 1.15); ctx.lineTo(4, -r * 0.78); ctx.fill(); ctx.stroke();
-        // Snout & Tusks
-        ctx.fillStyle = '#fca5a5';
-        ctx.beginPath(); ctx.ellipse(0, 6, 8, 5.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#fffbeb';
-        ctx.beginPath(); ctx.moveTo(-9, 7); ctx.lineTo(-15, -1); ctx.lineTo(-6, 4); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(9, 7); ctx.lineTo(15, -1); ctx.lineTo(6, 4); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#1e1b2e';
-        ctx.beginPath(); ctx.arc(-6, -3, 2.5, 0, Math.PI * 2); ctx.arc(6, -3, 2.5, 0, Math.PI * 2); ctx.fill();
-      } else if (m.tplId.includes('wolf') || m.tplId === 'fenrir') {
-        // Fierce Wolf / Fenrir Boss with Pointed Ears & Mane
-        ctx.fillStyle = bodyColor;
-        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        // Pointed Wolf Ears
-        ctx.beginPath(); ctx.moveTo(-r * 0.75, -r * 0.35); ctx.lineTo(-r * 0.85, -r * 1.25); ctx.lineTo(-r * 0.15, -r * 0.85); ctx.closePath(); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(r * 0.75, -r * 0.35); ctx.lineTo(r * 0.85, -r * 1.25); ctx.lineTo(r * 0.15, -r * 0.85); ctx.closePath(); ctx.fill(); ctx.stroke();
-        // Cheek fluff & glowing fierce eyes
-        ctx.fillStyle = m.tplId === 'fenrir' ? '#facc15' : m.tplId === 'glacier_wolf' ? '#0284c7' : '#ef4444';
-        ctx.beginPath(); ctx.arc(-r * 0.34, -r * 0.12, Math.max(3, r * 0.16), 0, Math.PI * 2); ctx.arc(r * 0.34, -r * 0.12, Math.max(3, r * 0.16), 0, Math.PI * 2); ctx.fill();
-        // Fangs
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.moveTo(-r * 0.25, r * 0.25); ctx.lineTo(-r * 0.18, r * 0.52); ctx.lineTo(-r * 0.08, r * 0.25); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(r * 0.25, r * 0.25); ctx.lineTo(r * 0.18, r * 0.52); ctx.lineTo(r * 0.08, r * 0.25); ctx.fill();
-      } else if (m.tplId === 'ignis' || m.tplId === 'lava_golem' || m.tplId === 'flame_imp') {
-        // Fiery Demon / Golem with Curved Magma Horns
-        ctx.fillStyle = bodyColor;
-        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        // Curved Horns
-        ctx.fillStyle = m.tplId === 'ignis' ? '#facc15' : '#fdba74';
-        ctx.beginPath(); ctx.moveTo(-r * 0.5, -r * 0.7); ctx.quadraticCurveTo(-r * 1.2, -r * 1.35, -r * 0.4, -r * 1.45); ctx.lineTo(-r * 0.2, -r * 0.88); ctx.closePath(); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(r * 0.5, -r * 0.7); ctx.quadraticCurveTo(r * 1.2, -r * 1.35, r * 0.4, -r * 1.45); ctx.lineTo(r * 0.2, -r * 0.88); ctx.closePath(); ctx.fill(); ctx.stroke();
-        // Glowing Magma Eyes & Core Crack
-        ctx.fillStyle = '#fef08a';
-        ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.12, Math.max(3.5, r * 0.17), 0, Math.PI * 2); ctx.arc(r * 0.32, -r * 0.12, Math.max(3.5, r * 0.17), 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#fde047'; ctx.lineWidth = 2.5;
-        ctx.beginPath(); ctx.moveTo(-r * 0.3, r * 0.3); ctx.lineTo(0, r * 0.12); ctx.lineTo(r * 0.3, r * 0.3); ctx.stroke();
-      } else if (m.tplId === 'treasure_goblin') {
-        // Purple Treasure Goblin with Golden Coin Sack
-        ctx.fillStyle = '#facc15';
-        ctx.beginPath(); ctx.arc(10, -4, r * 0.78, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = bodyColor;
-        ctx.beginPath(); ctx.arc(-4, 2, r * 0.85, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#fef08a';
-        ctx.beginPath(); ctx.arc(-9, -1, 3, 0, Math.PI * 2); ctx.arc(1, -1, 3, 0, Math.PI * 2); ctx.fill();
-      } else {
-        // Frost Wraith / Glacier Giant / Magma Lizard
-        ctx.fillStyle = bodyColor;
-        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = m.isIce ? '#e0f2fe' : '#fde047';
-        ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.15, Math.max(3, r * 0.15), 0, Math.PI * 2); ctx.arc(r * 0.32, -r * 0.15, Math.max(3, r * 0.15), 0, Math.PI * 2); ctx.fill();
       }
-
-      if (m.freezeTimer > 0) {
-        ctx.fillStyle = 'rgba(186, 230, 253, 0.45)';
-        ctx.strokeStyle = '#e0f2fe'; ctx.lineWidth = 2.5;
-        ctx.beginPath(); ctx.roundRect(-r - 3, -r - 3, (r + 3) * 2, (r + 3) * 2, 8); ctx.fill(); ctx.stroke();
-      }
-      ctx.restore();
-
-      // Monster Nameplate & Crisp Rounded HP Bar
-      const bw = m.tier === 'BOSS' ? 96 : 54;
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
-      ctx.beginPath(); ctx.roundRect(-bw / 2 - 1, -r - 22, bw + 2, 8, 4); ctx.fill();
-      ctx.fillStyle = m.tier === 'BOSS' ? '#f43f5e' : m.tier === 'ELITE' ? '#fb923c' : m.tier === 'RARE' ? '#e879f9' : '#ef4444';
-      ctx.beginPath(); ctx.roundRect(-bw / 2, -r - 21, bw * Math.max(0, m.hp / m.maxHp), 6, 3); ctx.fill();
-
-      const tag = m.tier === 'BOSS' ? '👑' : m.tier === 'RARE' ? '★' : m.tier === 'ELITE' ? '◆' : '';
-      ctx.font = m.tier === 'BOSS' ? 'bold 13px "Noto Sans KR"' : 'bold 10.5px "Noto Sans KR"';
-      ctx.textAlign = 'center';
-      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-      const label = `${tag}Lv.${m.lv} ${m.name}`;
-      ctx.strokeText(label, 0, -r - 27);
-      ctx.fillStyle = m.lv - this.player.lv > 5 ? '#fca5a5' : (m.tier === 'BOSS' ? '#fef08a' : '#f8fafc');
-      ctx.fillText(label, 0, -r - 27);
-      ctx.restore();
-    },
-
-    /* --- MapleStory-Style Chibi AI Adventurers --- */
-    drawMapleAiHero(ctx, ai) {
-      const bob = Math.abs(Math.sin(this.elapsed * 7 + ai.x * 0.05)) * 3;
-      ctx.save();
-      ctx.translate(ai.x, ai.y);
-      ctx.fillStyle = 'rgba(0,0,0,0.34)';
-      ctx.beginPath(); ctx.ellipse(0, 15, 14, 6, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2.4;
-      // Armor body
-      ctx.fillStyle = ai.color;
-      ctx.beginPath(); ctx.roundRect(-10, -2 - bob, 20, 15, 6); ctx.fill(); ctx.stroke();
-      // Chibi head
-      ctx.fillStyle = '#fde68a';
-      ctx.beginPath(); ctx.arc(0, -10 - bob, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      // Hair cap
-      ctx.fillStyle = ai.color;
-      ctx.beginPath(); ctx.arc(0, -13 - bob, 11, Math.PI, 0); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#1e1b2e';
-      ctx.beginPath(); ctx.arc(-4, -9 - bob, 1.8, 0, Math.PI * 2); ctx.arc(4, -9 - bob, 1.8, 0, Math.PI * 2); ctx.fill();
-      // Nameplate
-      ctx.font = 'bold 10px "Noto Sans KR"'; ctx.textAlign = 'center';
-      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-      ctx.strokeText(`[Lv.${ai.lv}] ${ai.name}`, 0, -28 - bob);
-      ctx.fillStyle = '#bae6fd'; ctx.fillText(`[Lv.${ai.lv}] ${ai.name}`, 0, -28 - bob);
-      ctx.restore();
-    },
-
-    /* --- MapleStory-Style Winged Magnet Pet --- */
-    drawMaplePet(ctx) {
-      const pet = this.pet;
-      const petTier = PET_TIERS[this.player.petTier];
-      for (const b of pet.beams) {
-        ctx.strokeStyle = b.color; ctx.lineWidth = 3.5;
-        ctx.shadowColor = b.color; ctx.shadowBlur = 10;
-        ctx.beginPath(); ctx.moveTo(b.x1, b.y1); ctx.lineTo(b.x2, b.y2); ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-      ctx.save();
-      const petBob = Math.sin(this.elapsed * 6) * 4.5;
-      const wingFlap = Math.sin(this.elapsed * 18) * 4;
-      ctx.translate(pet.x, pet.y + petBob);
-      // Cute flapping wings
-      ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 1.6;
-      ctx.beginPath(); ctx.ellipse(-11, -2 + wingFlap * 0.4, 7, 4, -0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(11, -2 + wingFlap * 0.4, 7, 4, 0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      // Pet round body & ears
-      ctx.fillStyle = petTier.color;
-      ctx.shadowColor = petTier.color; ctx.shadowBlur = 12;
-      ctx.beginPath(); ctx.arc(0, 0, 10.5, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2; ctx.stroke();
-      // Cat/Fairy ears
-      ctx.fillStyle = petTier.color;
-      ctx.beginPath(); ctx.moveTo(-7, -7); ctx.lineTo(-10, -15); ctx.lineTo(-2, -10); ctx.closePath(); ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(7, -7); ctx.lineTo(10, -15); ctx.lineTo(2, -10); ctx.closePath(); ctx.fill(); ctx.stroke();
-      // Sparkling eyes & rosy cheeks
-      ctx.fillStyle = '#1e1b2e';
-      ctx.beginPath(); ctx.arc(-3.5, 0, 2, 0, Math.PI * 2); ctx.arc(3.5, 0, 2, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(-4.1, -0.7, 0.8, 0, Math.PI * 2); ctx.arc(2.9, -0.7, 0.8, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    },
-
-    /* --- MapleStory-Level 2.5D Chibi Player with Live Equipment Visuals & Awakening Wings --- */
+<!-- ... existing code ... -->
     renderPlayer(ctx) {
       const p = this.player;
       const stats = this.getPlayerStats();
       const moving = Math.hypot(p.vx, p.vy) > 12;
-      const walkBob = moving ? Math.abs(Math.sin(this.elapsed * 14)) * 4.5 : Math.sin(this.elapsed * 3.5) * 1.5;
+      const bob = moving ? Math.abs(Math.sin(this.elapsed * 14)) * 4.5 : Math.sin(this.elapsed * 3.5) * 1.5;
       const isAwakened = p.awakeningTimer > 0;
-      const faceRight = Math.cos(p.facing) >= 0;
+      const faceLeft = Math.cos(p.facing) < 0;
 
       ctx.save();
-      if (p.invulnTimer > 0) ctx.globalAlpha = 0.6;
+      if (p.invulnTimer > 0) ctx.globalAlpha = 0.62;
       ctx.translate(p.x, p.y);
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.beginPath(); ctx.ellipse(0, 18, 17, 7, 0, 0, Math.PI * 2); ctx.fill();
 
-      // Ground Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.42)';
-      ctx.beginPath(); ctx.ellipse(0, 18, 17, 7.5, 0, 0, Math.PI * 2); ctx.fill();
-
-      // Auto-Hunt subtle radar ring underfoot
       if (this.autoHunt.enabled) {
-        ctx.strokeStyle = 'rgba(52, 211, 153, 0.65)'; ctx.lineWidth = 2;
-        ctx.setLineDash([6, 6]);
+        ctx.strokeStyle = 'rgba(52,211,153,0.7)'; ctx.lineWidth = 2; ctx.setLineDash([6, 6]);
         ctx.beginPath(); ctx.arc(0, 8, 25, this.elapsed * 2, this.elapsed * 2 + Math.PI * 2); ctx.stroke();
         ctx.setLineDash([]);
       }
 
-      // Awakening Golden Wings & Radiant Aura
-      if (isAwakened) {
-        ctx.save();
-        ctx.shadowColor = '#facc15'; ctx.shadowBlur = 18;
-        ctx.fillStyle = 'rgba(254, 240, 138, 0.85)';
-        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
-        const wFlap = Math.sin(this.elapsed * 12) * 5;
-        ctx.beginPath(); ctx.moveTo(-6, -4 - walkBob); ctx.quadraticCurveTo(-34, -22 + wFlap, -28, 4 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(6, -4 - walkBob); ctx.quadraticCurveTo(34, -22 + wFlap, 28, 4 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
-        ctx.restore();
-      }
-
-      // Berserker Helm low-HP crimson aura
       if (stats.uniques.has('BERSERKER_HELM') && p.hp <= stats.maxHp * 0.5) {
-        ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(0, 0, 27 + Math.sin(this.elapsed * 12) * 3, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = 'rgba(239,68,68,0.85)'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(0, -2, 27 + Math.sin(this.elapsed * 12) * 3, 0, Math.PI * 2); ctx.stroke();
       }
 
-      // Fluttering Cloak behind hero (Gold if Greed Cloak!)
-      if (p.equip.CLOAK) {
-        const sway = Math.sin(this.elapsed * 8) * 3;
-        ctx.fillStyle = stats.uniques.has('GREED_CLOAK') ? '#eab308' : '#3b82f6';
-        ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2.2;
-        ctx.beginPath();
-        ctx.moveTo(-10, -2 - walkBob); ctx.lineTo(10, -2 - walkBob);
-        ctx.lineTo(15 + sway, 15 - walkBob * 0.5); ctx.lineTo(-15 + sway, 15 - walkBob * 0.5);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      }
+      // Render Live 2D Pixel-Art Paperdoll Reflecting All Equipped Items!
+      PixelArt.drawHeroPaperdoll(ctx, p.equip, {
+        scale: 2.55,
+        faceLeft,
+        walkBob: bob,
+        elapsed: this.elapsed,
+        isAwakened,
+        weaponAngle: p.facing,
+        swingProg: p.swingTimer > 0 ? (1 - p.swingTimer / 0.22) : 0
+      });
 
-      // Cute Animated Boots (Cyan if Swift Boots!)
-      const footSwing = moving ? Math.sin(this.elapsed * 14) * 5 : 0;
-      ctx.fillStyle = stats.uniques.has('SWIFT_BOOTS') ? '#2dd4bf' : '#78350f';
-      ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.ellipse(-5 + footSwing, 14, 5.5, 3.8, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(5 - footSwing, 14, 5.5, 3.8, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-
-      // Armor Torso
-      ctx.fillStyle = stats.uniques.has('GUARDIAN_ARMOR') ? '#38bdf8' : p.equip.ARMOR ? '#2563eb' : '#64748b';
-      ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.roundRect(-12, -3 - walkBob, 24, 16, 7); ctx.fill(); ctx.stroke();
-      // Armor Chest Emblem
-      ctx.fillStyle = '#fde047';
-      ctx.beginPath(); ctx.arc(0, 5 - walkBob, 3.5, 0, Math.PI * 2); ctx.fill();
-
-      // Expressive Maple Chibi Head
-      ctx.fillStyle = '#ffedd5';
-      ctx.beginPath(); ctx.arc(0, -12 - walkBob, 13.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-
-      // Stylish Spiky Hero Hair or Helmet
-      if (stats.uniques.has('BERSERKER_HELM')) {
-        ctx.fillStyle = '#991b1b';
-        ctx.beginPath(); ctx.arc(0, -15 - walkBob, 14, Math.PI, 0); ctx.fill(); ctx.stroke();
-        // Demon horns
-        ctx.fillStyle = '#fef08a';
-        ctx.beginPath(); ctx.moveTo(-10, -21 - walkBob); ctx.lineTo(-17, -32 - walkBob); ctx.lineTo(-5, -25 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(10, -21 - walkBob); ctx.lineTo(17, -32 - walkBob); ctx.lineTo(5, -25 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
-      } else {
-        ctx.fillStyle = isAwakened ? '#facc15' : '#1d4ed8';
-        ctx.beginPath(); ctx.arc(0, -15 - walkBob, 14, Math.PI * 0.95, Math.PI * 0.05);
-        ctx.lineTo(12, -16 - walkBob); ctx.lineTo(4, -22 - walkBob); ctx.lineTo(0, -16 - walkBob); ctx.lineTo(-6, -22 - walkBob);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      }
-
-      // Expressive Eyes + Shine + Rosy Cheeks
-      const eyeShift = faceRight ? 2 : -2;
-      ctx.fillStyle = '#1a1625';
-      ctx.beginPath();
-      ctx.ellipse(-4.5 + eyeShift, -11 - walkBob, 2.3, 3.1, 0, 0, Math.PI * 2);
-      ctx.ellipse(4.5 + eyeShift, -11 - walkBob, 2.3, 3.1, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(-5.1 + eyeShift, -12.3 - walkBob, 1.1, 0, Math.PI * 2);
-      ctx.arc(3.9 + eyeShift, -12.3 - walkBob, 1.1, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'rgba(244, 114, 182, 0.5)';
-      ctx.beginPath();
-      ctx.arc(-8 + eyeShift, -8 - walkBob, 2.4, 0, Math.PI * 2);
-      ctx.arc(8 + eyeShift, -8 - walkBob, 2.4, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Detailed Glowing Sword held along facing angle
-      ctx.save();
-      ctx.translate(0, 2 - walkBob);
-      ctx.rotate(p.facing);
-      const bladeColor = isAwakened ? '#fde047' : stats.uniques.has('RIFT_SWORD') ? '#c084fc' : stats.uniques.has('FROST_SWORD') ? '#38bdf8' : (stats.uniques.has('FLAME_SWORD') || stats.uniques.has('IGNIS_SWORD')) ? '#f97316' : '#e2e8f0';
-      if (isAwakened || stats.uniques.has('FLAME_SWORD') || stats.uniques.has('FROST_SWORD') || stats.uniques.has('RIFT_SWORD') || stats.uniques.has('IGNIS_SWORD')) {
-        ctx.shadowColor = bladeColor; ctx.shadowBlur = 12;
-      }
-      // Crossguard
-      ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2;
-      ctx.fillRect(11, -7, 4, 14); ctx.strokeRect(11, -7, 4, 14);
-      // Blade
-      ctx.fillStyle = bladeColor;
-      ctx.beginPath();
-      ctx.moveTo(15, -4); ctx.lineTo(35, -2.5); ctx.lineTo(41, 0); ctx.lineTo(35, 2.5); ctx.lineTo(15, 4);
-      ctx.closePath(); ctx.fill(); ctx.stroke();
-      ctx.restore();
-
-      // Guardian Armor Hexagonal Shield Barrier VFX
       if (p.shield > 0) {
-        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5;
-        ctx.fillStyle = 'rgba(56, 189, 248, 0.16)';
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.4; ctx.fillStyle = 'rgba(56,189,248,0.16)';
         ctx.beginPath();
         for (let i = 0; i < 6; i++) {
-          const a = (Math.PI / 3) * i + this.elapsed * 0.9;
-          const hx = Math.cos(a) * 32, hy = Math.sin(a) * 32 - 4;
+          const a = (Math.PI / 3) * i + this.elapsed;
+          const hx = Math.cos(a) * 31, hy = Math.sin(a) * 31 - 4;
           if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
         }
         ctx.closePath(); ctx.fill(); ctx.stroke();
       }
-
-      // Rift Sword 3-stack indicator dots
-      if (stats.uniques.has('RIFT_SWORD') && p.riftSkillStack > 0) {
-        for (let s = 0; s < p.riftSkillStack; s++) {
-          ctx.fillStyle = '#e879f9';
-          ctx.beginPath(); ctx.arc(-10 + s * 10, -34 - walkBob, 3.5, 0, Math.PI * 2); ctx.fill();
-        }
-      }
-
-      // Auto-Hunt status tiny badge overhead
       if (this.autoHunt.enabled && this.autoHunt.status) {
-        ctx.font = 'bold 10px "Noto Sans KR"'; ctx.textAlign = 'center';
-        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
-        ctx.strokeText(`🤖 ${this.autoHunt.status}`, 0, -35 - walkBob);
-        ctx.fillStyle = '#6ee7b7'; ctx.fillText(`🤖 ${this.autoHunt.status}`, 0, -35 - walkBob);
+        ctx.font = 'bold 10px "Noto Sans KR"'; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(`🤖 ${this.autoHunt.status}`, 0, -40 - bob); ctx.fillStyle = '#6ee7b7'; ctx.fillText(`🤖 ${this.autoHunt.status}`, 0, -40 - bob);
       }
-
       ctx.restore();
     },
 <!-- ... existing code ... -->
-      // Skill Cooldown Overlays
-      this.setCdOverlay('cdSkill1', p.skill1Cd);
-      this.setCdOverlay('cdSkill2', p.skill2Cd);
-      this.setCdOverlay('cdDodge', p.dodgeCd);
-      this.setCdOverlay('cdPotion', p.potionCd);
+      if (type === 'inventory') {
+        title.textContent = '🎒 2D 픽셀 장비 · 외형 변경 · 🔮 큐브';
+        const eqHtml = Object.keys(SLOT_NAMES).map(slot => {
+          const it = p.equip[slot];
+          if (!it) return `<div class="p-2 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-500 flex items-center gap-2"><div class="w-9 h-9 rounded-lg bg-slate-950/80 border border-slate-800 flex items-center justify-center text-[10px]">빈칸</div><span>[${SLOT_NAMES[slot]}] 비어있음</span></div>`;
+          const tpl = ITEM_TEMPLATES[it.tplId];
+          const rInfo = RARITY_INFO[tpl.rarity];
+          const pot = it.potential;
+          const potHtml = pot
+            ? `<div class="text-[11px] font-black mt-0.5" style="color:${POTENTIAL_TIERS[pot.tier].color}">🔮 [${POTENTIAL_TIERS[pot.tier].name}] ${pot.label}</div>`
+            : `<div class="text-[10px] text-slate-500 mt-0.5">🔮 잠재능력 미개방 (큐브 120G + 강화석 1)</div>`;
+          return `<div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-600/80 flex items-start gap-2.5">
+            <div class="w-11 h-11 rounded-xl bg-slate-950 border-2 flex items-center justify-center shrink-0" style="border-color:${rInfo.color}">
+              ${PixelArt.toSvg(it.tplId, 34)}
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+              <div class="flex items-center justify-between gap-1 flex-wrap">
+                <span class="font-black text-xs truncate" style="color:${rInfo.color}">[${SLOT_NAMES[slot]}] ${tpl.name} ${it.enhance > 0 ? `+${it.enhance}` : ''}</span>
+                <div class="flex gap-1 shrink-0">
+                  ${it.enhance < 10 ? `<button onclick="window._G.enhanceSlot('${slot}')" class="px-2 py-0.5 rounded-lg bg-sky-600 text-[10px] font-black text-white">+강화(${(it.enhance + 1) * 150}G)</button>` : `<span class="text-[10px] text-amber-300 font-black">MAX</span>`}
+                  <button onclick="window._G.rerollPotential('${slot}')" class="px-2 py-0.5 rounded-lg bg-fuchsia-600 text-[10px] font-black text-white">🔮큐브</button>
+                  <button onclick="window._G.unequipSlot('${slot}')" class="px-1.5 py-0.5 rounded-lg bg-slate-700 text-[10px] font-bold text-slate-200">해제</button>
+                </div>
+              </div>
+              <div class="text-[10.5px] text-slate-300">ATK +${Balance.itemStat(tpl.atk, it.enhance)} · DEF +${Balance.itemStat(tpl.def, it.enhance)} · HP +${Balance.itemStat(tpl.hp, it.enhance)}</div>
+              <div class="text-[10.5px] text-amber-200/90">${tpl.desc}</div>
+              ${potHtml}
+            </div>
+          </div>`;
+        }).join('');
 
-      // Awakening Ultimate Button Charge Display
-      const ultBtn = document.getElementById('btnUlt');
-      const ultFill = document.getElementById('ultFillBar');
-      const ultLbl = document.getElementById('ultLabel');
-      if (p.awakeningTimer > 0) {
-        ultBtn.classList.add('ult-ready');
-        ultFill.style.height = `${(p.awakeningTimer / 10) * 100}%`;
-        ultLbl.textContent = `${p.awakeningTimer.toFixed(1)}s`;
-      } else {
-        const pct = Math.floor(p.ultGauge);
-        ultFill.style.height = `${pct}%`;
-        ultLbl.textContent = pct >= 100 ? '각성!' : `${pct}%`;
-        if (pct >= 100) ultBtn.classList.add('ult-ready');
-        else ultBtn.classList.remove('ult-ready');
-      }
+        const bagHtml = p.bag.length ? p.bag.map(it => {
+          const tpl = ITEM_TEMPLATES[it.tplId];
+          const rInfo = RARITY_INFO[tpl.rarity];
+          return `<div class="p-2 rounded-xl bg-slate-900/80 border border-slate-700 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-slate-950 border flex items-center justify-center shrink-0" style="border-color:${rInfo.color}">
+                ${PixelArt.toSvg(it.tplId, 30)}
+              </div>
+              <div class="min-w-0">
+                <div class="font-black truncate" style="color:${rInfo.color}">[${rInfo.name}] ${tpl.name}</div>
+                <div class="text-[10px] text-slate-400 truncate">${tpl.desc}</div>
+              </div>
+            </div>
+            <div class="flex gap-1 shrink-0">
+              <button onclick="window._G.equipFromBag(${it.uid})" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-black text-[10.5px]">착용</button>
+              <button onclick="window._G.sellFromBag(${it.uid})" class="px-2 py-1 rounded-lg bg-slate-700 text-amber-200 font-bold text-[10.5px]">분해</button>
+            </div>
+          </div>`;
+        }).join('') : `<div class="text-center text-slate-500 py-3">가방이 비어 있습니다. 필드 사냥이나 상점에서 픽셀 장비를 모아보세요!</div>`;
 
-      // Active Rune Buff Badge
-      const runeBadge = document.getElementById('runeBuffBadge');
-      if (this.activeRune) {
-        const info = RUNE_TYPES[this.activeRune.type];
-        runeBadge.classList.remove('hidden');
-        runeBadge.style.borderColor = info.color;
-        document.getElementById('runeBuffIcon').textContent = info.icon;
-        document.getElementById('runeBuffText').textContent = `${info.name} ${Math.ceil(this.activeRune.timer)}s`;
-      } else {
-        runeBadge.classList.add('hidden');
-      }
+        body.innerHTML = `
+          <div class="p-3 rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950/70 to-slate-900 border border-sky-400/40 flex items-center gap-3">
+            <div class="w-[104px] h-[116px] rounded-2xl bg-slate-950/90 border-2 border-amber-400/50 flex items-center justify-center shrink-0 relative overflow-hidden">
+              <canvas id="paperdollCanvas" width="104" height="116" class="pixelated block"></canvas>
+              <span class="absolute bottom-1 text-[9px] font-black text-amber-300/90">실시간 외형</span>
+            </div>
+            <div class="flex-1 space-y-1.5 min-w-0">
+              <div class="font-black text-amber-300 text-sm">✨ 2D 픽셀 페이퍼돌</div>
+              <div class="text-[10.5px] text-slate-300 leading-snug">아래 장비를 <b>착용/해제</b>하면 왼쪽 캐릭터와 월드 속 내 캐릭터 외형이 즉시 바뀝니다!</div>
+              <div class="grid grid-cols-3 gap-1 pt-1 text-center font-bold text-[11px]">
+                <div class="bg-slate-950/80 rounded-lg py-1">⚔️ <span class="text-rose-300">${stats.atk}</span></div>
+                <div class="bg-slate-950/80 rounded-lg py-1">🛡️ <span class="text-sky-300">${stats.def}</span></div>
+                <div class="bg-slate-950/80 rounded-lg py-1">⚡ <span class="text-emerald-300">${Math.round(stats.moveSpeed)}</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">${eqHtml}</div>
+          <div class="font-black text-amber-300 pt-1">📦 가방 (${p.bag.length}개)</div>
+          <div class="space-y-1.5">${bagHtml}</div>
+        `;
+        this.renderPaperdollPreview();
+      } else if (type === 'shop') {
+        title.textContent = '🛒 상점 · 2D 픽셀 장비 · 유물 가챠';
+        const nextPet = PET_TIERS[p.petTier + 1];
+        const petCard = nextPet
+          ? `<div class="p-3 rounded-2xl bg-slate-900/90 border border-sky-400/50 flex items-center justify-between gap-2">
+              <div>
+                <div class="font-black text-sky-300">🐾 다음 승급: ${nextPet.name}</div>
+                <div class="text-[10.5px] text-slate-300">${nextPet.desc}</div>
+              </div>
+              <button onclick="window._G.upgradePet()" class="px-3 py-2 rounded-xl bg-sky-600 text-white font-black text-xs shrink-0">${nextPet.cost}G</button>
+            </div>`
+          : `<div class="p-3 rounded-2xl bg-amber-950/60 border border-amber-400/60 font-black text-amber-300 text-center">👑 최고 등급 [영웅 자석펫] 보유 중!</div>`;
 
-      // Multi-Kill Combo Fever Badge
-      const comboBadge = document.getElementById('comboBadge');
-      if (this.combo.count >= 2) {
-        comboBadge.classList.remove('hidden');
-        const bonusPct = Math.min(20, Math.floor(this.combo.count / 5));
-        document.getElementById('comboCountText').textContent = `${this.combo.count} COMBO`;
-        document.getElementById('comboBonusText').textContent = bonusPct > 0 ? `XP/드롭 +${bonusPct}%` : 'FEVER!';
-      } else {
-        comboBadge.classList.add('hidden');
-      }
+        const shopGear = [
+          { id: 'iron_gloves', price: 140 },
+          { id: 'swift_boots', price: 280 },
+          { id: 'greed_cloak', price: 320 },
+          { id: 'flame_sword', price: 480 }
+        ].map(g => {
+          const tpl = ITEM_TEMPLATES[g.id];
+          const rInfo = RARITY_INFO[tpl.rarity];
+          return `<div class="p-2 rounded-xl bg-slate-900/90 border border-slate-700 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-10 h-10 rounded-lg bg-slate-950 border flex items-center justify-center shrink-0" style="border-color:${rInfo.color}">${PixelArt.toSvg(g.id, 30)}</div>
+              <div class="min-w-0">
+                <div class="font-black text-[11px] truncate" style="color:${rInfo.color}">${tpl.name}</div>
+                <div class="text-[9.5px] text-slate-400 truncate">${tpl.desc}</div>
+              </div>
+            </div>
+            <button onclick="window._G.buyPixelGear('${g.id}', ${g.price})" class="px-2.5 py-1.5 rounded-lg bg-amber-600 text-white font-black text-[10.5px] shrink-0">${g.price}G</button>
+          </div>`;
+        }).join('');
 
-      // Nearby NPC Interact Button
+        body.innerHTML = `
+          <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/40 flex items-center justify-between">
+            <div>
+              <div class="font-black text-emerald-300">🧪 응급 회복 물약 x3</div>
+              <div class="text-[10.5px] text-slate-300">체력 45% 즉시 회복 (보유: ${p.potions}개)</div>
+            </div>
+            <button onclick="window._G.buyPotion()" class="px-3 py-2 rounded-xl bg-emerald-600 text-white font-black text-xs">80G</button>
+          </div>
+          <div class="space-y-1.5">
+            <div class="font-black text-amber-300 text-xs">🎨 픽셀 외형 장비 상점 (착용 시 캐릭터 외형 변화)</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">${shopGear}</div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div class="p-3 rounded-2xl bg-gradient-to-br from-fuchsia-950/90 to-slate-900 border border-fuchsia-400/60 flex flex-col justify-between gap-2">
+              <div>
+                <div class="font-black text-fuchsia-300">🎁 미지의 유물 상자</div>
+                <div class="text-[10.5px] text-slate-300 mt-0.5">희귀(64%) · 영웅(29%) · <span class="text-amber-300 font-bold">전설(7%)</span> 즉시 획득!</div>
+              </div>
+              <button onclick="window._G.openMysteryBox()" class="w-full py-2 rounded-xl bg-gradient-to-r from-fuchsia-600 to-amber-500 text-white font-black text-xs">🎲 열기 (550G)</button>
+            </div>
+            <div class="p-3 rounded-2xl bg-gradient-to-br from-rose-950/90 to-slate-900 border border-rose-400/60 flex flex-col justify-between gap-2">
+              <div>
+                <div class="font-black text-rose-300">🌙 월드 피버 소환석</div>
+                <div class="text-[10.5px] text-slate-300 mt-0.5">블러드문 피버 또는 황금 고블린 대습격 즉시 발동!</div>
+              </div>
+              <button onclick="window._G.buyInstantFever()" class="w-full py-2 rounded-xl bg-gradient-to-r from-rose-600 to-orange-500 text-white font-black text-xs">🔥 발동 (400G)</button>
+            </div>
+          </div>
+          ${petCard}
+        `;
+      } else if (type === 'codex') {
 <!-- ... existing code ... -->
-        if (e.code === 'KeyF') this.interactNearbyNpc();
-        if (e.code === 'KeyZ') this.toggleAutoHunt();
-        if (e.code === 'KeyR') this.useAwakening();
-        if (e.code === 'KeyI') UI.toggleModal('inventory');
-        if (e.code === 'KeyM') UI.toggleModal('codex');
-        if (e.code === 'Escape') UI.closeModal();
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[10.5px] text-slate-400">다음 필드 보스까지 약 ${Math.max(0, Math.ceil(Game.bossState.timer))}초</span>
+            <button onclick="window._UI.confirmReset()" class="px-3 py-1.5 rounded-xl bg-rose-900/80 border border-rose-500/50 text-[11px] font-bold text-rose-200">세이브 초기화</button>
+          </div>
+        `;
+      }
+    },
+
+    renderPaperdollPreview() {
+      const c = document.getElementById('paperdollCanvas');
+      if (!c) return;
+      const g = c.getContext('2d');
+      g.clearRect(0, 0, c.width, c.height);
+      g.save();
+      g.translate(c.width / 2, c.height * 0.66);
+      g.fillStyle = 'rgba(0,0,0,0.45)';
+      g.beginPath(); g.ellipse(0, 22, 26, 9, 0, 0, Math.PI * 2); g.fill();
+      PixelArt.drawHeroPaperdoll(g, Game.player.equip, {
+        scale: 3.6,
+        faceLeft: false,
+        walkBob: 0,
+        elapsed: Game.elapsed,
+        isAwakened: Game.player.awakeningTimer > 0,
+        previewMode: true
       });
-<!-- ... existing code ... -->
-      bindBtn('btnSkill2', () => this.useSkill2());
-      bindBtn('btnDodge', () => this.useDodge());
-      bindBtn('btnPotion', () => this.usePotion());
-      bindBtn('btnAuto', () => this.toggleAutoHunt());
-      bindBtn('btnUlt', () => this.useAwakening());
+      g.restore();
+    }
+  };
 
-      // Virtual Joystick (Touch + Mouse drag)
-<!-- ... existing code ... -->
-  window.onload = function() {
+  window._G = Game;
+  window._UI = UI;
+
+  window.onload = function () {
     try {
       Game.init();
     } catch (err) {
-      console.error('Arcadia initialization error:', err);
+      console.error('Arcadia init error:', err);
     }
   };
 })();
 </script>
 </body>
 </html>
-            
