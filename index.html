@@ -1,2198 +1,1740 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>심연의 서약 : 운명의 파괴자</title>
-<style>
-  :root {
-    --bg: #08070b;
-    --panel: #14101a;
-    --card: #1d1724;
-    --gold: #d4a650;
-    --gold-dim: #6e5227;
-    --text: #efe5d5;
-    --muted: #988b7b;
-    --red: #e03e3e;
-    --blue: #3b82f6;
-    --green: #38c172;
-    --purple: #a855f7;
-    --cyan: #00f0d4;
-    --g0: #a0a0a0; --g1: #4cd964; --g2: #38a1ff;
-    --g3: #b85cff; --g4: #ff9f1a; --g5: #ff3838; --g6: #00f5d4;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
-  body {
-    background: #030205; color: var(--text);
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    display: flex; justify-content: center; height: 100dvh; overflow: hidden;
-  }
-  #app {
-    width: 100%; max-width: 480px; height: 100dvh;
-    background: radial-gradient(circle at top, #1d1426 0%, var(--bg) 78%);
-    display: flex; flex-direction: column; position: relative; overflow: hidden;
-    border-left: 1px solid #2d2133; border-right: 1px solid #2d2133;
-  }
-  #app.shake { animation: shakeScreen 0.24s ease-out; }
-  @keyframes shakeScreen {
-    0%,100% { transform: translate(0,0); }
-    20% { transform: translate(-6px, 3px); }
-    45% { transform: translate(6px, -4px); }
-    70% { transform: translate(-4px, -2px); }
-  }
-  #flash {
-    position: absolute; inset: 0; pointer-events: none; opacity: 0; z-index: 999;
-    transition: opacity 0.5s ease-out;
-  }
-  #toasts {
-    position: absolute; bottom: 64px; left: 12px; right: 12px;
-    display: flex; flex-direction: column; gap: 5px; z-index: 900; pointer-events: none;
-  }
-  .toast {
-    background: rgba(20, 15, 28, 0.96); border: 1px solid var(--gold); color: #fff0cf;
-    padding: 8px 12px; border-radius: 7px; font-size: 11.5px; font-weight: 700; text-align: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.85); animation: toastUp 0.18s ease-out;
-  }
-  .toast.good { border-color: #4cd964; color: #c7f9cc; }
-  .toast.bad  { border-color: #ff4d4d; color: #ffc2c2; }
-  .toast.jackpot { border-color: #00f5d4; background: linear-gradient(90deg,#2b1c0e,#122d33); color: #fff6b8; font-size: 13px; }
-  @keyframes toastUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+<!-- ... existing code ... -->
+    .boss-pulse {
+      animation: pulseBorder 1.4s infinite;
+    }
 
-  /* 상단 HUD */
-  .hud {
-    background: linear-gradient(180deg, #1a1322 0%, #100c14 100%);
-    border-bottom: 1px solid var(--gold-dim); padding: 7px 10px; flex-shrink: 0;
-  }
-  .hud-top { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; margin-bottom: 5px; }
-  .hud-left { display: flex; align-items: center; gap: 5px; font-weight: 800; color: var(--gold); }
-  .pill { font-size: 10px; padding: 1px 6px; border-radius: 9px; font-weight: 700; border: 1px solid #483854; background: #22192b; }
-  .pill.devil { border-color: #ff3838; color: #ff9999; background: #2e1217; }
-  .bars { display: grid; grid-template-columns: 1.2fr 1fr; gap: 5px; margin-bottom: 5px; }
-  .bar { height: 15px; background: #09070c; border: 1px solid #35293f; border-radius: 4px; position: relative; overflow: hidden; }
-  .bar-fill { height: 100%; transition: width 0.2s ease; }
-  .bar-hp { background: linear-gradient(90deg, #821b1b, #e03e3e); }
-  .bar-shield { position: absolute; top: 0; left: 0; height: 100%; background: rgba(56, 161, 255, 0.55); border-right: 2px solid #9be2ff; transition: width 0.2s; }
-  .bar-rage { background: linear-gradient(90deg, #9c4a12, #ff9f1a); }
-  .bar-txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 800; text-shadow: 1px 1px 2px #000; }
-  .hud-bot { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); }
-  .res { display: flex; gap: 8px; font-weight: 700; }
-  .syn-chips { display: flex; gap: 4px; font-size: 10px; }
-
-  /* 메인 스크롤 영역 */
-  .main { flex: 1; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; }
-  .panel { display: none; flex-direction: column; gap: 8px; height: 100%; }
-  .panel.active { display: flex; }
-
-  /* 전투 아레나 (Canvas VFX + 선명한 SVG 캐릭터/적) */
-  .arena {
-    height: 186px; border-radius: 9px; border: 1px solid var(--gold-dim);
-    background: linear-gradient(180deg, #120d1c 0%, #241730 68%, #16111c 100%);
-    position: relative; overflow: hidden; flex-shrink: 0;
-    box-shadow: inset 0 0 28px rgba(0,0,0,0.85);
-  }
-  .arena.boss-bg { background: linear-gradient(180deg, #24090f 0%, #38101c 68%, #1a0c12 100%); border-color: #d63c3c; }
-  #fx-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; }
-  .arena-floor {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 34px;
-    background: linear-gradient(180deg, #271d30 0%, #110c14 100%); border-top: 1px solid rgba(212,166,80,0.3);
-  }
-  .arena-top-bar {
-    position: absolute; top: 6px; left: 8px; right: 8px; z-index: 10;
-    display: flex; justify-content: space-between; align-items: center; font-size: 10.5px;
-  }
-  .unluck-meter {
-    background: rgba(15,10,20,0.85); border: 1px solid #4a355c; padding: 2px 7px; border-radius: 10px;
-    color: #e9c46a; font-weight: 700;
-  }
-  .fighter {
-    position: absolute; bottom: 26px; width: 120px; display: flex; flex-direction: column; align-items: center;
-    z-index: 8; transition: transform 0.14s cubic-bezier(.2,.8,.2,1);
-  }
-  .fighter.hero { left: 16px; }
-  .fighter.enemy { right: 16px; }
-  .fighter.lunge-r { transform: translateX(62px) scale(1.08); }
-  .fighter.lunge-l { transform: translateX(-62px) scale(1.08); }
-  .fighter.hit { animation: unitHit 0.25s ease; filter: brightness(2.2) saturate(1.8); }
-  @keyframes unitHit { 0%,100%{transform:translateX(0);} 30%{transform:translateX(-8px);} 70%{transform:translateX(8px);} }
-
-  .intent-tag {
-    margin-bottom: 4px; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 800;
-    background: rgba(30,15,25,0.92); border: 1px solid var(--gold); color: #ffe299; white-space: nowrap;
-  }
-  .intent-tag.danger {
-    background: rgba(150, 20, 28, 0.95); border-color: #ff6b6b; color: #fff;
-    box-shadow: 0 0 12px rgba(255,56,56,0.75); animation: dangerPulse 0.55s infinite alternate;
-  }
-  @keyframes dangerPulse { from { transform: scale(1); } to { transform: scale(1.08); } }
-
-  .sprite-box { width: 68px; height: 68px; display: flex; align-items: center; justify-content: center; position: relative; }
-  .fighter.boss .sprite-box { width: 88px; height: 88px; }
-  .status-row { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; margin-top: 2px; min-height: 15px; }
-  .st-badge { font-size: 9.5px; font-weight: 800; padding: 1px 4px; border-radius: 4px; background: #140f19; border: 1px solid #443550; }
-  .st-bleed { color: #ff6b6b; border-color: #a82424; }
-  .st-poison { color: #69f0ae; border-color: #267346; }
-  .st-stun { color: #ffd166; border-color: #c28e1d; }
-  .st-shield { color: #70d6ff; border-color: #2b7ea1; }
-  .mini-hp { width: 94px; height: 7px; background: #0a070d; border: 1px solid #42334f; border-radius: 4px; overflow: hidden; margin-top: 3px; }
-  .mini-name { font-size: 10.5px; font-weight: 800; text-shadow: 0 1px 3px #000; margin-top: 2px; white-space: nowrap; }
-
-  /* 스토리 / 상황 박스 */
-  .story-box {
-    background: linear-gradient(160deg, #211a28 0%, #141019 100%);
-    border: 1px solid var(--gold-dim); border-radius: 8px; padding: 10px 11px;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .story-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,166,80,0.2); padding-bottom: 4px; }
-  .story-title { font-size: 13.5px; font-weight: 800; color: var(--gold); }
-  .story-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: #2c2136; color: #f3d28f; }
-  .story-desc { font-size: 12.5px; line-height: 1.5; color: var(--text); white-space: pre-line; }
-  .combat-log {
-    background: rgba(9, 7, 13, 0.85); border-left: 3px solid var(--gold);
-    padding: 6px 9px; font-size: 11.5px; line-height: 1.45; border-radius: 0 5px 5px 0; display: none;
-  }
-  .combat-log.show { display: block; }
-
-  /* 행동 & 선택지 버튼 */
-  .actions { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
-  .combat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  .act-btn {
-    background: linear-gradient(180deg, #2c2336 0%, #1a1421 100%);
-    border: 1px solid var(--gold-dim); color: var(--text);
-    padding: 10px 10px; border-radius: 7px; text-align: left; cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center; gap: 6px;
-    transition: transform 0.08s, border-color 0.15s;
-  }
-  .act-btn:active { transform: scale(0.975); border-color: var(--gold); }
-  .act-btn:disabled { opacity: 0.4; cursor: default; }
-  .act-btn.parry-glow {
-    border-color: #00f5d4; background: linear-gradient(180deg, #12363d 0%, #0d2026 100%);
-    box-shadow: 0 0 12px rgba(0,245,212,0.45);
-  }
-  .act-btn.ult-ready {
-    border-color: #ff9f1a; background: linear-gradient(180deg, #472512 0%, #261209 100%);
-    box-shadow: 0 0 12px rgba(255,159,26,0.5);
-  }
-  .act-btn.devil-btn { border-color: #d63c3c; background: linear-gradient(180deg, #38141c 0%, #1f0a10 100%); }
-  .act-btn.special-btn { border-color: #5ca4ff; background: linear-gradient(180deg, #1b2a42 0%, #111a2b 100%); }
-  .act-title { font-size: 12.5px; font-weight: 800; display: block; }
-  .act-sub { font-size: 10px; color: var(--muted); display: block; margin-top: 2px; line-height: 1.3; }
-  .act-badge { font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 5px; background: #100c15; border: 1px solid #3f314d; white-space: nowrap; }
-
-  /* 갈림길 문 카드 */
-  .door-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-  .door-card {
-    background: linear-gradient(180deg, #271e30 0%, #16111c 100%);
-    border: 1px solid var(--gold-dim); border-radius: 8px; padding: 10px 9px;
-    cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
-    transition: transform 0.1s, border-color 0.15s;
-  }
-  .door-card:active { transform: scale(0.97); border-color: var(--gold); }
-  .door-card.risk { border-color: #b83232; background: linear-gradient(180deg, #33141c 0%, #1a0b10 100%); }
-  .door-icon { font-size: 26px; }
-  .door-name { font-size: 12.5px; font-weight: 800; color: var(--gold); }
-  .door-hint { font-size: 10.5px; color: var(--muted); line-height: 1.3; }
-
-  /* 공통 카드 & 장비 */
-  .card { background: var(--card); border: 1px solid #3a2e45; border-radius: 8px; padding: 10px; }
-  .sec-head { font-size: 12.5px; font-weight: 800; color: var(--gold); margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
-  .row {
-    background: #130f18; border: 1px solid #30253a; border-radius: 6px; padding: 8px 9px;
-    display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11.5px;
-  }
-  .row.click { cursor: pointer; }
-  .btn-sm {
-    background: #332518; border: 1px solid var(--gold); color: var(--text);
-    padding: 5px 8px; border-radius: 5px; font-size: 10.5px; font-weight: 800; cursor: pointer; white-space: nowrap;
-  }
-  .btn-sm:disabled { opacity: 0.35; cursor: default; }
-  .btn-sm.danger { background: #3b141a; border-color: #ff4d4d; color: #ffb3b3; }
-  .btn-sm.on { background: #173b24; border-color: #4cd964; color: #b8ffcb; }
-
-  /* 등급 색상 */
-  .g0 { color: var(--g0); } .g1 { color: var(--g1); } .g2 { color: var(--g2); }
-  .g3 { color: var(--g3); } .g4 { color: var(--g4); text-shadow: 0 0 6px rgba(255,159,26,0.45); }
-  .g5 { color: var(--g5); text-shadow: 0 0 8px rgba(255,56,56,0.65); }
-  .g6 { color: var(--g6); text-shadow: 0 0 10px rgba(0,245,212,0.85); }
-
-  /* 운명 카드 3택1 모달 */
-  .modal-bg {
-    position: absolute; inset: 0; background: rgba(4, 3, 7, 0.9);
-    display: none; align-items: center; justify-content: center; padding: 14px; z-index: 200;
-  }
-  .modal-bg.show { display: flex; }
-  .modal {
-    background: linear-gradient(180deg, #241c2e 0%, #130f18 100%);
-    border: 2px solid var(--gold); border-radius: 11px; width: 100%; max-width: 410px;
-    padding: 14px; display: flex; flex-direction: column; gap: 9px; max-height: 88dvh; overflow-y: auto;
-    box-shadow: 0 0 32px rgba(0,0,0,0.95);
-  }
-  .fate-card {
-    background: linear-gradient(135deg, #271e33 0%, #15101d 100%);
-    border: 1px solid #59446e; border-radius: 8px; padding: 10px; cursor: pointer;
-    display: flex; flex-direction: column; gap: 4px; transition: transform 0.1s, border-color 0.15s;
-  }
-  .fate-card:active { transform: scale(0.98); }
-  .fate-card.rare { border-color: #38a1ff; }
-  .fate-card.legend { border-color: #ff9f1a; box-shadow: 0 0 12px rgba(255,159,26,0.25); }
-
-  /* 하단 5탭 네비 */
-  .nav { display: grid; grid-template-columns: repeat(5, 1fr); background: #100c14; border-top: 2px solid var(--gold-dim); flex-shrink: 0; }
-  .nav-btn {
-    background: none; border: none; color: var(--muted); padding: 8px 2px;
-    font-size: 10.5px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; position: relative;
-  }
-  .nav-btn.active { color: var(--gold); background: #1c1524; }
-  .dot { position: absolute; top: 5px; right: 14px; width: 7px; height: 7px; border-radius: 50%; background: #ff3838; display: none; }
-  .dot.show { display: block; }
-</style>
+    /* Auto-Hunt Active Glow & Awakening Ultimate Pulse */
+    @keyframes autoSpinGlow {
+      0%, 100% { box-shadow: 0 0 12px rgba(52, 211, 153, 0.75), inset 0 0 10px rgba(52, 211, 153, 0.45); border-color: #34d399; }
+      50% { box-shadow: 0 0 24px rgba(56, 189, 248, 0.95), inset 0 0 16px rgba(56, 189, 248, 0.65); border-color: #7dd3fc; }
+    }
+    .auto-active {
+      background: linear-gradient(135deg, #059669 0%, #0284c7 100%) !important;
+      animation: autoSpinGlow 1.5s ease-in-out infinite;
+    }
+    @keyframes ultReadyPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(250, 204, 21, 0.85), inset 0 0 12px rgba(254, 240, 138, 0.6); }
+      50% { transform: scale(1.07); box-shadow: 0 0 28px rgba(249, 115, 22, 1), inset 0 0 18px rgba(254, 240, 138, 0.9); }
+    }
+    .ult-ready {
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 55%, #ec4899 100%) !important;
+      border-color: #fef08a !important;
+      animation: ultReadyPulse 1.1s ease-in-out infinite;
+    }
+    @keyframes comboPop {
+      0% { transform: scale(1.38) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .combo-pop {
+      animation: comboPop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  </style>
 </head>
-<body>
-<div id="app">
-  <div id="flash"></div>
-  <div id="toasts"></div>
-
-  <!-- 상단 HUD -->
-  <header class="hud">
-    <div class="hud-top">
-      <div class="hud-left">
-        <span id="hud-cls-ico">⚔️</span>
-        <span id="hud-lv">Lv.1</span>
-        <span id="hud-cls-name">전사</span>
-        <span class="pill" id="hud-floor">심연 1층 (1/5)</span>
+<!-- ... existing code ... -->
+          <div id="bossHpText" class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white drop-shadow">100%</div>
+        </div>
       </div>
-      <div style="display:flex; gap:4px; align-items:center;">
-        <span class="pill devil" id="hud-devil-pill" style="display:none;">😈 계약 0</span>
-        <button class="btn-sm" id="btn-auto-mob" style="padding:2px 6px; font-size:9.5px;" onclick="toggleAutoMob()">잡몹자동:OFF</button>
+
+      <!-- Active Ancient Rune Buff & Multi-Kill Combo Fever Strip -->
+      <div class="flex items-center justify-center gap-2 flex-wrap">
+        <div id="runeBuffBadge" class="hidden rpg-panel rounded-full px-3 py-1 text-[11px] font-black text-amber-200 border border-amber-400/70 shadow-lg flex items-center gap-1.5">
+          <span id="runeBuffIcon">⚡</span>
+          <span id="runeBuffText">광풍의 룬 20s</span>
+        </div>
+        <div id="comboBadge" class="hidden rpg-panel rounded-full px-3 py-1 text-xs font-black border-2 border-orange-400/80 bg-gradient-to-r from-orange-600/80 to-rose-600/80 text-white shadow-lg flex items-center gap-1.5">
+          <span class="text-yellow-300">🔥</span>
+          <span id="comboCountText">10 COMBO</span>
+          <span id="comboBonusText" class="text-[10px] text-amber-200">+4%</span>
+        </div>
       </div>
     </div>
+<!-- ... existing code ... -->
+    <!-- RIGHT ACTION WHEEL (Mobile Touch + Mouse Clickable) -->
+    <div id="actionCluster" class="fixed right-3 bottom-3 w-[198px] h-[206px] sm:w-[218px] sm:h-[222px] pointer-events-auto z-30">
+      <!-- Smart AUTO-HUNT Toggle (Top-Right above Attack) -->
+      <button id="btnAuto" class="action-btn absolute right-1 top-0 w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-slate-400/70 text-slate-100" title="스마트 자동사냥 (Z)">
+        <span class="text-base leading-none">🤖</span>
+        <span id="autoBtnLabel" class="text-[9px] font-black mt-0.5">AUTO</span>
+        <span class="hidden sm:block text-[8px] text-slate-300/80">Z</span>
+      </button>
 
-    <div class="bars">
-      <div class="bar">
-        <div class="bar-fill bar-hp" id="bar-hp" style="width:100%"></div>
-        <div class="bar-shield" id="bar-shield" style="width:0%"></div>
-        <div class="bar-txt" id="txt-hp">HP 120/120</div>
-      </div>
-      <div class="bar">
-        <div class="bar-fill bar-rage" id="bar-rage" style="width:0%"></div>
-        <div class="bar-txt" id="txt-rage">분노 0/100</div>
-      </div>
+      <!-- Awakening Overdrive Ultimate (Left-Top arc) -->
+      <button id="btnUlt" class="action-btn absolute left-[52px] top-[2px] w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-slate-800 to-slate-950 border-2 border-amber-400/45 text-amber-200 overflow-hidden" title="에테르 각성 궁극기 (R)">
+        <div id="ultFillBar" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-amber-500/80 via-orange-400/70 to-yellow-300/60 transition-all duration-150 pointer-events-none" style="height:0%"></div>
+        <span class="relative z-10 text-base leading-none">🌟</span>
+        <span id="ultLabel" class="relative z-10 text-[9px] font-black">0%</span>
+        <span class="relative z-10 hidden sm:block text-[8px] text-amber-100/80">R</span>
+      </button>
+
+      <!-- Primary Basic Attack (Bottom-Right Large) -->
+      <button id="btnAtk" class="action-btn absolute right-1 bottom-1 w-[74px] h-[74px] sm:w-[82px] sm:h-[82px] bg-gradient-to-br from-rose-500 to-red-800 border-2 border-rose-300/80 text-white">
+        <span class="text-2xl leading-none">⚔️</span>
+        <span class="text-[10px] font-black mt-0.5">공격</span>
+        <span class="hidden sm:block text-[8px] text-rose-200/80">SPACE</span>
+      </button>
+
+      <!-- Skill 1: Whirlwind (Arc Left-Top of Attack) -->
+      <button id="btnSkill1" class="action-btn absolute left-[46px] bottom-[64px] w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-amber-500 to-orange-700 border-2 border-amber-200/80 text-white">
+        <span class="text-lg leading-none">🌪️</span>
+        <span class="text-[9px] font-bold">회전베기</span>
+        <span class="hidden sm:block text-[8px] text-amber-100/80">J</span>
+        <div id="cdSkill1" class="cd-overlay hidden"></div>
+      </button>
+
+      <!-- Skill 2: Piercing Dash (Arc Top of Attack) -->
+      <button id="btnSkill2" class="action-btn absolute right-[64px] top-[52px] w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] bg-gradient-to-br from-violet-500 to-indigo-800 border-2 border-violet-300/80 text-white">
+        <span class="text-lg leading-none">⚡</span>
+        <span class="text-[9px] font-bold">질풍참</span>
+        <span class="hidden sm:block text-[8px] text-violet-200/80">K</span>
+        <div id="cdSkill2" class="cd-overlay hidden"></div>
+      </button>
+
+      <!-- Dodge Roll (Left-Bottom of Attack) -->
+      <button id="btnDodge" class="action-btn absolute left-[42px] bottom-1 w-[50px] h-[50px] sm:w-[54px] sm:h-[54px] bg-gradient-to-br from-cyan-500 to-blue-800 border-2 border-cyan-200/80 text-white">
+        <span class="text-base leading-none">💨</span>
+        <span class="text-[9px] font-bold">회피</span>
+        <span class="hidden sm:block text-[8px] text-cyan-100/80">SHIFT</span>
+        <div id="cdDodge" class="cd-overlay hidden"></div>
+      </button>
+
+      <!-- Health Potion (Far Left) -->
+      <button id="btnPotion" class="action-btn absolute left-0 bottom-[52px] w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] bg-gradient-to-br from-emerald-500 to-teal-800 border-2 border-emerald-200/80 text-white">
+        <span class="text-sm leading-none">🧪</span>
+        <span id="hudPotionCount" class="text-[10px] font-black">5</span>
+        <div id="cdPotion" class="cd-overlay hidden"></div>
+      </button>
     </div>
-
-    <div class="hud-bot">
-      <div class="res">
-        <span style="color:#f0c24b;">🪙 <span id="hud-gold">0</span></span>
-        <span style="color:#00f0d4;">💎 <span id="hud-soul">0</span></span>
-        <span id="hud-align" style="color:#c4b5fd;">⚖️ 중립</span>
-      </div>
-      <div class="syn-chips" id="hud-syns"></div>
-    </div>
-  </header>
-
-  <main class="main">
-    <!-- 1. 심연 탐험 & 전투 탭 -->
-    <section id="tab-run" class="panel active">
-      <div class="arena" id="arena">
-        <canvas id="fx-canvas"></canvas>
-        <div class="arena-top-bar">
-          <span class="unluck-meter" id="unluck-txt">🎰 잭팟 확률 3%</span>
-          <span class="unluck-meter" id="reward-mult-txt" style="color:#ff9999;">🔥 보상 x1.0</span>
-        </div>
-        <div class="arena-floor"></div>
-
-        <!-- 아군 -->
-        <div class="fighter hero" id="hero-unit">
-          <div class="intent-tag" id="hero-companion-tag" style="display:none; border-color:#4cd964; color:#b8ffcb;">🛡️ 동행</div>
-          <div class="sprite-box" id="hero-svg"></div>
-          <div class="mini-hp"><div class="bar-fill bar-hp" id="arena-hero-hp" style="width:100%"></div></div>
-          <div class="status-row" id="hero-status"></div>
-          <div class="mini-name" id="hero-name">모험가</div>
-        </div>
-
-        <!-- 적군 / 이벤트 오브젝트 -->
-        <div class="fighter enemy" id="enemy-unit">
-          <div class="intent-tag" id="enemy-intent" style="display:none;">⚔️ 베기 18</div>
-          <div class="sprite-box" id="enemy-svg"></div>
-          <div class="mini-hp" id="enemy-hp-box" style="display:none;"><div class="bar-fill bar-hp" id="arena-enemy-hp" style="width:100%"></div></div>
-          <div class="status-row" id="enemy-status"></div>
-          <div class="mini-name" id="enemy-name">심연의 입구</div>
-        </div>
-      </div>
-
-      <div class="story-box">
-        <div class="story-head">
-          <span class="story-title" id="ev-title">심연의 갈림길</span>
-          <span class="story-tag" id="ev-tag">선택</span>
-        </div>
-        <div class="story-desc" id="ev-desc">운명의 문을 선택하십시오. 모든 선택에는 대가가 따릅니다.</div>
-        <div class="combat-log" id="combat-log"></div>
-      </div>
-
-      <div class="actions" id="actions"></div>
-    </section>
-
-    <!-- 2. 빌드 (운명 카드 · 시너지 · 악마 계약 · 동료) 탭 -->
-    <section id="tab-build" class="panel">
-      <div class="card">
-        <div class="sec-head"><span>🔥 태그 시너지 (2장 / 4장 발동)</span></div>
-        <div id="synergy-list" style="display:flex; flex-direction:column; gap:5px;"></div>
-      </div>
-      <div class="card">
-        <div class="sec-head"><span>🃏 보유 운명 카드</span><span id="card-cnt">0장</span></div>
-        <div id="card-list" style="display:flex; flex-direction:column; gap:5px;"></div>
-      </div>
-      <div class="card" style="border-color:#7a222b;">
-        <div class="sec-head"><span style="color:#ff8585;">😈 맺은 악마 계약</span><span id="contract-mult" style="color:#ff9999;">보상 x1.0</span></div>
-        <div id="contract-list" style="display:flex; flex-direction:column; gap:5px;"></div>
-      </div>
-      <div class="card">
-        <div class="sec-head"><span>🤝 동행 중인 동료</span></div>
-        <div id="companion-box"></div>
-      </div>
-    </section>
-
-    <!-- 3. 장비 & 하이리스크 대장간 탭 -->
-    <section id="tab-gear" class="panel">
-      <div class="card">
-        <div class="sec-head">
-          <span>⚔️ 장착 장비 (클릭하여 강화 · 유산 지정)</span>
-          <span style="font-size:10.5px; color:#00f5d4;">유산 1개는 죽어도 계승!</span>
-        </div>
-        <div id="equip-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-      </div>
-      <div class="card">
-        <div class="sec-head">
-          <span>🎒 전리품 가방 (<span id="bag-cnt">0</span>/20)</span>
-          <button class="btn-sm" onclick="salvageTrash()">♻️ 일반~희귀 일괄판매</button>
-        </div>
-        <div id="bag-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-      </div>
-    </section>
-
-    <!-- 4. 영혼 제단 (로그라이트 영구 성장) 탭 -->
-    <section id="tab-altar" class="panel">
-      <div class="card" style="border-color:#00a8cc;">
-        <div class="sec-head">
-          <span style="color:var(--cyan);">🌌 영혼 제단 (죽어도 영구 유지)</span>
-          <span style="color:var(--cyan);">💎 <span id="altar-soul">0</span></span>
-        </div>
-        <div id="meta-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-      </div>
-      <div class="card">
-        <div class="sec-head"><span>🏆 최고 기록</span></div>
-        <div id="record-box" style="font-size:12px; line-height:1.7;"></div>
-      </div>
-    </section>
-
-    <!-- 5. 연대기 (스토리 플래그 · 유니크 도감 · 설정) 탭 -->
-    <section id="tab-lore" class="panel">
-      <div class="card">
-        <div class="sec-head"><span>📜 현재 런의 운명 플래그</span></div>
-        <div id="flags-box" style="font-size:11.5px; line-height:1.6; color:var(--muted);"></div>
-      </div>
-      <div class="card">
-        <div class="sec-head"><span>👑 발견한 규칙 파괴 유니크</span><span id="codex-cnt">0종</span></div>
-        <div id="codex-box" style="display:flex; flex-direction:column; gap:5px;"></div>
-      </div>
-      <div class="card">
-        <div class="sec-head"><span>⚙️ 설정</span></div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn-sm" id="btn-sfx" onclick="toggleSfx()">🔊 효과음: ON</button>
-          <button class="btn-sm danger" id="btn-giveup" onclick="giveUpRun()">💀 현재 런 포기(결산)</button>
-          <button class="btn-sm danger" id="btn-wipe" onclick="wipeAllData()">🗑️ 전체 초기화</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <nav class="nav">
-    <button class="nav-btn active" id="nav-run" onclick="switchTab('run')"><span>⚔️</span><span>심연</span></button>
-    <button class="nav-btn" id="nav-build" onclick="switchTab('build')"><span>🃏</span><span>빌드</span></button>
-    <button class="nav-btn" id="nav-gear" onclick="switchTab('gear')"><span>🎒</span><span>장비/강화</span><span class="dot" id="dot-gear"></span></button>
-    <button class="nav-btn" id="nav-altar" onclick="switchTab('altar')"><span>🌌</span><span>영혼제단</span><span class="dot" id="dot-altar"></span></button>
-    <button class="nav-btn" id="nav-lore" onclick="switchTab('lore')"><span>📜</span><span>연대기</span></button>
-  </nav>
-
-  <div class="modal-bg" id="modal-bg">
-    <div class="modal" id="modal-body"></div>
-  </div>
-</div>
-
-<script>
-/* =========================================================================
- * 《심연의 서약 : 운명의 파괴자 v5.0》
- * - 1) 빌드 시너지(🩸출혈폭파 / ⚡번개연쇄 / 🛡️가시불사 / 🔥광기처형)
- * - 2) 규칙 파괴 유니크 + 하이리스크 대장간(+1~+15) + 다단히트 딜뽕
- * - 3) 패링 전투 + 갈림길 + 악마 계약 + 연쇄 스토리·동료 배신 + 불운 천장 잭팟
- * ========================================================================= */
-
-const fmt = n => {
-  if (!n || isNaN(n)) return '0';
-  const s = n < 0 ? '-' : '';
-  n = Math.floor(Math.abs(n));
-  if (n < 1000) return s + n;
-  const u = ['K','M','B','T','Qa','Qi'];
-  let i = -1;
-  while (n >= 1000 && i < u.length - 1) { n /= 1000; i++; }
-  return s + n.toFixed(n >= 100 ? 0 : n >= 10 ? 1 : 2) + u[i];
-};
-
-// 절차적 Web Audio 사운드 (패링 쇳소리, 치명타, 연쇄 번개, 폭발, 잭팟)
-const SFX = {
-  ctx: null, on: true,
-  init() {
-    if (!this.ctx) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) this.ctx = new AC();
+<!-- ... existing code ... -->
+    rift() {
+      this.tone(190, 0.45, 'sawtooth', 0.12, 65);
+      this.tone(620, 0.4, 'sine', 0.09, 140, 0.05);
+    },
+    awaken() {
+      [440, 554.37, 659.25, 880, 1108.73].forEach((f, i) => this.tone(f, 0.42, 'sawtooth', 0.12, f * 1.12, i * 0.055));
+    },
+    rune() {
+      [587.33, 739.99, 880, 1174.66].forEach((f, i) => this.tone(f, 0.32, 'sine', 0.13, null, i * 0.06));
+    },
+    chestBurst() {
+      [660, 880, 1046.5, 1318.5].forEach((f, i) => this.tone(f, 0.25, 'triangle', 0.14, null, i * 0.05));
     }
-    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
-  },
-  play(t) {
-    if (!this.on) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      const now = this.ctx.currentTime;
-      const tone = (type, f1, f2, dur, vol, delay = 0) => {
-        const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-        o.type = type; o.connect(g); g.connect(this.ctx.destination);
-        o.frequency.setValueAtTime(f1, now + delay);
-        if (f2 !== f1) o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), now + delay + dur);
-        g.gain.setValueAtTime(vol, now + delay);
-        g.gain.exponentialRampToValueAtTime(0.005, now + delay + dur);
-        o.start(now + delay); o.stop(now + delay + dur);
+  };
+
+  /* Ancient Field Runes (MapleStory-inspired World Buffs) */
+  const RUNE_TYPES = {
+    STORM:    { id: 'STORM',    name: '광풍의 룬', icon: '⚡', color: '#38bdf8', dur: 20, desc: '공속+45% · 이속+25% · 주기 낙뢰 타격!' },
+    METEOR:   { id: 'METEOR',   name: '파멸의 룬', icon: '☄️', color: '#f97316', dur: 20, desc: '주변 몬스터에게 화염 운석 지원 폭격!' },
+    BLESSING: { id: 'BLESSING', name: '축복의 룬', icon: '💎', color: '#a855f7', dur: 25, desc: '경험치 2배 · 아이템 드롭률 +60%!' }
+  };
+<!-- ... existing code ... -->
+    particles: [],
+    floatingTexts: [],
+    rifts: [],
+    zoneSpawners: {},
+
+    // === 60,000x FUN SYSTEMS: Auto-Hunt, Combo Fever, Field Runes, Treasure Chests, AmbientFX ===
+    autoHunt: { enabled: false, targetUid: null, roamX: 1650, roamY: 2350, roamTimer: 0, status: '' },
+    combo: { count: 0, timer: 0, maxTimer: 6.5 },
+    runes: [],
+    activeRune: null, // { type, timer, tick }
+    runeSpawnTimer: 6,
+    chests: [],
+    ambientParticles: [],
+    hitStop: 0,
+
+    // Field Boss Scheduler (90s cycle for fun prototype testing)
+<!-- ... existing code ... -->
+        // Unique item internal cooldowns & counters
+        flameIcd: 0, lightningIcd: 0, frostIcd: 0, riftIcd: 0, riftSkillStack: 0,
+        lifestealWindow: 0, lifestealAccum: 0,
+        // Awakening Ultimate Gauge (0~100) & Timer
+        ultGauge: 0, awakeningTimer: 0,
+        // Equipment & Bag
+<!-- ... existing code ... -->
+      if (uniques.has('BERSERKER_HELM') && p.hp <= maxHp * 0.5) {
+        atkSpeedMult *= 1.25;
+        critMult += 0.30;
+      }
+      if (defPenalty > 0) def = Math.round(def * (1 - defPenalty));
+
+      // Combo Fever Resonance (+1% XP/Drop & +0.5% Move Speed per 5 combo, capped at +20%)
+      const comboSteps = Math.min(20, Math.floor(this.combo.count / 5));
+      if (comboSteps > 0) {
+        xpBonus += comboSteps * 0.01;
+        dropBonus += comboSteps * 0.01;
+        moveSpeed *= (1 + comboSteps * 0.005);
+      }
+
+      // Active Ancient Field Rune Buffs
+      if (this.activeRune) {
+        if (this.activeRune.type === 'STORM') { atkSpeedMult *= 1.45; moveSpeed *= 1.25; }
+        else if (this.activeRune.type === 'BLESSING') { xpBonus += 1.0; dropBonus += 0.60; }
+      }
+
+      // Awakening Overdrive Mode (10s Golden Hero Mode)
+      if (p.awakeningTimer > 0) {
+        atk = Math.round(atk * 1.32);
+        atkSpeedMult *= 1.40;
+        moveSpeed *= 1.20;
+        critChance += 0.15;
+      }
+
+      const stats = {
+        maxHp, atk, def, moveSpeed, atkSpeedMult, critChance, critMult,
+        dropBonus, goldBonus, xpBonus, normalDmgBonus, dodgeCdMult, uniques
       };
-      if (t === 'click') tone('triangle', 320, 140, 0.05, 0.1);
-      else if (t === 'hit') tone('sawtooth', 190, 48, 0.1, 0.16);
-      else if (t === 'crit') { tone('sawtooth', 360, 60, 0.16, 0.22); tone('square', 720, 240, 0.12, 0.12, 0.03); }
-      else if (t === 'parry') { tone('sine', 1200, 1850, 0.14, 0.2); tone('triangle', 880, 1320, 0.2, 0.16, 0.04); }
-      else if (t === 'zap') tone('sawtooth', 980, 260, 0.09, 0.14);
-      else if (t === 'boom') tone('sawtooth', 110, 28, 0.28, 0.26);
-      else if (t === 'devil') { tone('sawtooth', 95, 62, 0.45, 0.16); tone('sine', 142, 98, 0.45, 0.12, 0.05); }
-      else if (t === 'fail') tone('sawtooth', 180, 82, 0.24, 0.15);
-      else if (t === 'jackpot') [523,659,784,1046,1318].forEach((f,i) => tone('triangle', f, f*1.02, 0.35, 0.18, i*0.06));
-    } catch(e){}
-  }
-};
+      stats.cp = Balance.computeCP(stats, uniques.size);
+      return stats;
+    },
+<!-- ... existing code ... -->
+      this.initZoneSpawners();
+      this.initAiPlayers();
+      this.initAmbientParticles();
+      this.spawnInitialRunes();
+      this.bindInputs();
+      this.resize();
+      window.addEventListener('resize', () => this.resize());
 
-function toast(msg, cls = '', ms = 2200) {
-  const box = document.getElementById('toasts');
-  const el = document.createElement('div');
-  el.className = 'toast ' + cls;
-  el.textContent = msg;
-  box.appendChild(el);
-  while (box.children.length > 3) box.removeChild(box.firstChild);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.25s'; setTimeout(() => el.remove(), 250); }, ms);
-}
+      this.pet.x = this.player.x - 35;
+      this.pet.y = this.player.y - 25;
+      this.camera.x = this.player.x - this.vw / 2;
+      this.camera.y = this.player.y - this.vh / 2;
 
-const armed = {};
-function confirmTap(key, btn, label) {
-  const now = Date.now();
-  if (armed[key] && armed[key].exp > now) { clearTimeout(armed[key].tm); delete armed[key]; return true; }
-  if (armed[key]) clearTimeout(armed[key].tm);
-  const orig = btn.innerHTML;
-  btn.innerHTML = label;
-  toast('한 번 더 누르면 실행됩니다', 'bad', 1600);
-  const tm = setTimeout(() => { delete armed[key]; btn.innerHTML = orig; }, 2600);
-  armed[key] = { exp: now + 2600, tm };
-  return false;
-}
+      UI.log('🌍 아르카디아 심리스 오픈월드에 접속했습니다. 로딩 없이 대륙을 탐험하세요!', '#38bdf8');
+      UI.log('🤖 팁: 우측 [AUTO (Z)] 버튼으로 스마트 자동사냥을 켤 수 있고, [R]로 에테르 각성을 발동합니다!', '#34d399');
+      this.updateHUD();
 
-// =========================================================================
-// 핵심 데이터: 직업 4종, 운명 카드(시너지), 악마 계약, 규칙 파괴 유니크
-// =========================================================================
-const CLASSES = {
-  warrior: {
-    name: '혈검 전사', icon: '⚔️', color: '#e04f4f', hp: 150, atk: 20, crit: 12,
-    skill: { name: '혈참 베기', rage: 35, desc: '210% 피해 + 출혈 3중첩 + HP 10% 회복' },
-    ult:   { name: '선혈의 대지폭파', desc: '적의 출혈/독을 2.5배로 즉시 폭파 + 340% 참격' }
-  },
-  rogue: {
-    name: '뇌전 암살자', icon: '🗡️', color: '#38c172', hp: 115, atk: 24, crit: 28,
-    skill: { name: '섬광 3연격', rage: 30, desc: '85% 피해 × 3회 연속 타격 (치명타/번개 개별 발동!)' },
-    ult:   { name: '천뢰 지옥살', desc: '확정 치명타 4연쇄 낙뢰 + 이번 턴 회피 100%' }
-  },
-  mage: {
-    name: '심연 마도사', icon: '🔮', color: '#a855f7', hp: 105, atk: 27, crit: 18,
-    skill: { name: '연쇄 뇌폭', rage: 35, desc: '250% 마법 피해 + 50% 확률 적 기절 + 맹독 2중첩' },
-    ult:   { name: '차원 붕괴', desc: '460% 극대 피해 + 적 의도 붕괴(확정 기절)' }
-  },
-  paladin: {
-    name: '철벽 심판관', icon: '🛡️', color: '#f0c24b', hp: 170, atk: 18, crit: 10,
-    skill: { name: '성광의 방패강타', rage: 30, desc: '최대 HP 25% 방어막 획득 + 현재 방어막만큼 추가 피해' },
-    ult:   { name: '불멸의 심판', desc: '최대 HP 45% 방어막 + 320% 신성 강타 + HP 25% 회복' }
-  }
-};
+      this.lastTime = performance.now();
+      requestAnimationFrame((t) => this.loop(t));
+    },
+<!-- ... existing code ... -->
+      const nearest = this.findNearestMonster(p.x, p.y, 260);
+      if (nearest) p.facing = Math.atan2(nearest.y - p.y, nearest.x - p.x);
 
-const TAGS = {
-  bleed:   { icon: '🩸', name: '혈독', b2: '출혈·독 턴 피해 +60%', b4: '출혈·독 6중첩 도달 시 자동 대폭발!' },
-  chain:   { icon: '⚡', name: '연쇄', b2: '치명타 시 번개 추가타(+45% 피해)', b4: '번개 추가타도 45% 확률로 재연쇄(최대 6회)!' },
-  thorns:  { icon: '🛡️', name: '철벽', b2: '패링/피격 시 공격력의 90% 반사 + 방어막', b4: '전투당 1회 치명상 시 HP 1 불사 + 400% 반격!' },
-  madness: { icon: '🔥', name: '광기', b2: '잃은 HP 1%당 공격력 +1.8%', b4: '적 HP 28% 이하 시 즉시 처형(보스 15% 이하)!' }
-};
+      // Visual slash arc (larger golden arc during Awakening!)
+      const isAwakened = p.awakeningTimer > 0;
+      this.particles.push({
+        type: 'slash', x: p.x, y: p.y, angle: p.facing,
+        radius: isAwakened ? 92 : 70,
+        color: isAwakened ? '#fde047' : stats.uniques.has('RIFT_SWORD') ? '#c084fc' : stats.uniques.has('FROST_SWORD') ? '#7dd3fc' : stats.uniques.has('FLAME_SWORD') || stats.uniques.has('IGNIS_SWORD') ? '#fb923c' : '#f1f5f9',
+        life: 0.2, maxLife: 0.2
+      });
 
-// 사기 빌드용 운명 카드 풀 (16종)
-const FATE_CARDS = [
-  { id: 'c_bleed1', tag: 'bleed', rarity: 'common', name: '톱니 칼날', desc: '모든 타격 시 출혈 2중첩 부여' },
-  { id: 'c_bleed2', tag: 'bleed', rarity: 'rare',   name: '부패의 성배', desc: '출혈/독 폭파 시 피해량의 30%만큼 HP 회복' },
-  { id: 'c_bleed3', tag: 'bleed', rarity: 'legend', name: '혈독 과부하', desc: '매 턴 시작 시 적의 모든 출혈·독 중첩 2배 증폭!' },
-  { id: 'c_bleed4', tag: 'bleed', rarity: 'common', name: '맹독 주머니', desc: '전투 시작 시 적에게 맹독 4중첩 즉시 부여' },
-
-  { id: 'c_chain1', tag: 'chain', rarity: 'common', name: '전도성 반지', desc: '치명타 확률 +15%, 치명타 시 분노 +15 추가 획득' },
-  { id: 'c_chain2', tag: 'chain', rarity: 'rare',   name: '폭풍의 눈', desc: '스킬 사용 시 40% 확률로 분노 소모 반환(재사용 가능!)' },
-  { id: 'c_chain3', tag: 'chain', rarity: 'legend', name: '무한 뇌격', desc: '치명타마다 번개 추가타 2회 발사 + 치명타 피해 +50%' },
-  { id: 'c_chain4', tag: 'chain', rarity: 'common', name: '그림자 잔상', desc: '기본 공격이 45% 확률로 1회 더 타격' },
-
-  { id: 'c_thrn1', tag: 'thorns', rarity: 'common', name: '가시 철갑', desc: '전투 시작 시 최대 HP 22% 방어막 획득' },
-  { id: 'c_thrn2', tag: 'thorns', rarity: 'rare',   name: '완벽한 반격', desc: '패링 성공 시 반격 피해 2배(440%) + HP 15% 회복' },
-  { id: 'c_thrn3', tag: 'thorns', rarity: 'legend', name: '황금 요새', desc: '매 턴 종료 시 방어막이 남아있으면 방어막의 150%만큼 적에게 충격파' },
-  { id: 'c_thrn4', tag: 'thorns', rarity: 'common', name: '단단한 신념', desc: '최대 HP +30%, 받는 모든 피해 15% 감소' },
-
-  { id: 'c_mad1',  tag: 'madness', rarity: 'common', name: '피의 갈증', desc: '공격력 +30%, 대신 매 전투 시작 시 HP 8% 소모' },
-  { id: 'c_mad2',  tag: 'madness', rarity: 'rare',   name: '도박사의 주사위', desc: '모든 공격 피해가 60%~240% 랜덤 폭주 + 잭팟 확률 +4%' },
-  { id: 'c_mad3',  tag: 'madness', rarity: 'legend', name: '사신의 계약서', desc: '적 처치 시 공격력 영구 +8%(런 중 누적) + HP 15% 회복' },
-  { id: 'c_mad4',  tag: 'madness', rarity: 'rare',   name: '최후의 발악', desc: 'HP 40% 이하일 때 모든 공격 치명타 100% 확정!' }
-];
-
-// 목숨 거는 악마 계약 6종
-const DEVIL_CONTRACTS = [
-  { id: 'd_arm',   name: '🩸 왼팔의 감각을 바친다', gain: '치명타 피해 +120% & 공격력 +35%', cost: '최대 HP 영구 -25%', mult: 0.35 },
-  { id: 'd_nopar', name: '🔥 방패를 부순 광기', gain: '매 턴 적 출혈 +4 & 공격력 +60%', cost: '전투 중 패링(방어) 불가', mult: 0.45 },
-  { id: 'd_greed', name: '👑 탐욕의 왕관 낙인', gain: '전설·신화 드롭률 3배 & 골드 2배', cost: '회복 효과 절반 감소', mult: 0.40 },
-  { id: 'd_glass', name: '⚡ 유리 대포의 저주', gain: '모든 스킬 2회 연속 발동(딜 2배!)', cost: '받는 피해 +45%', mult: 0.55 },
-  { id: 'd_soul',  name: '💀 영혼 저당권', gain: '보스 처치 시 영혼석 2.5배 & 즉석 300G', cost: '매 방 이동 시 HP 6% 손실', mult: 0.35 },
-  { id: 'd_chaos', name: '🎲 혼돈의 주사위', gain: '잭팟 확률 +8% & 치명타 +25%', cost: '강화 실패 시 20% 확률로 하락', mult: 0.30 }
-];
-
-const GRADES = [
-  { name: '일반', cls: 'g0', col: '#a0a0a0', mult: 1.0, w: 360 },
-  { name: '고급', cls: 'g1', col: '#4cd964', mult: 1.35, w: 280 },
-  { name: '희귀', cls: 'g2', col: '#38a1ff', mult: 1.8, w: 180 },
-  { name: '영웅', cls: 'g3', col: '#b85cff', mult: 2.5, w: 100 },
-  { name: '전설', cls: 'g4', col: '#ff9f1a', mult: 3.6, w: 52 },
-  { name: '신화', cls: 'g5', col: '#ff3838', mult: 5.2, w: 22 },
-  { name: '창조', cls: 'g6', col: '#00f5d4', mult: 8.0, w: 6 }
-];
-
-const SLOTS = [
-  { id: 'weapon', name: '무기', icon: '⚔️', stat: 'atk', base: 14 },
-  { id: 'armor',  name: '갑옷', icon: '🛡️', stat: 'hp',  base: 55 },
-  { id: 'ring',   name: '반지', icon: '💍', stat: 'crit',base: 8 },
-  { id: 'relic',  name: '유물', icon: '🔮', stat: 'atk', base: 10 }
-];
-
-// [핵심] 실제로 전투 규칙을 바꾸는 고유 발동 유니크 효과 풀!
-const UNIQUE_EFFECTS = [
-  { id: 'u_thunder', name: '뇌신의 단죄검', slot: 'weapon', desc: '치명타 시 벼락 2연쇄(+70% 피해×2)' },
-  { id: 'u_vamp',    name: '진홍의 흡혈대검', slot: 'weapon', desc: '출혈 상태 적 타격 시 피해 28% 흡혈 + 출혈 +2' },
-  { id: 'u_exec',    name: '사신의 낫', slot: 'weapon', desc: '적 HP 30% 이하 공격 시 피해 2.5배 + 처치 시 분노 100%' },
-  { id: 'u_phoenix', name: '불사조의 성갑', slot: 'armor', desc: '죽음에 이르는 피해 시 1회 부활(HP 40%) + 350% 화염 반격' },
-  { id: 'u_thorns',  name: '심연 가시갑주', slot: 'armor', desc: '피격 시 방어막 15% 생성 + 공격력 130% 가시 반사' },
-  { id: 'u_double',  name: '시간역행의 반지', slot: 'ring', desc: '스킬·필살기 사용 시 35% 확률로 1회 추가 시전!' },
-  { id: 'u_jackpot', name: '황금 폭군의 반지', slot: 'ring', desc: '공격 시 8% 확률로 황금 폭발(250% 피해 + 즉석 골드)' },
-  { id: 'u_detonate',name: '역병 군주의 심장', slot: 'relic', desc: '매 턴 적 출혈·독 2중첩 추가 + 폭파 피해 +80%' },
-  { id: 'u_parry',   name: '거울 기사의 성배', slot: 'relic', desc: '패링 성공 시 적에게 500% 반격 + 모든 스킬 분노 0(1회)' }
-];
-
-const MONSTERS = [
-  { id: 'skel', name: '피묻은 해골기사', col: '#d6cfc2', acc: '#ff4d4d' },
-  { id: 'garg', name: '심연의 가고일', col: '#697288', acc: '#b85cff' },
-  { id: 'spid', name: '역병 아라크네', col: '#2c4d39', acc: '#4cd964' },
-  { id: 'exec', name: '광기의 처형자', col: '#631d25', acc: '#ff9f1a' },
-  { id: 'wrai', name: '공허의 사신', col: '#312659', acc: '#00f5d4' },
-  { id: 'drag', name: '타락한 암흑룡', col: '#3c154a', acc: '#ff4fd8' }
-];
-
-const META_UPGRADES = [
-  { id: 'm_atk',  name: '⚔️ 선조의 검술', desc: '모든 런 시작 공격력 +15% / Lv', cost: 4 },
-  { id: 'm_hp',   name: '❤️ 불멸의 혈통', desc: '모든 런 시작 최대 HP +18% / Lv', cost: 4 },
-  { id: 'm_gold', name: '🪙 황금의 유산', desc: '시작 골드 +80G & 골드 획득 +20% / Lv', cost: 5 },
-  { id: 'm_luck', name: '🎰 운명 조작', desc: '기본 잭팟 확률 +2%p & 희귀 드롭↑ / Lv', cost: 6 },
-  { id: 'm_card', name: '🃏 시작 운명 카드', desc: 'Lv.1 달성 시 런 시작에 운명 카드 1장 선택!', cost: 10, max: 1 }
-];
-
-// =========================================================================
-// 영구 메타 데이터 + 현재 런 상태 관리 (localStorage 자동저장)
-// =========================================================================
-let meta = {
-  souls: 0,
-  upgrades: { m_atk: 0, m_hp: 0, m_gold: 0, m_luck: 0, m_card: 0 },
-  legacyItem: null,
-  codex: [],
-  bestFloor: 1,
-  bestDmg: 0,
-  runs: 0,
-  sfx: true
-};
-
-let run = null;
-let enemy = null;
-let autoMob = false;
-let autoTimer = null;
-let phase = 'door'; // 'door' | 'combat' | 'event' | 'reward'
-
-function saveAll() {
-  localStorage.setItem('ABYSS_V5_META', JSON.stringify(meta));
-  if (run) localStorage.setItem('ABYSS_V5_RUN', JSON.stringify(run));
-  else localStorage.removeItem('ABYSS_V5_RUN');
-}
-
-function loadAll() {
-  try {
-    const m = localStorage.getItem('ABYSS_V5_META');
-    if (m) meta = { ...meta, ...JSON.parse(m), upgrades: { ...meta.upgrades, ...(JSON.parse(m).upgrades || {}) } };
-    SFX.on = meta.sfx !== false;
-    const r = localStorage.getItem('ABYSS_V5_RUN');
-    if (r) { run = JSON.parse(r); return true; }
-  } catch(e){}
-  return false;
-}
-
-function createRun(classKey) {
-  const c = CLASSES[classKey];
-  const startGold = 80 + (meta.upgrades.m_gold || 0) * 80;
-  const r = {
-    classKey, lv: 1, exp: 0, reqExp: 45,
-    floor: 1, room: 1,
-    hp: c.hp, maxHp: c.hp, shield: 0, rage: 20,
-    gold: startGold, soulsEarned: 0,
-    light: 0, dark: 0, unluck: 0,
-    killBonusAtkPct: 0,
-    cards: [],
-    contracts: [],
-    companion: null, // { id, name, trust, desc, atkMult }
-    flags: {},       // 연쇄 스토리 플래그!
-    equipped: { weapon: null, armor: null, ring: null, relic: null },
-    bag: [],
-    maxHit: 0, kills: 0,
-    revivedThisFight: false,
-    freeSkillNext: false,
-    evadeNext: false
-  };
-  // 유산 장비 계승!
-  if (meta.legacyItem) {
-    const leg = JSON.parse(JSON.stringify(meta.legacyItem));
-    leg.isLegacy = true;
-    r.equipped[leg.slotId] = leg;
-  } else {
-    const starter = makeItem(1, 1, 'weapon');
-    r.equipped.weapon = starter;
-  }
-  return r;
-}
-
-// =========================================================================
-// 스탯 & 시너지 계산
-// =========================================================================
-function hasCard(id) { return run && run.cards.some(c => c.id === id); }
-function hasContract(id) { return run && run.contracts.some(c => c.id === id); }
-function hasUnique(uidEffect) {
-  if (!run) return false;
-  return Object.values(run.equipped).some(it => it && it.uniqueId === uidEffect);
-}
-function getTagCounts() {
-  const cnt = { bleed: 0, chain: 0, thorns: 0, madness: 0 };
-  if (run) run.cards.forEach(c => { if (cnt[c.tag] !== undefined) cnt[c.tag]++; });
-  return cnt;
-}
-function getRewardMult() {
-  if (!run) return 1;
-  let m = 1 + run.contracts.reduce((a, c) => a + c.mult, 0);
-  if (hasContract('d_greed')) m += 0.5;
-  return Number(m.toFixed(2));
-}
-function getJackpotChance() {
-  let base = 2 + (meta.upgrades.m_luck || 0) * 2 + Math.floor((run?.unluck || 0) * 0.25);
-  if (hasCard('c_mad2')) base += 4;
-  if (hasContract('d_chaos')) base += 8;
-  return Math.min(35, base);
-}
-
-function calcStats() {
-  const c = CLASSES[run.classKey];
-  const tags = getTagCounts();
-  let atk = c.atk + (run.lv - 1) * 5;
-  let maxHp = c.hp + (run.lv - 1) * 20;
-  let crit = c.crit;
-  let critDmg = 165;
-  let atkPct = (meta.upgrades.m_atk || 0) * 15 + (run.killBonusAtkPct || 0);
-  let hpPct = (meta.upgrades.m_hp || 0) * 18;
-
-  Object.values(run.equipped).forEach(it => {
-    if (!it) return;
-    const enhMult = 1 + (it.enh || 0) * (it.enh >= 10 ? 0.24 : 0.14);
-    const val = Math.floor(it.baseVal * enhMult);
-    if (it.stat === 'atk') atk += val;
-    if (it.stat === 'hp') maxHp += val;
-    if (it.stat === 'crit') crit += val;
-    atkPct += it.atkPct || 0;
-    critDmg += it.critDmg || 0;
-  });
-
-  if (hasCard('c_chain1')) crit += 15;
-  if (hasCard('c_chain3')) critDmg += 50;
-  if (hasCard('c_thrn4')) hpPct += 30;
-  if (hasCard('c_mad1')) atkPct += 30;
-
-  if (hasContract('d_arm')) { atkPct += 35; critDmg += 120; hpPct -= 25; }
-  if (hasContract('d_nopar')) atkPct += 60;
-  if (hasContract('d_chaos')) crit += 25;
-
-  // 광기 2세트: 잃은 HP 1%당 공격력 +1.8%
-  const missingHpPct = Math.max(0, Math.round((1 - run.hp / Math.max(1, run.maxHp)) * 100));
-  if (tags.madness >= 2) atkPct += Math.floor(missingHpPct * 1.8);
-
-  if (run.companion && run.companion.trust > 0) atkPct += 15;
-
-  maxHp = Math.max(30, Math.floor(maxHp * Math.max(0.35, 1 + hpPct / 100)));
-  atk = Math.max(5, Math.floor(atk * Math.max(0.4, 1 + atkPct / 100)));
-  crit = Math.min(95, crit);
-  return { atk, maxHp, crit, critDmg, tags };
-}
-
-// =========================================================================
-// SVG 스프라이트 & Canvas VFX 파티클/번개/폭발 오버레이
-// =========================================================================
-function getHeroSvg(clsKey) {
-  const c = CLASSES[clsKey].color;
-  if (clsKey === 'warrior') return `<svg viewBox="0 0 64 64" width="64" height="64"><circle cx="30" cy="18" r="9" fill="#e8cfb5"/><path d="M21 15 Q30 4 39 15 Z" fill="#94a3b8"/><rect x="20" y="27" width="20" height="24" rx="4" fill="${c}"/><path d="M44 10 L54 6 L48 40 L42 38 Z" fill="#ffd166" stroke="#fff" stroke-width="1.5"/></svg>`;
-  if (clsKey === 'rogue') return `<svg viewBox="0 0 64 64" width="64" height="64"><path d="M20 20 Q30 5 40 20 L42 50 L18 50 Z" fill="#1e2923"/><circle cx="30" cy="20" r="8" fill="#e8cfb5"/><rect x="22" y="18" width="16" height="4" fill="#111"/><circle cx="33" cy="20" r="1.5" fill="#4cd964"/><path d="M40 28 L58 18 L44 34 Z" fill="#00f5d4"/><path d="M20 32 L6 24 L18 38 Z" fill="#4cd964"/></svg>`;
-  if (clsKey === 'mage') return `<svg viewBox="0 0 64 64" width="64" height="64"><polygon points="30,4 16,22 44,22" fill="#4c1d95"/><circle cx="30" cy="24" r="7" fill="#f0d9c2"/><path d="M20 31 L40 31 L46 56 L14 56 Z" fill="${c}"/><line x1="48" y1="54" x2="50" y2="14" stroke="#a16207" stroke-width="3"/><circle cx="50" cy="12" r="6" fill="#e879f9"/></svg>`;
-  return `<svg viewBox="0 0 64 64" width="64" height="64"><ellipse cx="30" cy="8" rx="10" ry="3" fill="none" stroke="#fde047" stroke-width="2.5"/><circle cx="30" cy="20" r="8" fill="#f0d9c2"/><path d="M18 28 L42 28 L44 54 L16 54 Z" fill="#f5ebe0"/><path d="M40 26 L56 30 L54 48 L46 54 L38 48 Z" fill="#f0c24b" stroke="#fff" stroke-width="1.5"/></svg>`;
-}
-
-function getEnemySvg(mObj, isBoss) {
-  const s = isBoss ? 84 : 64;
-  if (!mObj) return `<svg viewBox="0 0 64 64" width="60" height="60"><rect x="14" y="14" width="36" height="40" rx="6" fill="#2a1f36" stroke="#d4a650" stroke-width="2"/><circle cx="32" cy="34" r="7" fill="#d4a650"/></svg>`;
-  if (mObj.id === 'drag') return `<svg viewBox="0 0 64 64" width="${s}" height="${s}"><path d="M28 24 L60 6 L52 38 Z" fill="#280e36"/><ellipse cx="34" cy="38" rx="16" ry="12" fill="${mObj.col}"/><path d="M22 32 L6 16 L16 14 L28 26 Z" fill="${mObj.col}"/><circle cx="15" cy="20" r="2.5" fill="${mObj.acc}"/></svg>`;
-  if (mObj.id === 'spid') return `<svg viewBox="0 0 64 64" width="${s}" height="${s}"><g stroke="#1b3324" stroke-width="3"><line x1="20" y1="36" x2="6" y2="52"/><line x1="22" y1="32" x2="4" y2="38"/><line x1="44" y1="36" x2="58" y2="52"/><line x1="42" y1="32" x2="60" y2="38"/></g><ellipse cx="38" cy="36" rx="14" ry="11" fill="${mObj.col}"/><circle cx="22" cy="38" r="9" fill="${mObj.col}"/><circle cx="18" cy="36" r="2.2" fill="${mObj.acc}"/><circle cx="22" cy="40" r="2.2" fill="${mObj.acc}"/></svg>`;
-  return `<svg viewBox="0 0 64 64" width="${s}" height="${s}"><path d="M18 14 L10 4 M46 14 L54 4" stroke="${mObj.acc}" stroke-width="3.5"/><circle cx="32" cy="22" r="11" fill="${mObj.col}"/><rect x="25" y="20" width="5" height="3" fill="${mObj.acc}"/><rect x="34" y="20" width="5" height="3" fill="${mObj.acc}"/><rect x="20" y="33" width="24" height="22" rx="4" fill="${mObj.col}"/><line x1="16" y1="42" x2="4" y2="18" stroke="#cbd5e1" stroke-width="4"/></svg>`;
-}
-
-const FX = {
-  cvs: null, ctx: null, parts: [], bolts: [], floats: [],
-  init() {
-    this.cvs = document.getElementById('fx-canvas');
-    this.ctx = this.cvs.getContext('2d');
-    const resize = () => {
-      const r = this.cvs.parentElement.getBoundingClientRect();
-      this.cvs.width = Math.max(260, Math.floor(r.width));
-      this.cvs.height = Math.max(160, Math.floor(r.height));
-    };
-    resize(); window.addEventListener('resize', resize);
-    const loop = () => {
-      requestAnimationFrame(loop);
-      const ctx = this.ctx, w = this.cvs.width, h = this.cvs.height;
-      ctx.clearRect(0, 0, w, h);
-      for (let i = this.bolts.length - 1; i >= 0; i--) {
-        const b = this.bolts[i]; b.life -= 0.06;
-        if (b.life <= 0) { this.bolts.splice(i, 1); continue; }
-        ctx.save(); ctx.globalAlpha = b.life; ctx.strokeStyle = b.col; ctx.lineWidth = b.w || 3;
-        ctx.beginPath(); ctx.moveTo(b.x1, b.y1);
-        ctx.lineTo((b.x1+b.x2)/2 + (Math.random()-0.5)*24, (b.y1+b.y2)/2 + (Math.random()-0.5)*24);
-        ctx.lineTo(b.x2, b.y2); ctx.stroke(); ctx.restore();
+      // Check Legendary Rift Greatsword proc (after 3 skill casts)
+      if (stats.uniques.has('RIFT_SWORD') && p.riftSkillStack >= 3 && p.riftIcd <= 0) {
+        p.riftSkillStack = 0;
+        p.riftIcd = 12.0;
+        const rx = p.x + Math.cos(p.facing) * 110;
+        const ry = p.y + Math.sin(p.facing) * 110;
+        this.spawnSpatialRift(rx, ry, stats);
       }
-      for (let i = this.parts.length - 1; i >= 0; i--) {
-        const p = this.parts[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.life -= 0.03;
-        if (p.life <= 0) { this.parts.splice(i, 1); continue; }
-        ctx.save(); ctx.globalAlpha = p.life; ctx.fillStyle = p.col;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
+
+      // Unique Weapons: Flame Sword / Ignis Heart Sword projectiles (boosted proc during Awakening)
+      const procBoost = isAwakened ? 1.45 : 1.0;
+      if (p.flameIcd <= 0 && Math.random() < 0.35 * procBoost) {
+        if (stats.uniques.has('IGNIS_SWORD')) {
+          p.flameIcd = 1.5;
+          SFX.fire();
+          [-0.26, 0, 0.26].forEach(offset => {
+            this.projectiles.push({
+              owner: 'player', kind: 'flame_wave', x: p.x, y: p.y,
+              vx: Math.cos(p.facing + offset) * 430, vy: Math.sin(p.facing + offset) * 430,
+              radius: 16, mult: 1.05, pierce: 3, hitSet: new Set(), life: 0.65, color: '#f97316'
+            });
+          });
+        } else if (stats.uniques.has('FLAME_SWORD')) {
+          p.flameIcd = 1.5;
+          SFX.fire();
+          this.projectiles.push({
+            owner: 'player', kind: 'flame_wave', x: p.x, y: p.y,
+            vx: Math.cos(p.facing) * 440, vy: Math.sin(p.facing) * 440,
+            radius: 18, mult: 1.20, pierce: 3, hitSet: new Set(), life: 0.68, color: '#fb923c'
+          });
+        }
       }
-      for (let i = this.floats.length - 1; i >= 0; i--) {
-        const f = this.floats[i]; f.y += f.vy; f.vy *= 0.93; f.life -= 0.022;
-        if (f.life <= 0) { this.floats.splice(i, 1); continue; }
-        ctx.save(); ctx.globalAlpha = Math.min(1, f.life * 1.5);
-        ctx.font = `900 ${f.sz}px sans-serif`; ctx.textAlign = 'center';
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 3.5; ctx.strokeText(f.txt, f.x, f.y);
-        ctx.fillStyle = f.col; ctx.fillText(f.txt, f.x, f.y); ctx.restore();
+
+      // Awakening Bonus Golden Crescent Wave
+      if (isAwakened && Math.random() < 0.5) {
+        this.projectiles.push({
+          owner: 'player', kind: 'aether_wave', x: p.x, y: p.y,
+          vx: Math.cos(p.facing) * 470, vy: Math.sin(p.facing) * 470,
+          radius: 18, mult: 0.85, pierce: 4, hitSet: new Set(), life: 0.55, color: '#fde047'
+        });
       }
-    };
-    requestAnimationFrame(loop);
-  },
-  burst(isEnemySide, txt, col = '#fff', big = false, bolt = false) {
-    const w = this.cvs.width, h = this.cvs.height;
-    const x = isEnemySide ? w * 0.76 : w * 0.24;
-    const y = h * 0.52;
-    const cnt = big ? 20 : 9;
-    for (let i = 0; i < cnt; i++) {
-      const a = Math.random() * Math.PI * 2, s = (big ? 3.5 : 2) + Math.random() * (big ? 5 : 3);
-      this.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s - 2, r: big ? 3.5 : 2.2, col: i%3===0 ? '#fff' : col, life: 1 });
-    }
-    if (bolt) this.bolts.push({ x1: w*0.24, y1: h*0.5, x2: x, y2: y, col, w: big ? 4.5 : 2.8, life: 1 });
-    if (txt) this.floats.push({ txt, x: x + (Math.random()-0.5)*26, y: y - 16, vy: big ? -3.2 : -2.2, col, sz: big ? 20 : 14, life: 1 });
-    if (big) {
-      const app = document.getElementById('app');
-      app.classList.remove('shake'); void app.offsetWidth; app.classList.add('shake');
-    }
-  }
-};
 
-function flashScreen(col) {
-  const fl = document.getElementById('flash');
-  fl.style.background = `radial-gradient(circle, ${col} 0%, transparent 72%)`;
-  fl.style.opacity = '0.82';
-  setTimeout(() => fl.style.opacity = '0', 460);
-}
+      // Hit Treasure Pinata Chests in melee range
+      for (let ci = this.chests.length - 1; ci >= 0; ci--) {
+        const ch = this.chests[ci];
+        if (Math.hypot(ch.x - p.x, ch.y - p.y) <= (isAwakened ? 105 : 85)) {
+          this.hitTreasureChest(ch);
+        }
+      }
 
-// =========================================================================
-// 아이템 생성 & 잭팟(불운 천장) 시스템
-// =========================================================================
-function makeItem(floor, minGrade = 0, forceSlotId = null) {
-  const devilGreed = hasContract('d_greed') ? 3.0 : 1.0;
-  const luckBonus = (meta.upgrades.m_luck || 0) * 18 + floor * 6;
-  const pool = GRADES.map((g, i) => {
-    let w = i < minGrade ? 0 : g.w;
-    if (i >= 3 && w > 0) w = w * devilGreed + luckBonus * (7 - i);
-    return { g, i, w };
-  });
-  let total = pool.reduce((a, b) => a + b.w, 0), r = Math.random() * total, pick = pool[0];
-  for (const p of pool) { if (r <= p.w) { pick = p; break; } r -= p.w; }
+      // Hit monsters in melee cone
+      const reach = isAwakened ? 96 : 78;
+      for (const m of this.monsters) {
+        if (m.hp <= 0 || m.spawnAnim > 0) continue;
+        const dx = m.x - p.x, dy = m.y - p.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist <= reach + m.radius) {
+          const ang = Math.atan2(dy, dx);
+          let diff = ang - p.facing;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          if (Math.abs(diff) <= 1.32 || dist < 38) {
+            this.damageMonster(m, 1.0, stats, 'player');
+          }
+        }
+      }
+    },
 
-  const slot = forceSlotId ? SLOTS.find(s => s.id === forceSlotId) : SLOTS[Math.floor(Math.random() * SLOTS.length)];
-  const baseVal = Math.max(2, Math.floor(slot.base * (1 + floor * 0.32) * pick.g.mult));
+    /* ------------------------------------------------------------------------
+       AWAKENING OVERDRIVE ULTIMATE (R Key / Button)
+       ------------------------------------------------------------------------ */
+    useAwakening() {
+      const p = this.player;
+      if (p.ultGauge < 100 || p.awakeningTimer > 0) return;
+      p.ultGauge = 0;
+      p.awakeningTimer = 10.0;
+      p.invulnTimer = Math.max(p.invulnTimer, 0.8);
+      const stats = this.getPlayerStats();
 
-  // 영웅(3) 이상은 규칙 파괴 유니크 효과 부여 가능, 전설(4) 이상은 100% 고유 효과!
-  let unique = null;
-  if (pick.i >= 4 || (pick.i === 3 && Math.random() < 0.6)) {
-    const slotUniques = UNIQUE_EFFECTS.filter(u => u.slot === slot.id);
-    if (slotUniques.length) unique = slotUniques[Math.floor(Math.random() * slotUniques.length)];
-  }
+      SFX.awaken();
+      this.camera.shake = 14;
+      this.hitStop = 0.05;
+      UI.banner('🌟 에테르 각성 발동!!', '10초간 공격력+32% · 공속+40% · 이속+20% · 황금 검기 방출!', '#facc15');
+      UI.log('🌟 [에테르 각성] 폭발적인 고대 마력이 해방되었습니다!', '#fde047');
 
-  return {
-    uid: 'it_' + Date.now() + '_' + Math.floor(Math.random() * 99999),
-    slotId: slot.id, slotName: slot.name, icon: slot.icon, stat: slot.stat,
-    name: unique ? unique.name : `${pick.g.name} 심연의 ${slot.name}`,
-    gradeIdx: pick.i, gradeName: pick.g.name, gradeCls: pick.g.cls,
-    baseVal, enh: 0,
-    atkPct: pick.i >= 2 ? 4 + pick.i * 4 + Math.floor(Math.random() * 8) : 0,
-    critDmg: pick.i >= 3 ? 10 + pick.i * 7 : 0,
-    uniqueId: unique ? unique.id : null,
-    uniqueDesc: unique ? unique.desc : null,
-    isLegacy: false
-  };
-}
+      this.particles.push({ type: 'ring', x: p.x, y: p.y, r: 16, maxR: 230, color: '#fde047', life: 0.55, maxLife: 0.55 });
+      this.particles.push({ type: 'ring', x: p.x, y: p.y, r: 10, maxR: 170, color: '#f97316', life: 0.42, maxLife: 0.42 });
+      for (let i = 0; i < 20; i++) {
+        const a = (Math.PI * 2 * i) / 20;
+        this.particles.push({
+          type: 'dot', x: p.x, y: p.y, vx: Math.cos(a) * 220, vy: Math.sin(a) * 220,
+          r: 5.5, color: i % 2 === 0 ? '#fef08a' : '#f97316', life: 0.5, maxLife: 0.5
+        });
+      }
 
-function gainItem(it, showModal = false) {
-  if (it.uniqueId && !meta.codex.includes(it.uniqueId)) {
-    meta.codex.push(it.uniqueId);
-    toast(`📖 신규 규칙파괴 유니크 발견: [${it.name}]!`, 'jackpot', 2600);
-  }
-  if (it.gradeIdx >= 4) {
-    flashScreen(GRADES[it.gradeIdx].col);
-    SFX.play('jackpot');
-  }
-  if (run.bag.length >= 20) {
-    const sellG = 25 + it.gradeIdx * 30;
-    run.gold += sellG;
-    toast(`가방 가득 참: [${it.name}] 자동 판매 (+${sellG}G)`);
-    return;
-  }
-  run.bag.unshift(it);
-  document.getElementById('dot-gear').classList.add('show');
-  if (showModal) openLootModal(it);
-}
+      // Massive Awakening AoE Burst (280% ATK)
+      for (const m of this.monsters) {
+        if (m.hp <= 0 || m.spawnAnim > 0) continue;
+        if (Math.hypot(m.x - p.x, m.y - p.y) <= 230 + m.radius) {
+          this.damageMonster(m, 2.8, stats, 'player', false);
+        }
+      }
+      for (let ci = this.chests.length - 1; ci >= 0; ci--) {
+        if (Math.hypot(this.chests[ci].x - p.x, this.chests[ci].y - p.y) <= 230) {
+          this.hitTreasureChest(this.chests[ci], 3);
+        }
+      }
+    },
 
-// 인생역전 대박(잭팟) 체크!
-function tryJackpot(contextName) {
-  const chance = getJackpotChance();
-  if (Math.random() * 100 < chance) {
-    run.unluck = 0; // 천장 초기화
-    const minG = Math.random() < 0.3 ? 6 : 5; // 신화 또는 창조!
-    const it = makeItem(run.floor + 2, minG);
-    const bonusSoul = 3 + Math.floor(run.floor / 2);
-    const bonusGold = 150 + run.floor * 80;
-    run.gold += bonusGold;
-    run.soulsEarned += bonusSoul;
-    meta.souls += bonusSoul;
-    gainItem(it, false);
-    flashScreen('#00f5d4');
-    SFX.play('jackpot');
-    toast(`🎰 인생역전 잭팟!! [${it.gradeName}] ${it.name} + 💎${bonusSoul} + 🪙${fmt(bonusGold)}!`, 'jackpot', 3600);
-    return `🎰 <strong>[운명의 잭팟 대폭발!!]</strong> ${contextName}에서 신화적 행운이 터졌습니다! <span class="${it.gradeCls}">[${it.gradeName}] ${it.name}</span>, 🪙+${fmt(bonusGold)}G, 💎+${bonusSoul} 획득!`;
-  }
-  return '';
-}
-
-// =========================================================================
-// 갈림길 분기 지도 (매 방 2~3개 문 선택)
-// =========================================================================
-function showDoorChoices() {
-  phase = 'door';
-  enemy = null;
-  document.getElementById('arena').classList.remove('boss-bg');
-  document.getElementById('enemy-intent').style.display = 'none';
-  document.getElementById('enemy-hp-box').style.display = 'none';
-  document.getElementById('enemy-status').innerHTML = '';
-  document.getElementById('enemy-svg').innerHTML = getEnemySvg(null, false);
-  document.getElementById('enemy-name').textContent = `심연 ${run.floor}층 갈림길`;
-  document.getElementById('combat-log').classList.remove('show');
-
-  // 5번째 방은 무조건 계층 보스전!
-  if (run.room >= 5) {
-    document.getElementById('ev-title').textContent = `👑 심연 ${run.floor}층 계층 군주의 방`;
-    document.getElementById('ev-tag').textContent = '보스 관문';
-    document.getElementById('ev-desc').textContent = '거대한 흑요석 문 너머로 살기가 흘러나옵니다. 보스를 쓰러뜨리면 [운명 카드 3택1]과 영혼석을 얻습니다.';
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn devil-btn" style="justify-content:center;" onclick="enterRoom('boss')">
-        <span class="act-title">🔥 계층 군주의 방으로 돌입한다</span>
-      </button>
-    `;
-    updateUI();
-    return;
-  }
-
-  // 2~3개의 전략적 갈림길 생성
-  const pool = [
-    { type: 'combat', icon: '⚔️', name: '피의 투기장', hint: '일반 전투 · 골드 & 경험치', risk: false },
-    { type: 'elite',  icon: '⚡', name: '정예 사냥터', hint: '고위험 전투 · 영웅~전설 유니크 드롭↑', risk: true },
-    { type: 'story',  icon: '❓', name: '핏빛 사건',   hint: '연쇄 스토리 · 동료/배신/숨은 보상', risk: false },
-    { type: 'devil',  icon: '😈', name: '악마의 밀실', hint: '치명적 대가 ↔ 파격적 영구 힘', risk: true },
-    { type: 'chest',  icon: '🧰', name: '잠긴 보물고', hint: '도박 함정 상자 · 대박 장비 찬스', risk: false },
-    { type: 'camp',   icon: '🏕️', name: '꺼져가는 화톳불', hint: 'HP 55% 회복 또는 무료 강화 찬스', risk: false }
-  ];
-  const doors = [];
-  // 첫 문은 전투/정예 보장, 나머지는 다양하게
-  doors.push(Math.random() < 0.42 ? pool[1] : pool[0]);
-  const others = pool.slice(2).sort(() => Math.random() - 0.5);
-  doors.push(others[0], others[1]);
-
-  document.getElementById('ev-title').textContent = `🚪 심연 ${run.floor}층 갈림길 (${run.room}/5방)`;
-  document.getElementById('ev-tag').textContent = '경로 선택';
-  document.getElementById('ev-desc').textContent = '어느 문으로 들어가시겠습니까? 위험한 문일수록 빌드와 전리품이 폭발합니다.';
-
-  document.getElementById('actions').innerHTML = `
-    <div class="door-grid" style="grid-template-columns: repeat(3, 1fr);">
-      ${doors.map(d => `
-        <div class="door-card ${d.risk ? 'risk' : ''}" onclick="enterRoom('${d.type}')">
-          <div class="door-icon">${d.icon}</div>
-          <div class="door-name">${d.name}</div>
-          <div class="door-hint">${d.hint}</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-  updateUI();
-  saveAll();
-}
-
-function enterRoom(type) {
-  SFX.play('click');
-  // 악마 계약 [영혼 저당권]: 매 방 이동 시 HP 6% 손실
-  if (hasContract('d_soul')) {
-    const loss = Math.max(1, Math.floor(run.maxHp * 0.06));
-    run.hp = Math.max(1, run.hp - loss);
-  }
-  if (type === 'combat' || type === 'elite' || type === 'boss') startCombat(type);
-  else if (type === 'devil') startDevilEvent();
-  else if (type === 'story') startChainStoryEvent();
-  else if (type === 'chest') startChestEvent();
-  else startCampEvent();
-}
-
-// =========================================================================
-// 전투 시스템 (패링, 출혈/독 폭파, 번개 무한 연쇄, 불사 반격)
-// =========================================================================
-function startCombat(tier, customName = null) {
-  phase = 'combat';
-  const s = calcStats();
-  run.maxHp = s.maxHp;
-  run.revivedThisFight = false;
-  run.evadeNext = false;
-  run.shield = hasCard('c_thrn1') ? Math.floor(s.maxHp * 0.22) : 0;
-  if (hasCard('c_mad1')) run.hp = Math.max(1, run.hp - Math.floor(s.maxHp * 0.08));
-
-  const mBase = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
-  const mult = tier === 'boss' ? 2.85 : tier === 'elite' ? 1.65 : 1.0;
-  const floorScale = Math.pow(1.28, run.floor - 1);
-  const maxHp = Math.floor(95 * floorScale * mult);
-  const atk = Math.floor(14 * Math.pow(1.22, run.floor - 1) * (tier === 'boss' ? 1.45 : tier === 'elite' ? 1.2 : 1.0));
-
-  enemy = {
-    base: mBase, tier,
-    name: customName || ((tier === 'boss' ? '👑 ' : tier === 'elite' ? '⚡ ' : '') + mBase.name),
-    hp: maxHp, maxHp, atk,
-    bleed: 0, poison: hasCard('c_bleed4') ? 4 : 0,
-    stun: false, intent: 'atk', intentVal: atk
-  };
-
-  document.getElementById('arena').classList.toggle('boss-bg', tier === 'boss');
-  document.getElementById('enemy-unit').classList.toggle('boss', tier === 'boss');
-  document.getElementById('enemy-svg').innerHTML = getEnemySvg(mBase, tier === 'boss');
-  document.getElementById('enemy-hp-box').style.display = 'block';
-  document.getElementById('ev-title').textContent = `${enemy.name} 출현!`;
-  document.getElementById('ev-tag').textContent = tier === 'boss' ? '계층 보스' : tier === 'elite' ? '정예 전투' : '전투';
-  document.getElementById('ev-desc').textContent = tier === 'boss'
-    ? '압도적인 살기! 적이 🔥 강타를 예고할 때 [🛡️ 패링]으로 튕겨내면 치명적인 반격이 터집니다!'
-    : '적의 머리 위 행동 예고를 보고 스킬·패링·폭파를 조합하세요.';
-
-  // 연쇄 스토리 보답: 엘레나 구출 플래그가 있으면 보스전에서 지원 참전!
-  if (tier === 'boss' && run.flags.elenaSaved && !run.flags.elenaJoined) {
-    run.flags.elenaJoined = true;
-    run.companion = { id: 'elena', name: '성기사 엘레나', trust: 80, desc: '매 턴 성광 지원 공격 + 치명상 방어' };
-    toast('✨ 구해주었던 성기사 엘레나가 보스전에 지원군으로 합류했습니다!', 'good', 3200);
-  }
-
-  rollEnemyIntent();
-  renderCombatButtons();
-  updateUI();
-
-  // 잡몹 자동 전투가 켜져 있으면 일반 전투만 자동 진행 (보스·정예는 손맛 유지!)
-  if (autoMob && tier === 'combat') scheduleAutoCombat();
-}
-
-function rollEnemyIntent() {
-  if (!enemy) return;
-  const r = Math.random();
-  if (r < 0.45) {
-    enemy.intent = 'atk'; enemy.intentVal = enemy.atk;
-  } else if (r < 0.80) {
-    enemy.intent = 'heavy'; enemy.intentVal = Math.floor(enemy.atk * 1.85);
-  } else {
-    enemy.intent = 'curse'; enemy.intentVal = Math.floor(enemy.atk * 0.85);
-  }
-}
-
-function renderCombatButtons() {
-  if (!enemy) return;
-  const c = CLASSES[run.classKey];
-  const noParry = hasContract('d_nopar');
-  const isDanger = enemy.intent === 'heavy' && !enemy.stun;
-  const skillCost = run.freeSkillNext ? 0 : c.skill.rage;
-  const canSkill = run.rage >= skillCost;
-  const canUlt = run.rage >= 100;
-
-  document.getElementById('actions').innerHTML = `
-    <div class="combat-grid">
-      <button class="act-btn" onclick="doCombatTurn('atk')">
-        <div><span class="act-title">⚔️ 기본 공격</span><span class="act-sub">분노 +28 · 적중 효과 발동</span></div>
-      </button>
-      <button class="act-btn special-btn" ${canSkill ? '' : 'disabled'} onclick="doCombatTurn('skill')">
-        <div><span class="act-title">${c.icon} ${c.skill.name}</span><span class="act-sub">${c.skill.desc}</span></div>
-        <span class="act-badge">분노 ${skillCost}</span>
-      </button>
-      <button class="act-btn ${isDanger && !noParry ? 'parry-glow' : ''}" ${noParry ? 'disabled' : ''} onclick="doCombatTurn('parry')">
-        <div><span class="act-title">🛡️ ${isDanger ? '퍼펙트 패링!' : '방어 태세'}</span><span class="act-sub">${noParry ? '악마 계약으로 봉인됨' : isDanger ? '강타 반사 + 기절 + 220% 카운터!' : '피해 65% 감소 + 방어막'}</span></div>
-      </button>
-      <button class="act-btn ${canUlt ? 'ult-ready' : ''}" ${canUlt ? '' : 'disabled'} onclick="doCombatTurn('ult')">
-        <div><span class="act-title">💥 ${c.ult.name}</span><span class="act-sub">${c.ult.desc}</span></div>
-        <span class="act-badge">${run.rage}/100</span>
-      </button>
-    </div>
-  `;
-}
-
-// 다단히트 & 시너지 연쇄 처리 엔진
-function dealHeroHit(mult, opts = {}) {
-  if (!enemy || enemy.hp <= 0) return 0;
-  const s = calcStats();
-  const tags = s.tags;
-  let totalDmg = 0;
-
-  // 도박사의 주사위 카드: 60%~240% 랜덤 배율
-  let rndMult = hasCard('c_mad2') ? (0.6 + Math.random() * 1.8) : (0.94 + Math.random() * 0.12);
-  let forceCrit = opts.forceCrit || (hasCard('c_mad4') && run.hp <= s.maxHp * 0.4);
-  let isCrit = forceCrit || (Math.random() * 100 < s.crit);
-
-  // [사신의 낫 유니크] 적 HP 30% 이하 시 피해 2.5배
-  if (hasUnique('u_exec') && enemy.hp <= enemy.maxHp * 0.30) mult *= 2.5;
-
-  let dmg = Math.max(1, Math.floor(s.atk * mult * rndMult * (isCrit ? s.critDmg / 100 : 1)));
-  enemy.hp -= dmg;
-  totalDmg += dmg;
-
-  if (dmg > run.maxHit) run.maxHit = dmg;
-  if (dmg > meta.bestDmg) meta.bestDmg = dmg;
-
-  // 비주얼 타격 & 사운드
-  const heroEl = document.getElementById('hero-unit'), enEl = document.getElementById('enemy-unit');
-  heroEl.classList.add('lunge-r'); setTimeout(() => heroEl.classList.remove('lunge-r'), 130);
-  enEl.classList.add('hit'); setTimeout(() => enEl.classList.remove('hit'), 220);
-
-  SFX.play(isCrit ? 'crit' : 'hit');
-  FX.burst(true, `${isCrit ? '💥' : ''}-${fmt(dmg)}`, isCrit ? '#ffd166' : '#ffffff', isCrit, opts.bolt);
-
-  // 치명타 미발동 시 불운 게이지 소폭 상승
-  if (!isCrit) run.unluck = Math.min(100, run.unluck + 2);
-  else if (hasCard('c_chain1')) run.rage = Math.min(100, run.rage + 15);
-
-  // 적중 시 출혈 부여
-  if (hasCard('c_bleed1')) enemy.bleed += 2;
-  if (hasUnique('u_vamp') && enemy.bleed > 0) {
-    const heal = Math.max(1, Math.floor(dmg * 0.28));
-    healHero(heal);
-    enemy.bleed += 2;
-  }
-
-  // [황금 폭군의 반지] 8% 확률 황금 폭발
-  if (hasUnique('u_jackpot') && Math.random() < 0.08 && enemy.hp > 0) {
-    const gDmg = Math.floor(s.atk * 2.5);
-    enemy.hp -= gDmg; totalDmg += gDmg;
-    const gGain = 20 + run.floor * 10;
-    run.gold += gGain;
-    FX.burst(true, `👑-${fmt(gDmg)} (+${gGain}G)`, '#f0c24b', true);
-  }
-
-  // ⚡ 연쇄 번개 트리거! (시너지 2/4세트 + 무한 뇌격 카드 + 뇌신 검 유니크)
-  if (isCrit && !opts.isChain && enemy.hp > 0) {
-    let bolts = 0;
-    if (tags.chain >= 2) bolts += 1;
-    if (hasCard('c_chain3')) bolts += 2;
-    if (hasUnique('u_thunder')) bolts += 2;
-    if (bolts > 0) triggerChainLightning(bolts, s, tags.chain >= 4);
-  }
-
-  // 🩸 혈독 4세트 자동 대폭발!
-  if (tags.bleed >= 4 && (enemy.bleed + enemy.poison) >= 6 && enemy.hp > 0) {
-    const boomDmg = detonateStacks(1.3);
-    totalDmg += boomDmg;
-  }
-
-  // 🔥 광기 4세트 즉시 처형!
-  const execRatio = enemy.tier === 'boss' ? 0.15 : 0.28;
-  if (tags.madness >= 4 && enemy.hp > 0 && enemy.hp <= enemy.maxHp * execRatio) {
-    enemy.hp = 0;
-    SFX.play('boom');
-    FX.burst(true, '💀 즉시 처형!!', '#ff3838', true);
-  }
-
-  return totalDmg;
-}
-
-function triggerChainLightning(count, s, canRecurse) {
-  let hits = count;
-  if (canRecurse) {
-    for (let k = 0; k < 4; k++) if (Math.random() < 0.45) hits++;
-  }
-  hits = Math.min(7, hits);
-  for (let i = 0; i < hits; i++) {
-    setTimeout(() => {
-      if (!enemy || enemy.hp <= 0) return;
-      const zDmg = Math.max(1, Math.floor(s.atk * (hasUnique('u_thunder') ? 0.70 : 0.48)));
-      enemy.hp -= zDmg;
-      if (zDmg > run.maxHit) run.maxHit = zDmg;
-      SFX.play('zap');
-      FX.burst(true, `⚡-${fmt(zDmg)}`, '#00f5d4', false, true);
-      updateUI();
-      if (enemy.hp <= 0 && phase === 'combat') finishCombatWin('⚡ 연쇄 낙뢰로 적을 소멸시켰습니다!');
-    }, (i + 1) * 95);
-  }
-}
-
-function detonateStacks(mult = 1.6) {
-  if (!enemy) return 0;
-  const totalStacks = enemy.bleed + enemy.poison;
-  if (totalStacks <= 0) return 0;
-  const s = calcStats();
-  const uniMult = hasUnique('u_detonate') ? 1.8 : 1.0;
-  const boomDmg = Math.floor(totalStacks * s.atk * 0.55 * mult * uniMult);
-  enemy.bleed = 0; enemy.poison = 0;
-  enemy.hp -= boomDmg;
-  if (boomDmg > run.maxHit) run.maxHit = boomDmg;
-  SFX.play('boom');
-  FX.burst(true, `🩸폭파 -${fmt(boomDmg)}!!`, '#ff4d6d', true);
-  if (hasCard('c_bleed2')) healHero(Math.floor(boomDmg * 0.30));
-  return boomDmg;
-}
-
-function healHero(amt) {
-  if (amt <= 0) return;
-  const real = hasContract('d_greed') ? Math.max(1, Math.floor(amt * 0.5)) : amt;
-  run.hp = Math.min(run.maxHp, run.hp + real);
-  FX.burst(false, `+${fmt(real)}`, '#4cd964', false);
-}
-
-function doCombatTurn(act) {
-  if (!enemy || phase !== 'combat') return;
-  const s = calcStats();
-  const c = CLASSES[run.classKey];
-  let logs = [];
-  let parried = false;
-
-  // 매 턴 시작 효과 (혈독 과부하 / 악마 계약 출혈 / 역병 군주 유물)
-  if (hasCard('c_bleed3') && (enemy.bleed + enemy.poison) > 0) {
-    enemy.bleed *= 2; enemy.poison *= 2;
-    logs.push(`🩸 [혈독 과부하] 적의 혈독 중첩이 2배로 폭증!`);
-  }
-  if (hasContract('d_nopar')) enemy.bleed += 4;
-  if (hasUnique('u_detonate')) { enemy.bleed += 1; enemy.poison += 1; }
-
-  const castCount = (act === 'skill' || act === 'ult')
-    ? (1 + (hasContract('d_glass') ? 1 : 0) + (hasUnique('u_double') && Math.random() < 0.35 ? 1 : 0))
-    : 1;
-
-  if (act === 'atk') {
-    run.rage = Math.min(100, run.rage + 28);
-    const d = dealHeroHit(1.0);
-    logs.push(`⚔️ 기본 공격! <strong>${fmt(d)}</strong> 피해`);
-    if (hasCard('c_chain4') && Math.random() < 0.45 && enemy.hp > 0) {
-      const d2 = dealHeroHit(0.8);
-      logs.push(`⚡ [그림자 잔상] 추가타 <strong>${fmt(d2)}</strong>!`);
-    }
-  } else if (act === 'skill') {
-    const cost = run.freeSkillNext ? 0 : c.skill.rage;
-    if (run.rage < cost) return;
-    run.freeSkillNext = false;
-    if (!(hasCard('c_chain2') && Math.random() < 0.40)) run.rage -= cost;
-    else logs.push(`🌪️ [폭풍의 눈] 분노 소모 반환!`);
-
-    for (let k = 0; k < castCount; k++) {
-      if (enemy.hp <= 0) break;
-      if (run.classKey === 'warrior') {
-        const d = dealHeroHit(2.1); enemy.bleed += 3; healHero(Math.floor(s.maxHp * 0.1));
-        logs.push(`⚔️ [혈참 베기] ${fmt(d)} 피해 + 출혈 3중첩!`);
-      } else if (run.classKey === 'rogue') {
-        let sum = 0;
-        for (let h = 0; h < 3; h++) sum += dealHeroHit(0.85, { bolt: h > 0 });
-        logs.push(`🗡️ [섬광 3연격] 총 <strong>${fmt(sum)}</strong> 연타!`);
-      } else if (run.classKey === 'mage') {
-        const d = dealHeroHit(2.5, { bolt: true }); enemy.poison += 2;
-        if (Math.random() < 0.5) { enemy.stun = true; logs.push(`💫 적 감전 기절!`); }
-        logs.push(`🔮 [연쇄 뇌폭] ${fmt(d)} 피해 + 맹독 2중첩!`);
+    /* ------------------------------------------------------------------------
+       SMART AUTO-HUNT AI CONTROLLER (Toggleable via Z / AUTO Button)
+       ------------------------------------------------------------------------ */
+    toggleAutoHunt() {
+      this.autoHunt.enabled = !this.autoHunt.enabled;
+      const btn = document.getElementById('btnAuto');
+      const lbl = document.getElementById('autoBtnLabel');
+      if (this.autoHunt.enabled) {
+        btn.classList.add('auto-active');
+        lbl.textContent = 'ON';
+        SFX.rune();
+        UI.log('🤖 스마트 자동사냥 ON — 적정 사냥터 이동 · 스킬 연계 · 장판 자동 회피 · 룬 획득 가동!', '#34d399');
+        this.addFloatingText(this.player.x, this.player.y - 44, '🤖 AUTO ON', '#34d399', 14);
       } else {
-        const sh = Math.floor(s.maxHp * 0.25);
-        run.shield += sh;
-        const d = dealHeroHit(1.2) + Math.floor(run.shield * 0.9);
-        enemy.hp -= Math.floor(run.shield * 0.9);
-        logs.push(`🛡️ [방패강타] 방어막 +${fmt(sh)} & 총 ${fmt(d)} 피해!`);
+        btn.classList.remove('auto-active');
+        lbl.textContent = 'AUTO';
+        this.autoHunt.status = '';
+        SFX.loot();
+        UI.log('🎮 자동사냥 OFF — 수동 조작 모드로 전환했습니다.', '#94a3b8');
+        this.addFloatingText(this.player.x, this.player.y - 44, '🎮 수동 모드', '#cbd5e1', 13);
       }
-    }
-  } else if (act === 'ult') {
-    if (run.rage < 100) return;
-    run.rage = 0;
-    for (let k = 0; k < castCount; k++) {
-      if (enemy.hp <= 0) break;
-      if (run.classKey === 'warrior') {
-        const b = detonateStacks(2.5);
-        const d = dealHeroHit(3.4, { forceCrit: true });
-        logs.push(`💥 [선혈 대지폭파] 폭파 ${fmt(b)} + 참격 <strong>${fmt(d)}</strong>!`);
-      } else if (run.classKey === 'rogue') {
-        let sum = 0; run.evadeNext = true;
-        for (let h = 0; h < 4; h++) sum += dealHeroHit(1.15, { forceCrit: true, bolt: true });
-        logs.push(`⚡ [천뢰 지옥살] 확정 치명타 4연격 <strong>${fmt(sum)}</strong> + 회피!`);
-      } else if (run.classKey === 'mage') {
-        const d = dealHeroHit(4.6, { forceCrit: true, bolt: true });
-        enemy.stun = true;
-        logs.push(`🌌 [차원 붕괴] 극대 피해 <strong>${fmt(d)}</strong> + 적 기절!`);
+    },
+
+    getBestAutoZoneForLevel(lv) {
+      // Pick the highest combat zone where player isn't under-leveled
+      if (lv >= 22) return ZONES.find(z => z.id === 'frost_tundra');
+      if (lv >= 12) return ZONES.find(z => z.id === 'redcliff');
+      if (lv >= 6)  return ZONES.find(z => z.id === 'wolf_woods');
+      return ZONES.find(z => z.id === 'dawn_fields');
+    },
+
+    computeAutoHuntIntent(stats, dt) {
+      const p = this.player;
+      const curZone = this.getZoneAt(p.x, p.y);
+
+      // 1) Smart Auto-Potion when HP < 48%
+      if (p.hp < stats.maxHp * 0.48 && p.potions > 0 && p.potionCd <= 0) {
+        this.usePotion();
+      }
+
+      // 2) Smart Auto-Dodge against incoming monster red telegraphs!
+      if (p.dodgeCd <= 0 && p.invulnTimer <= 0) {
+        for (const m of this.monsters) {
+          if (!m.telegraph) continue;
+          const tg = m.telegraph;
+          if (tg.t / tg.dur < 0.45) continue; // React right before impact
+          let inDanger = false;
+          let escX = p.x - m.x, escY = p.y - m.y;
+          if (tg.kind === 'circle' && Math.hypot(p.x - tg.x, p.y - tg.y) <= tg.r + p.radius + 14) {
+            inDanger = true; escX = p.x - tg.x; escY = p.y - tg.y;
+          } else if (tg.kind === 'meteors') {
+            for (const pt of tg.pts) {
+              if (Math.hypot(p.x - pt.x, p.y - pt.y) <= tg.r + p.radius + 14) {
+                inDanger = true; escX = p.x - pt.x; escY = p.y - pt.y; break;
+              }
+            }
+          } else if (tg.kind === 'line') {
+            const dx = p.x - tg.x, dy = p.y - tg.y;
+            const proj = dx * Math.cos(tg.ang) + dy * Math.sin(tg.ang);
+            const perp = -dx * Math.sin(tg.ang) + dy * Math.cos(tg.ang);
+            if (proj >= -10 && proj <= tg.len + 15 && Math.abs(perp) <= tg.width * 0.55 + p.radius) {
+              inDanger = true;
+              const side = perp >= 0 ? 1 : -1;
+              escX = -Math.sin(tg.ang) * side; escY = Math.cos(tg.ang) * side;
+            }
+          } else if (tg.kind === 'cone' && Math.hypot(p.x - tg.x, p.y - tg.y) <= tg.r + p.radius + 10) {
+            inDanger = true;
+          }
+          if (inDanger) {
+            const len = Math.hypot(escX, escY) || 1;
+            p.vx = (escX / len) * stats.moveSpeed;
+            p.vy = (escY / len) * stats.moveSpeed;
+            p.facing = Math.atan2(escY, escX);
+            this.useDodge();
+            return { ix: escX / len, iy: escY / len };
+          }
+        }
+      }
+
+      // 3) Brief safe heal in town if critically low HP and out of potions
+      if (curZone.safe && p.hp < stats.maxHp * 0.85 && p.potions === 0) {
+        this.autoHunt.status = '마을 회복 중';
+        return { ix: 0, iy: 0 };
+      }
+
+      // 4) Priority 1: Nearby Ancient Field Rune (within 460px)
+      let nearRune = null, rBest = 460;
+      for (const r of this.runes) {
+        const d = Math.hypot(r.x - p.x, r.y - p.y);
+        if (d < rBest) { rBest = d; nearRune = r; }
+      }
+      if (nearRune) {
+        this.autoHunt.status = '고대 룬 획득';
+        const dx = nearRune.x - p.x, dy = nearRune.y - p.y, d = Math.hypot(dx, dy) || 1;
+        return { ix: dx / d, iy: dy / d };
+      }
+
+      // 5) Priority 2: Nearby Treasure Pinata Chest (within 420px)
+      let nearChest = null, cBest = 420;
+      for (const ch of this.chests) {
+        const d = Math.hypot(ch.x - p.x, ch.y - p.y);
+        if (d < cBest) { cBest = d; nearChest = ch; }
+      }
+      if (nearChest) {
+        this.autoHunt.status = '보물상자 개봉';
+        const dx = nearChest.x - p.x, dy = nearChest.y - p.y, d = Math.hypot(dx, dy) || 1;
+        if (d <= 68) {
+          p.facing = Math.atan2(dy, dx);
+          this.performBasicAttack();
+          return { ix: 0, iy: 0 };
+        }
+        return { ix: dx / d, iy: dy / d };
+      }
+
+      // 6) Priority 3: Active Field Boss if player is strong enough (lv >= boss.lv - 4)
+      const boss = this.bossState.activeBoss;
+      let target = null;
+      if (boss && boss.hp > 0 && p.lv >= boss.lv - 4 && Math.hypot(boss.x - p.x, boss.y - p.y) < 1600) {
+        target = boss;
+        this.autoHunt.status = `보스 토벌: ${boss.name}`;
+      }
+
+      // 7) Priority 4: Best suitable monster nearby (prioritize Rare/Elite, avoid +6 level walls)
+      if (!target) {
+        let bestScore = Infinity;
+        for (const m of this.monsters) {
+          if (m.hp <= 0 || m.spawnAnim > 0) continue;
+          if (m.lv > p.lv + 5) continue; // Respect anti-inflation level cap
+          const d = Math.hypot(m.x - p.x, m.y - p.y);
+          if (d > 820) continue;
+          const tierBonus = m.tier === 'RARE' ? -240 : m.tier === 'ELITE' ? -120 : 0;
+          const score = d + tierBonus;
+          if (score < bestScore) { bestScore = score; target = m; }
+        }
+      }
+
+      if (target) {
+        const dx = target.x - p.x, dy = target.y - p.y;
+        const d = Math.hypot(dx, dy) || 1;
+        p.facing = Math.atan2(dy, dx);
+        this.autoHunt.status = `사냥: ${target.name}`;
+
+        // Trigger Awakening when full near Elites/Bosses or 2+ mobs
+        if (p.ultGauge >= 100 && p.awakeningTimer <= 0) {
+          const nearbyCount = this.monsters.filter(mm => mm.hp > 0 && Math.hypot(mm.x - p.x, mm.y - p.y) < 220).length;
+          if (target.tier !== 'NORMAL' || nearbyCount >= 2) this.useAwakening();
+        }
+
+        // Skill 2 Dash Strike gap closer
+        if (d <= 170 && d >= 65 && p.skill2Cd <= 0) {
+          this.useSkill2();
+        }
+        // Skill 1 Whirlwind AoE
+        if (d <= 112 + target.radius && p.skill1Cd <= 0) {
+          this.useSkill1();
+        }
+        // Basic Attack in melee reach
+        const attackRange = (p.awakeningTimer > 0 ? 84 : 68) + target.radius;
+        if (d <= attackRange) {
+          this.performBasicAttack();
+          return { ix: 0, iy: 0 };
+        }
+        return { ix: dx / d, iy: dy / d };
+      }
+
+      // 8) No monster nearby: navigate smoothly to recommended hunting ground
+      const idealZone = this.getBestAutoZoneForLevel(p.lv);
+      this.autoHunt.status = `${idealZone.name} 이동 중`;
+      this.autoHunt.roamTimer -= dt;
+      if (this.autoHunt.roamTimer <= 0 || Math.hypot(this.autoHunt.roamX - p.x, this.autoHunt.roamY - p.y) < 55) {
+        this.autoHunt.roamTimer = 4.0;
+        this.autoHunt.roamX = idealZone.x + idealZone.w * (0.25 + Math.random() * 0.5);
+        this.autoHunt.roamY = idealZone.y + idealZone.h * (0.25 + Math.random() * 0.5);
+      }
+      const dx = this.autoHunt.roamX - p.x, dy = this.autoHunt.roamY - p.y, d = Math.hypot(dx, dy) || 1;
+      return { ix: dx / d, iy: dy / d };
+    },
+
+    /* ------------------------------------------------------------------------
+       ANCIENT FIELD RUNES & GOLDEN TREASURE CHESTS (60,000x Fun Events)
+       ------------------------------------------------------------------------ */
+    spawnInitialRunes() {
+      const combatZones = ZONES.filter(z => !z.safe && !z.hidden);
+      combatZones.slice(0, 3).forEach(z => this.spawnRuneInZone(z));
+    },
+
+    spawnRuneInZone(zone) {
+      const keys = Object.keys(RUNE_TYPES);
+      const tKey = keys[Math.floor(Math.random() * keys.length)];
+      this.runes.push({
+        uid: ++this.uidCounter,
+        type: tKey,
+        zoneId: zone.id,
+        x: zone.x + 160 + Math.random() * (zone.w - 320),
+        y: zone.y + 160 + Math.random() * (zone.h - 320),
+        life: 120
+      });
+    },
+
+    spawnTreasureChest(x, y, mobLv) {
+      this.chests.push({
+        uid: ++this.uidCounter,
+        x: Math.max(80, Math.min(WORLD_W - 80, x + (Math.random() - 0.5) * 40)),
+        y: Math.max(80, Math.min(WORLD_H - 80, y + (Math.random() - 0.5) * 40)),
+        lv: mobLv,
+        hp: 4, maxHp: 4, hitFlash: 0, shake: 0, life: 40
+      });
+      SFX.rune();
+      UI.banner('🎁 차원의 보물상자 출현!', '공격해서 부수면 골드와 희귀 장비가 쏟아집니다!', '#facc15');
+      UI.log('🎁 [보물 이벤트] 필드에 [차원의 보물상자]가 나타났습니다! 때려서 열어보세요!', '#fde047');
+    },
+
+    hitTreasureChest(ch, power = 1) {
+      if (ch.hp <= 0) return;
+      ch.hp -= power;
+      ch.hitFlash = 0.14;
+      ch.shake = 7;
+      SFX.hit(true);
+      this.addFloatingText(ch.x, ch.y - 26, '💥 쾅!', '#fde047', 14);
+      for (let i = 0; i < 6; i++) {
+        const a = Math.random() * Math.PI * 2;
+        this.particles.push({
+          type: 'dot', x: ch.x, y: ch.y, vx: Math.cos(a) * 110, vy: Math.sin(a) * 110,
+          r: 4, color: '#fde047', life: 0.35, maxLife: 0.35
+        });
+      }
+      if (ch.hp <= 0) {
+        const idx = this.chests.indexOf(ch);
+        if (idx !== -1) this.chests.splice(idx, 1);
+        SFX.chestBurst();
+        this.camera.shake = 9;
+        // Fountain of Loot!
+        for (let g = 0; g < 5; g++) {
+          this.spawnLoot(ch.x, ch.y, { kind: 'gold', amount: 60 + ch.lv * 18, rarity: 'COMMON', name: `${60 + ch.lv * 18}G` });
+        }
+        this.spawnLoot(ch.x, ch.y, { kind: 'stone', amount: 3, rarity: 'RARE', name: '강화석 x3' });
+        const rarity = Math.random() < 0.22 ? 'EPIC' : Math.random() < 0.65 ? 'RARE' : 'UNCOMMON';
+        this.dropRandomRarityItem(ch.x, ch.y, ch.lv + 2, rarity);
+      }
+    },
+
+    updateRunesAndChests(dt) {
+      const p = this.player;
+      const stats = this.getPlayerStats();
+
+      // Combo decay
+      if (this.combo.count > 0) {
+        this.combo.timer -= dt;
+        if (this.combo.timer <= 0) this.combo.count = 0;
+      }
+
+      // Respawn field runes up to 4
+      this.runeSpawnTimer -= dt;
+      if (this.runeSpawnTimer <= 0) {
+        this.runeSpawnTimer = 26;
+        if (this.runes.length < 4) {
+          const combatZones = ZONES.filter(z => !z.safe && !z.hidden);
+          const z = combatZones[Math.floor(Math.random() * combatZones.length)];
+          this.spawnRuneInZone(z);
+        }
+      }
+
+      // Check player activation of runes
+      for (let i = this.runes.length - 1; i >= 0; i--) {
+        const r = this.runes[i];
+        r.life -= dt;
+        if (r.life <= 0) { this.runes.splice(i, 1); continue; }
+        if (Math.hypot(r.x - p.x, r.y - p.y) < 46) {
+          const info = RUNE_TYPES[r.type];
+          this.activeRune = { type: r.type, timer: info.dur, tick: 0.4 };
+          this.runes.splice(i, 1);
+          SFX.rune();
+          this.camera.shake = 7;
+          UI.banner(`${info.icon} [${info.name}] 해방!`, info.desc, info.color);
+          UI.log(`${info.icon} 고대 룬 [${info.name}] 발동! (${info.dur}초간 ${info.desc})`, info.color);
+          this.particles.push({ type: 'ring', x: p.x, y: p.y, r: 14, maxR: 150, color: info.color, life: 0.45, maxLife: 0.45 });
+        }
+      }
+
+      // Active Rune combat triggers (Storm Lightning / Meteor Shower!)
+      if (this.activeRune) {
+        this.activeRune.timer -= dt;
+        this.activeRune.tick -= dt;
+        if (this.activeRune.tick <= 0) {
+          if (this.activeRune.type === 'STORM') {
+            this.activeRune.tick = 1.1;
+            const target = this.findNearestMonster(p.x, p.y, 320);
+            if (target) {
+              SFX.lightning();
+              this.particles.push({ type: 'lightning', x1: target.x, y1: target.y - 160, x2: target.x, y2: target.y, color: '#38bdf8', life: 0.25, maxLife: 0.25 });
+              this.particles.push({ type: 'ring', x: target.x, y: target.y, r: 8, maxR: 54, color: '#7dd3fc', life: 0.26, maxLife: 0.26 });
+              this.damageMonster(target, 1.35, stats, 'player', true);
+            }
+          } else if (this.activeRune.type === 'METEOR') {
+            this.activeRune.tick = 1.25;
+            const nearMobs = this.monsters.filter(m => m.hp > 0 && Math.hypot(m.x - p.x, m.y - p.y) < 340);
+            if (nearMobs.length > 0) {
+              const target = nearMobs[Math.floor(Math.random() * nearMobs.length)];
+              SFX.fire();
+              this.particles.push({ type: 'line', x1: target.x - 75, y1: target.y - 190, x2: target.x, y2: target.y, color: '#fb923c', width: 12, life: 0.25, maxLife: 0.25 });
+              this.particles.push({ type: 'ring', x: target.x, y: target.y, r: 10, maxR: 92, color: '#f97316', life: 0.35, maxLife: 0.35 });
+              for (const m of nearMobs) {
+                if (Math.hypot(m.x - target.x, m.y - target.y) <= 92 + m.radius) {
+                  this.damageMonster(m, 1.5, stats, 'player', true);
+                }
+              }
+            }
+          }
+        }
+        if (this.activeRune.timer <= 0) this.activeRune = null;
+      }
+
+      // Update Treasure Chests
+      for (let i = this.chests.length - 1; i >= 0; i--) {
+        const ch = this.chests[i];
+        ch.life -= dt;
+        if (ch.hitFlash > 0) ch.hitFlash -= dt;
+        if (ch.shake > 0) ch.shake = Math.max(0, ch.shake - dt * 28);
+        if (ch.life <= 0) this.chests.splice(i, 1);
+      }
+    },
+
+    /* Ambient MapleStory-style Biome Particles (Leaves, Fireflies, Embers, Snow) */
+    initAmbientParticles() {
+      this.ambientParticles = [];
+      for (let i = 0; i < 42; i++) {
+        this.ambientParticles.push({
+          rx: Math.random(), ry: Math.random(),
+          vx: (Math.random() - 0.5) * 24, vy: 12 + Math.random() * 24,
+          size: 2 + Math.random() * 3.5, phase: Math.random() * Math.PI * 2
+        });
+      }
+    },
+
+    updateAmbientParticles(dt) {
+      for (const ap of this.ambientParticles) {
+        ap.rx += (ap.vx * dt) / Math.max(400, this.vw);
+        ap.ry += (ap.vy * dt) / Math.max(400, this.vh);
+        if (ap.ry > 1.05) { ap.ry = -0.05; ap.rx = Math.random(); }
+        if (ap.rx < -0.05) ap.rx = 1.05;
+        if (ap.rx > 1.05) ap.rx = -0.05;
+      }
+    },
+<!-- ... existing code ... -->
+      if (source === 'player') {
+        SFX.hit(res.isCrit);
+        if (res.isCrit) this.hitStop = Math.max(this.hitStop, 0.022);
+        // Charge Awakening Ultimate Gauge
+        if (p.awakeningTimer <= 0) {
+          p.ultGauge = Math.min(100, p.ultGauge + (res.isCrit ? 4.5 : 2.8));
+        }
+        this.addFloatingText(
+          m.x + (Math.random() - 0.5) * 20, m.y - m.radius - 12,
+          res.isCrit ? `💥 ${res.dmg}!` : `${res.dmg}`,
+          res.isCrit ? '#fde047' : (res.isUnderLeveled ? '#94a3b8' : '#ffffff'),
+          res.isCrit ? 19 : 14,
+          res.isCrit
+        );
+        if (res.isUnderLeveled) {
+<!-- ... existing code ... -->
+      // Track codex & kill telemetry
+      p.codex.monsters[m.tplId] = (p.codex.monsters[m.tplId] || 0) + 1;
+      this.killTimes.push(Date.now());
+      if (this.killTimes.length > 40) this.killTimes.shift();
+
+      // Multi-Kill Combo Fever & Awakening Charge
+      this.combo.count++;
+      this.combo.timer = this.combo.maxTimer;
+      if (p.awakeningTimer <= 0) p.ultGauge = Math.min(100, p.ultGauge + (m.tier === 'NORMAL' ? 8 : 25));
+      if ([10, 25, 50, 100].includes(this.combo.count)) {
+        SFX.rune();
+        this.addFloatingText(p.x, p.y - 54, `🔥 ${this.combo.count} COMBO!!`, '#fb923c', 18, true);
+      }
+      // Chance to spawn Golden Treasure Pinata Chest right on the field!
+      if ((m.tier === 'NORMAL' && Math.random() < 0.065) || m.tier === 'RARE' || (m.tier === 'ELITE' && Math.random() < 0.45)) {
+        if (this.chests.length < 3) this.spawnTreasureChest(m.x, m.y, m.lv);
+      }
+
+      // XP with ±5 level scaling & Hunter's Necklace bonus
+<!-- ... existing code ... -->
+    addFloatingText(x, y, text, color = '#fff', size = 13, isCrit = false) {
+      this.floatingTexts.push({ x, y, text, color, size, isCrit, life: isCrit ? 1.05 : 0.9, maxLife: isCrit ? 1.05 : 0.9 });
+    },
+<!-- ... existing code ... -->
+    loop(now) {
+      const rawDt = Math.min(0.05, (now - this.lastTime) / 1000);
+      this.lastTime = now;
+
+      // Crisp ARPG Hit-Stop micro-freeze on heavy crits / awakening
+      if (this.hitStop > 0) {
+        this.hitStop = Math.max(0, this.hitStop - rawDt);
+        this.render();
+        requestAnimationFrame((t) => this.loop(t));
+        return;
+      }
+
+      const dt = rawDt;
+      this.elapsed += dt;
+
+      this.updatePlayer(dt);
+      this.updateRunesAndChests(dt);
+      this.updateSpawners(dt);
+      this.updateFieldBoss(dt);
+      this.updateMonsters(dt);
+      this.updateAiPlayers(dt);
+      this.updatePet(dt);
+      this.updateProjectilesAndEffects(dt);
+      this.updateAmbientParticles(dt);
+<!-- ... existing code ... -->
+      // Cooldowns
+      ['atkCd', 'skill1Cd', 'skill2Cd', 'dodgeCd', 'potionCd', 'invulnTimer',
+       'flameIcd', 'lightningIcd', 'frostIcd', 'riftIcd', 'awakeningTimer'].forEach(k => {
+        if (p[k] > 0) p[k] = Math.max(0, p[k] - dt);
+      });
+
+      // Awakening golden aura sparkles
+      if (p.awakeningTimer > 0 && Math.random() < 0.55) {
+        this.particles.push({
+          type: 'dot', x: p.x + (Math.random() - 0.5) * 28, y: p.y + (Math.random() - 0.5) * 22,
+          vx: (Math.random() - 0.5) * 25, vy: -35 - Math.random() * 35,
+          r: 3.5, color: Math.random() < 0.5 ? '#fde047' : '#fb923c', life: 0.4, maxLife: 0.4
+        });
+      }
+<!-- ... existing code ... -->
+      // Movement Input (Keyboard + Virtual Joystick, with Seamless Smart Auto-Hunt fallback)
+      let ix = 0, iy = 0;
+      if (this.keys['KeyW'] || this.keys['ArrowUp']) iy -= 1;
+      if (this.keys['KeyS'] || this.keys['ArrowDown']) iy += 1;
+      if (this.keys['KeyA'] || this.keys['ArrowLeft']) ix -= 1;
+      if (this.keys['KeyD'] || this.keys['ArrowRight']) ix += 1;
+      if (this.joystick.active) { ix = this.joystick.dx; iy = this.joystick.dy; }
+
+      const manualMove = Math.hypot(ix, iy) > 0.08;
+      if (!manualMove && this.autoHunt.enabled) {
+        const aiMove = this.computeAutoHuntIntent(stats, dt);
+        ix = aiMove.ix;
+        iy = aiMove.iy;
+      }
+<!-- ... existing code ... -->
+    /* ------------------------------------------------------------------------
+       RENDERING PIPELINE (MapleStory-Level 2.5D Cartoon Fantasy Canvas Art)
+       ------------------------------------------------------------------------ */
+    render() {
+      const ctx = this.ctx;
+      const cam = this.camera;
+      const sx = cam.shake > 0 ? (Math.random() - 0.5) * cam.shake : 0;
+      const sy = cam.shake > 0 ? (Math.random() - 0.5) * cam.shake : 0;
+
+      ctx.clearRect(0, 0, this.vw, this.vh);
+      ctx.save();
+      ctx.translate(-Math.round(cam.x + sx), -Math.round(cam.y + sy));
+
+      // 1) Lush Maple-style Layered Terrain Zones
+      ctx.fillStyle = '#1f3622';
+      ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+
+      ZONES.forEach(z => {
+        if (z.id === 'secret_cave') return;
+        if (z.x + z.w < cam.x || z.x > cam.x + this.vw || z.y + z.h < cam.y || z.y > cam.y + this.vh) return;
+        const tGrad = ctx.createLinearGradient(z.x, z.y, z.x, z.y + z.h);
+        if (z.id === 'greenhaven')       { tGrad.addColorStop(0, '#3e7a43'); tGrad.addColorStop(1, '#2f6138'); }
+        else if (z.id === 'dawn_fields') { tGrad.addColorStop(0, '#4f9642'); tGrad.addColorStop(1, '#3c7a38'); }
+        else if (z.id === 'wolf_woods')  { tGrad.addColorStop(0, '#224a38'); tGrad.addColorStop(1, '#1b3a2e'); }
+        else if (z.id === 'silverbrook') { tGrad.addColorStop(0, '#5a687c'); tGrad.addColorStop(1, '#475366'); }
+        else if (z.id === 'redcliff')    { tGrad.addColorStop(0, '#6e3426'); tGrad.addColorStop(1, '#4d2219'); }
+        else                             { tGrad.addColorStop(0, '#a8cbe6'); tGrad.addColorStop(1, '#79a7cc'); }
+        ctx.fillStyle = tGrad;
+        ctx.fillRect(z.x, z.y, z.w, z.h);
+
+        // Stylized cobblestone / grass tuft repeating motif (frustum-clipped)
+        const step = 140;
+        const startX = Math.max(z.x + 20, Math.floor(cam.x / step) * step);
+        const startY = Math.max(z.y + 20, Math.floor(cam.y / step) * step);
+        ctx.fillStyle = z.id === 'silverbrook' ? 'rgba(255,255,255,0.08)' : z.id === 'frost_tundra' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.065)';
+        for (let gx = startX; gx < z.x + z.w - 20 && gx < cam.x + this.vw + step; gx += step) {
+          for (let gy = startY; gy < z.y + z.h - 20 && gy < cam.y + this.vh + step; gy += step) {
+            if (z.id === 'silverbrook') {
+              ctx.fillRect(gx, gy, 42, 22);
+              ctx.fillRect(gx + 54, gy + 30, 38, 20);
+            } else {
+              ctx.beginPath();
+              ctx.ellipse(gx + ((gy * 7) % 45), gy + ((gx * 3) % 35), 24, 11, 0, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+      });
+
+      // Secret Cave glowing amethyst floor
+      const cave = ZONES.find(z => z.id === 'secret_cave');
+      const cGrad = ctx.createRadialGradient(cave.x + cave.w / 2, cave.y + cave.h / 2, 20, cave.x + cave.w / 2, cave.y + cave.h / 2, 260);
+      cGrad.addColorStop(0, '#3b2563'); cGrad.addColorStop(1, '#1e1633');
+      ctx.fillStyle = cGrad;
+      ctx.fillRect(cave.x, cave.y, cave.w, cave.h);
+      ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 4;
+      ctx.strokeRect(cave.x, cave.y, cave.w, cave.h);
+
+      // 2) Warm Storybook Dirt Roads, Sparkling River, Stone Bridge & Battlements
+      ctx.fillStyle = '#a48358';
+      ctx.fillRect(690, 2315, 3450, 90);
+      ctx.fillRect(1820, 820, 76, 1520);
+      ctx.fillRect(3000, 920, 76, 1450);
+      ctx.fillStyle = '#c5a273';
+      ctx.fillRect(690, 2327, 3450, 66);
+      ctx.fillRect(1830, 820, 56, 1520);
+      ctx.fillRect(3010, 920, 56, 1450);
+
+      // Sparkling Silver River
+      const rGrad = ctx.createLinearGradient(2530, 0, 2640, 0);
+      rGrad.addColorStop(0, '#1e40af'); rGrad.addColorStop(0.5, '#38bdf8'); rGrad.addColorStop(1, '#1d4ed8');
+      ctx.fillStyle = rGrad;
+      ctx.fillRect(2530, 1680, 110, 1600);
+      ctx.fillStyle = 'rgba(224, 242, 254, 0.45)';
+      const waveOff = (this.elapsed * 42) % 72;
+      for (let ry = 1700 + waveOff; ry < 3250; ry += 72) {
+        ctx.beginPath(); ctx.roundRect(2548, ry, 74, 8, 4); ctx.fill();
+      }
+
+      // Detailed Arched Stone Bridge
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(2512, 2292, 146, 136);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(2512, 2292, 146, 16);
+      ctx.fillRect(2512, 2412, 146, 16);
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 4;
+      ctx.strokeRect(2512, 2292, 146, 136);
+
+      // Town Walls with Cartoon Outline
+      ctx.strokeStyle = '#44403c'; ctx.lineWidth = 18; ctx.strokeRect(180, 1880, 1000, 1040);
+      ctx.strokeStyle = '#a8a29e'; ctx.lineWidth = 11; ctx.strokeRect(180, 1880, 1000, 1040);
+      ctx.fillStyle = '#c5a273'; ctx.fillRect(1165, 2295, 32, 130);
+
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 16; ctx.strokeRect(2640, 1940, 740, 860);
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 10; ctx.strokeRect(2640, 1940, 740, 860);
+      ctx.fillStyle = '#c5a273';
+      ctx.fillRect(2625, 2298, 30, 124);
+      ctx.fillRect(3366, 2298, 30, 124);
+
+      // Animated Sparkling Waterfall hiding Secret Cave
+      const wfX = 1260, wfY = 440, wfW = 240, wfH = 46;
+      ctx.fillStyle = 'rgba(14, 165, 233, 0.8)';
+      ctx.fillRect(wfX, wfY, wfW, wfH);
+      ctx.fillStyle = 'rgba(224, 242, 254, 0.85)';
+      for (let i = 0; i < 9; i++) {
+        const wy = wfY + ((this.elapsed * 85 + i * 19) % wfH);
+        ctx.beginPath(); ctx.roundRect(wfX + 10 + i * 26, wy, 14, 12, 5); ctx.fill();
+      }
+      ctx.font = 'bold 12px "Noto Sans KR"'; ctx.textAlign = 'center';
+      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+      const wfLabel = this.player.codex.zones.includes('secret_cave') ? '🗝️ 고블린 은신처 입구' : '💧 수상한 폭포...';
+      ctx.strokeText(wfLabel, wfX + wfW / 2, wfY - 8);
+      ctx.fillStyle = '#e0f2fe'; ctx.fillText(wfLabel, wfX + wfW / 2, wfY - 8);
+
+      // 3) MapleStory-Style World Props (Frustum Culled)
+      for (const pr of WORLD_PROPS) {
+        if (pr.x + 160 < cam.x || pr.x - 160 > cam.x + this.vw || pr.y + 160 < cam.y || pr.y - 160 > cam.y + this.vh) continue;
+        this.drawMapleProp(ctx, pr);
+      }
+
+      // 4) Ancient Field Runes (Glowing Maple-style Floating Runestones)
+      for (const r of this.runes) {
+        if (r.x + 90 < cam.x || r.x - 90 > cam.x + this.vw || r.y + 90 < cam.y || r.y - 90 > cam.y + this.vh) continue;
+        const info = RUNE_TYPES[r.type];
+        const bob = Math.sin(this.elapsed * 3.8 + r.uid) * 6;
+        ctx.save();
+        // Ground magic circle
+        ctx.strokeStyle = info.color; ctx.lineWidth = 2.5;
+        ctx.globalAlpha = 0.55 + Math.sin(this.elapsed * 5) * 0.2;
+        ctx.beginPath(); ctx.ellipse(r.x, r.y + 16, 28, 13, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 1;
+        // Floating crystal diamond
+        ctx.fillStyle = info.color;
+        ctx.shadowColor = info.color; ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.moveTo(r.x, r.y - 24 + bob);
+        ctx.lineTo(r.x + 15, r.y - 4 + bob);
+        ctx.lineTo(r.x, r.y + 14 + bob);
+        ctx.lineTo(r.x - 15, r.y - 4 + bob);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.font = '14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(info.icon, r.x, r.y - 5 + bob);
+        ctx.font = 'bold 11px "Noto Sans KR"';
+        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(`✨ ${info.name}`, r.x, r.y - 34 + bob);
+        ctx.fillStyle = '#fef08a'; ctx.fillText(`✨ ${info.name}`, r.x, r.y - 34 + bob);
+        ctx.restore();
+      }
+
+      // 4.5) Golden Treasure Pinata Chests
+      for (const ch of this.chests) {
+        if (ch.x + 80 < cam.x || ch.x - 80 > cam.x + this.vw || ch.y + 80 < cam.y || ch.y - 80 > cam.y + this.vh) continue;
+        const jx = ch.shake > 0 ? (Math.random() - 0.5) * ch.shake : 0;
+        const bounce = Math.abs(Math.sin(this.elapsed * 5)) * 4;
+        ctx.save();
+        ctx.translate(ch.x + jx, ch.y - bounce);
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        ctx.beginPath(); ctx.ellipse(0, 18 + bounce, 22, 9, 0, 0, Math.PI * 2); ctx.fill();
+        // Chest body
+        ctx.fillStyle = ch.hitFlash > 0 ? '#ffffff' : '#b45309';
+        ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.roundRect(-20, -14, 40, 28, 6); ctx.fill(); ctx.stroke();
+        // Gold lid & bands
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(-20, -4, 40, 6);
+        ctx.fillRect(-5, -14, 10, 28);
+        ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2;
+        ctx.strokeRect(-5, -6, 10, 10);
+        // Chest HP pips
+        ctx.font = 'bold 11px "Noto Sans KR"'; ctx.textAlign = 'center';
+        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(`🎁 보물상자 (${ch.hp}/${ch.maxHp})`, 0, -24);
+        ctx.fillStyle = '#fde047'; ctx.fillText(`🎁 보물상자 (${ch.hp}/${ch.maxHp})`, 0, -24);
+        ctx.restore();
+      }
+
+      // 5) Spatial Rifts (Legendary Weapon VFX)
+      for (const rf of this.rifts) {
+        ctx.save();
+        ctx.translate(rf.x, rf.y);
+        ctx.rotate(this.elapsed * 3.5);
+        const grad = ctx.createRadialGradient(0, 0, 10, 0, 0, rf.r);
+        grad.addColorStop(0, 'rgba(192, 132, 252, 0.78)');
+        grad.addColorStop(0.6, 'rgba(109, 40, 217, 0.35)');
+        grad.addColorStop(1, 'rgba(109, 40, 217, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(0, 0, rf.r, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#e879f9'; ctx.lineWidth = 2.5;
+        ctx.setLineDash([12, 10]);
+        ctx.beginPath(); ctx.arc(0, 0, rf.r * 0.75, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+      }
+
+      // 6) Town NPCs (Expressive Maple-style NPCs)
+      for (const n of NPCS) {
+        if (n.x + 80 < cam.x || n.x - 80 > cam.x + this.vw || n.y + 80 < cam.y || n.y - 80 > cam.y + this.vh) continue;
+        this.drawMapleNpc(ctx, n);
+      }
+
+      // 7) Dropped Loots with Rarity Vertical Light Beams & Sparkles
+      for (const l of this.loots) {
+        if (l.x + 80 < cam.x || l.x - 80 > cam.x + this.vw || l.y + 140 < cam.y || l.y - 140 > cam.y + this.vh) continue;
+        const arcH = Math.sin(l.arcT * Math.PI) * 38;
+        const lx = l.startX + (l.x - l.startX) * l.arcT;
+        const ly = l.startY + (l.y - l.startY) * l.arcT - arcH;
+        const rColor = RARITY_INFO[l.rarity]?.color || '#fbbf24';
+
+        if (['RARE', 'EPIC', 'LEGENDARY'].includes(l.rarity)) {
+          const bh = l.rarity === 'LEGENDARY' ? 155 : l.rarity === 'EPIC' ? 115 : 76;
+          const bw = l.rarity === 'LEGENDARY' ? 28 : 16;
+          const grad = ctx.createLinearGradient(lx, ly, lx, ly - bh);
+          grad.addColorStop(0, rColor);
+          grad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = grad;
+          ctx.globalAlpha = 0.6 + Math.sin(this.elapsed * 8) * 0.15;
+          ctx.fillRect(lx - bw / 2, ly - bh, bw, bh);
+          ctx.globalAlpha = 1;
+        }
+
+        // Cute Coin / Gem / Glowing Item Orb
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        ctx.beginPath(); ctx.ellipse(lx, ly + 8, 7, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+        if (l.kind === 'gold') {
+          ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(lx, ly, 6.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = '#fef9c3'; ctx.fillRect(lx - 1.5, ly - 3.5, 3, 7);
+        } else {
+          ctx.fillStyle = rColor; ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2.2;
+          ctx.beginPath(); ctx.arc(lx, ly, 9.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(lx - 3, ly - 3, 2.5, 0, Math.PI * 2); ctx.fill();
+        }
+
+        if (l.kind !== 'gold' || l.amount >= 200) {
+          ctx.font = 'bold 11px "Noto Sans KR"'; ctx.textAlign = 'center';
+          ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+          ctx.strokeText(l.name, lx, ly - 15);
+          ctx.fillStyle = rColor; ctx.fillText(l.name, lx, ly - 15);
+        }
+      }
+
+      // 8) Monster Telegraphs
+      for (const m of this.monsters) {
+        if (!m.telegraph) continue;
+        const tg = m.telegraph;
+        const ratio = Math.min(1, tg.t / tg.dur);
+        ctx.save();
+        if (tg.kind === 'circle') {
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
+          ctx.beginPath(); ctx.arc(tg.x, tg.y, tg.r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.42)';
+          ctx.beginPath(); ctx.arc(tg.x, tg.y, tg.r * ratio, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.5; ctx.stroke();
+        } else if (tg.kind === 'meteors') {
+          tg.pts.forEach(pt => {
+            ctx.fillStyle = 'rgba(249, 115, 22, 0.24)';
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, tg.r, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.48)';
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, tg.r * ratio, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 2.5; ctx.stroke();
+          });
+        } else if (tg.kind === 'line') {
+          ctx.translate(tg.x, tg.y); ctx.rotate(tg.ang);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.24)';
+          ctx.fillRect(0, -tg.width / 2, tg.len, tg.width);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.48)';
+          ctx.fillRect(0, -tg.width / 2, tg.len * ratio, tg.width);
+          ctx.strokeStyle = '#f87171'; ctx.lineWidth = 2;
+          ctx.strokeRect(0, -tg.width / 2, tg.len, tg.width);
+        } else if (tg.kind === 'cone') {
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.28)';
+          ctx.beginPath(); ctx.moveTo(tg.x, tg.y);
+          ctx.arc(tg.x, tg.y, tg.r, tg.ang - tg.spread, tg.ang + tg.spread);
+          ctx.closePath(); ctx.fill();
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.5)';
+          ctx.beginPath(); ctx.moveTo(tg.x, tg.y);
+          ctx.arc(tg.x, tg.y, tg.r * ratio, tg.ang - tg.spread, tg.ang + tg.spread);
+          ctx.closePath(); ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // 9) MapleStory-Style Monsters (Custom Cartoon Sprites per Species)
+      for (const m of this.monsters) {
+        if (m.x + 110 < cam.x || m.x - 110 > cam.x + this.vw || m.y + 110 < cam.y || m.y - 110 > cam.y + this.vh) continue;
+        this.drawMapleMonster(ctx, m);
+      }
+
+      // 10) AI Adventurers (Chibi 2.5D Characters)
+      for (const ai of this.aiPlayers) {
+        if (ai.x + 70 < cam.x || ai.x - 70 > cam.x + this.vw || ai.y + 70 < cam.y || ai.y - 70 > cam.y + this.vh) continue;
+        this.drawMapleAiHero(ctx, ai);
+      }
+
+      // 11) MapleStory-Style Magnet Pet & Beams
+      this.drawMaplePet(ctx);
+
+      // 12) Player Character (Chibi 2.5D Hero with Visible Equipped Gear & Awakening Wings)
+      this.renderPlayer(ctx);
+
+      // 13) Projectiles & Particles
+      for (const pr of this.projectiles) {
+        ctx.save();
+        ctx.fillStyle = pr.color;
+        ctx.shadowColor = pr.color; ctx.shadowBlur = 14;
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.radius * 0.78, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.radius * 0.35, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+
+      for (const pt of this.particles) {
+        const a = Math.max(0, pt.life / pt.maxLife);
+        ctx.save();
+        ctx.globalAlpha = a;
+        if (pt.type === 'dot' || pt.type === 'homing') {
+          ctx.fillStyle = pt.color;
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2); ctx.fill();
+        } else if (pt.type === 'ring') {
+          const curR = pt.r + (pt.maxR - pt.r) * (1 - a);
+          ctx.strokeStyle = pt.color; ctx.lineWidth = 5 * a;
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, curR, 0, Math.PI * 2); ctx.stroke();
+        } else if (pt.type === 'slash') {
+          ctx.strokeStyle = pt.color; ctx.lineWidth = 13 * a; ctx.lineCap = 'round';
+          ctx.shadowColor = pt.color; ctx.shadowBlur = 10;
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.radius, pt.angle - 1.1, pt.angle + 1.1); ctx.stroke();
+          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4 * a;
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.radius - 3, pt.angle - 0.9, pt.angle + 0.9); ctx.stroke();
+        } else if (pt.type === 'line') {
+          ctx.strokeStyle = pt.color; ctx.lineWidth = pt.width * a; ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(pt.x1, pt.y1); ctx.lineTo(pt.x2, pt.y2); ctx.stroke();
+        } else if (pt.type === 'lightning') {
+          ctx.strokeStyle = pt.color; ctx.lineWidth = 3.5;
+          ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 10;
+          ctx.beginPath(); ctx.moveTo(pt.x1, pt.y1);
+          const mx = (pt.x1 + pt.x2) / 2 + (Math.random() - 0.5) * 32;
+          const my = (pt.y1 + pt.y2) / 2 + (Math.random() - 0.5) * 32;
+          ctx.lineTo(mx, my); ctx.lineTo(pt.x2, pt.y2); ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // 14) MapleStory-Style Vibrant Gradient Damage & Drop Numbers
+      for (const ft of this.floatingTexts) {
+        ctx.save();
+        const prog = 1 - ft.life / ft.maxLife;
+        const popScale = prog < 0.18 ? (0.75 + (prog / 0.18) * 0.45) : 1.0;
+        ctx.globalAlpha = Math.min(1, ft.life / ft.maxLife * 1.5);
+        ctx.translate(ft.x, ft.y);
+        ctx.scale(popScale, popScale);
+        ctx.font = `900 ${ft.size}px "Noto Sans KR"`;
+        ctx.textAlign = 'center';
+        ctx.lineWidth = ft.isCrit ? 4.5 : 3.2;
+        ctx.strokeStyle = ft.isCrit ? '#7c2d12' : 'rgba(15, 23, 42, 0.9)';
+        ctx.strokeText(ft.text, 0, 0);
+        if (ft.isCrit) {
+          const g = ctx.createLinearGradient(0, -14, 0, 4);
+          g.addColorStop(0, '#fef08a'); g.addColorStop(0.55, '#fb923c'); g.addColorStop(1, '#ef4444');
+          ctx.fillStyle = g;
+        } else {
+          ctx.fillStyle = ft.color;
+        }
+        ctx.fillText(ft.text, 0, 0);
+        ctx.restore();
+      }
+
+      // 15) Active Field Boss Directional Compass Arrow
+      if (this.bossState.activeBoss) {
+        const b = this.bossState.activeBoss;
+        const dist = Math.hypot(b.x - this.player.x, b.y - this.player.y);
+        if (dist > 280) {
+          const ang = Math.atan2(b.y - this.player.y, b.x - this.player.x);
+          const ax = this.player.x + Math.cos(ang) * 66;
+          const ay = this.player.y + Math.sin(ang) * 66;
+          ctx.save();
+          ctx.translate(ax, ay); ctx.rotate(ang);
+          ctx.fillStyle = '#f43f5e'; ctx.strokeStyle = '#fef08a'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-9, -10); ctx.lineTo(-4, 0); ctx.lineTo(-9, 10); ctx.closePath();
+          ctx.fill(); ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      ctx.restore();
+
+      // 16) Screen-Space Ambient Biome Particles (Snow / Embers / Fireflies / Pollen)
+      const curZone = this.getZoneAt(this.player.x, this.player.y);
+      ctx.save();
+      for (const ap of this.ambientParticles) {
+        const px = ap.rx * this.vw + Math.sin(this.elapsed * 1.8 + ap.phase) * 14;
+        const py = ap.ry * this.vh;
+        if (curZone.id === 'frost_tundra') {
+          ctx.fillStyle = 'rgba(241, 245, 249, 0.78)';
+        } else if (curZone.id === 'redcliff') {
+          ctx.fillStyle = 'rgba(251, 146, 60, 0.75)';
+        } else if (curZone.id === 'wolf_woods' || curZone.id === 'secret_cave') {
+          ctx.fillStyle = `rgba(167, 243, 208, ${0.35 + Math.sin(this.elapsed * 4 + ap.phase) * 0.35})`;
+        } else {
+          ctx.fillStyle = 'rgba(254, 240, 138, 0.55)';
+        }
+        ctx.beginPath(); ctx.arc(px, py, ap.size, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    },
+
+    /* --- MapleStory-Level Procedural 2.5D Props --- */
+    drawMapleProp(ctx, pr) {
+      if (pr.type === 'house') {
+        ctx.fillStyle = 'rgba(0,0,0,0.32)';
+        ctx.beginPath(); ctx.roundRect(pr.x + 8, pr.y + 14, pr.w, pr.h, 8); ctx.fill();
+        // Timber wall with dark cartoon outline
+        ctx.fillStyle = '#fef3c7'; ctx.strokeStyle = '#292524'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.roundRect(pr.x, pr.y + 24, pr.w, pr.h - 24, 6); ctx.fill(); ctx.stroke();
+        // Wooden beams & warm glowing windows
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(pr.x + pr.w / 2 - 14, pr.y + pr.h - 32, 28, 32); // Door
+        ctx.fillStyle = '#fde047';
+        ctx.fillRect(pr.x + 16, pr.y + 42, 20, 18);
+        ctx.fillRect(pr.x + pr.w - 36, pr.y + 42, 20, 18);
+        ctx.strokeStyle = '#451a03'; ctx.lineWidth = 2;
+        ctx.strokeRect(pr.x + 16, pr.y + 42, 20, 18);
+        ctx.strokeRect(pr.x + pr.w - 36, pr.y + 42, 20, 18);
+        // Pitched Storybook Roof + Chimney
+        ctx.fillStyle = '#78716c'; ctx.fillRect(pr.x + pr.w - 30, pr.y - 22, 16, 26); ctx.strokeRect(pr.x + pr.w - 30, pr.y - 22, 16, 26);
+        ctx.fillStyle = pr.roof;
+        ctx.beginPath();
+        ctx.moveTo(pr.x - 14, pr.y + 30);
+        ctx.lineTo(pr.x + pr.w / 2, pr.y - 22);
+        ctx.lineTo(pr.x + pr.w + 14, pr.y + 30);
+        ctx.closePath();
+        ctx.fill(); ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 3; ctx.stroke();
+        // Signpost label
+        ctx.font = 'bold 12px "Noto Sans KR"'; ctx.textAlign = 'center';
+        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(pr.label, pr.x + pr.w / 2, pr.y + pr.h + 18);
+        ctx.fillStyle = '#fef08a'; ctx.fillText(pr.label, pr.x + pr.w / 2, pr.y + pr.h + 18);
+      } else if (pr.type === 'fountain') {
+        ctx.fillStyle = 'rgba(0,0,0,0.32)';
+        ctx.beginPath(); ctx.ellipse(pr.x, pr.y + 10, pr.r + 6, pr.r * 0.72, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#94a3b8'; ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        const wg = ctx.createRadialGradient(pr.x - 6, pr.y - 6, 4, pr.x, pr.y, pr.r - 8);
+        wg.addColorStop(0, '#bae6fd'); wg.addColorStop(1, '#0284c7');
+        ctx.fillStyle = wg;
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, pr.r - 8, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#e0f2fe'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, 12 + Math.sin(this.elapsed * 4.5) * 4, 0, Math.PI * 2); ctx.stroke();
+        ctx.font = 'bold 11px "Noto Sans KR"'; ctx.textAlign = 'center';
+        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+        ctx.strokeText('✨ 회복의 샘 (안전지대)', pr.x, pr.y + pr.r + 18);
+        ctx.fillStyle = '#a7f3d0'; ctx.fillText('✨ 회복의 샘 (안전지대)', pr.x, pr.y + pr.r + 18);
+      } else if (pr.type === 'tree' || pr.type === 'pine_dark' || pr.type === 'pine_snow') {
+        // 2.5D Shaded Tree with Trunk & Layered Canopy
+        ctx.fillStyle = 'rgba(0,0,0,0.28)';
+        ctx.beginPath(); ctx.ellipse(pr.x + 3, pr.y + pr.r * 0.72, pr.r * 0.95, pr.r * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+        // Trunk
+        ctx.fillStyle = '#78350f'; ctx.strokeStyle = '#292524'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.roundRect(pr.x - 5, pr.y, 10, pr.r * 0.72, 3); ctx.fill(); ctx.stroke();
+        // Layered Leaves
+        const baseCol = pr.type === 'pine_snow' ? '#94a3b8' : pr.type === 'pine_dark' ? '#14532d' : '#15803d';
+        const midCol  = pr.type === 'pine_snow' ? '#e2e8f0' : pr.type === 'pine_dark' ? '#166534' : '#22c55e';
+        const hiCol   = pr.type === 'pine_snow' ? '#ffffff' : pr.type === 'pine_dark' ? '#22c55e' : '#86efac';
+        ctx.strokeStyle = '#14261c'; ctx.lineWidth = 2.5;
+        ctx.fillStyle = baseCol;
+        ctx.beginPath(); ctx.arc(pr.x, pr.y - 4, pr.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = midCol;
+        ctx.beginPath(); ctx.arc(pr.x - pr.r * 0.16, pr.y - pr.r * 0.28, pr.r * 0.72, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = hiCol;
+        ctx.beginPath(); ctx.arc(pr.x - pr.r * 0.32, pr.y - pr.r * 0.44, pr.r * 0.34, 0, Math.PI * 2); ctx.fill();
+      } else if (pr.type === 'lava_pool') {
+        ctx.fillStyle = '#7c2d12';
+        ctx.beginPath(); ctx.ellipse(pr.x, pr.y, pr.r * 1.38, pr.r * 0.88, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath(); ctx.ellipse(pr.x, pr.y, pr.r * 1.15, pr.r * 0.72, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fef08a';
+        const pulse = 0.55 + Math.sin(this.elapsed * 3 + pr.x) * 0.12;
+        ctx.beginPath(); ctx.ellipse(pr.x, pr.y, pr.r * pulse, pr.r * pulse * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+      } else if (pr.type === 'red_rock' || pr.type === 'ice_crystal') {
+        ctx.fillStyle = 'rgba(0,0,0,0.28)';
+        ctx.beginPath(); ctx.ellipse(pr.x, pr.y + pr.r * 0.65, pr.r * 0.85, pr.r * 0.35, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = pr.type === 'ice_crystal' ? '#38bdf8' : '#9a3412';
+        ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(pr.x, pr.y - pr.r);
+        ctx.lineTo(pr.x + pr.r * 0.85, pr.y + pr.r * 0.55);
+        ctx.lineTo(pr.x - pr.r * 0.85, pr.y + pr.r * 0.55);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = pr.type === 'ice_crystal' ? '#e0f2fe' : '#fb923c';
+        ctx.beginPath();
+        ctx.moveTo(pr.x, pr.y - pr.r * 0.85);
+        ctx.lineTo(pr.x + pr.r * 0.18, pr.y + pr.r * 0.4);
+        ctx.lineTo(pr.x - pr.r * 0.45, pr.y + pr.r * 0.4);
+        ctx.closePath(); ctx.fill();
+      } else if (pr.type === 'flower') {
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath(); ctx.arc(pr.x, pr.y + 3, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = (Math.floor(pr.x) % 2 === 0) ? '#f472b6' : '#fef08a';
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, 4.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, 1.8, 0, Math.PI * 2); ctx.fill();
+      }
+    },
+
+    /* --- MapleStory-Style Expressive NPCs --- */
+    drawMapleNpc(ctx, n) {
+      const bob = Math.sin(this.elapsed * 3 + n.x) * 2.5;
+      ctx.save();
+      ctx.translate(n.x, n.y);
+      ctx.fillStyle = 'rgba(0,0,0,0.38)';
+      ctx.beginPath(); ctx.ellipse(0, 18, 17, 7, 0, 0, Math.PI * 2); ctx.fill();
+      // Robe body
+      ctx.fillStyle = n.color; ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.roundRect(-12, -2 + bob, 24, 18, 8); ctx.fill(); ctx.stroke();
+      // Chibi Head
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath(); ctx.arc(0, -10 + bob, 13, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      // Eyes & happy blush
+      ctx.fillStyle = '#1e1b2e';
+      ctx.beginPath(); ctx.arc(-4.5, -10 + bob, 2, 0, Math.PI * 2); ctx.arc(4.5, -10 + bob, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(244, 114, 182, 0.55)';
+      ctx.beginPath(); ctx.arc(-8, -7 + bob, 2.5, 0, Math.PI * 2); ctx.arc(8, -7 + bob, 2.5, 0, Math.PI * 2); ctx.fill();
+      // Role badge floating above
+      ctx.font = '15px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(n.icon, 0, -32 + bob);
+      ctx.font = 'bold 11px "Noto Sans KR"';
+      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+      ctx.strokeText(n.name, 0, -47 + bob);
+      ctx.fillStyle = '#fde047'; ctx.fillText(n.name, 0, -47 + bob);
+      ctx.restore();
+    },
+
+    /* --- MapleStory-Style Expressive Monsters & Epic Field Bosses --- */
+    drawMapleMonster(ctx, m) {
+      if (m.spawnAnim > 0) {
+        ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(m.x, m.y, m.radius * (1 + m.spawnAnim), 0, Math.PI * 2); ctx.stroke();
+        return;
+      }
+      const r = m.radius;
+      const bounce = Math.abs(Math.sin(this.elapsed * (m.tier === 'BOSS' ? 3.5 : 5.5) + m.uid)) * (m.tplId.includes('slime') ? 6 : 3);
+      const sqX = m.tplId.includes('slime') ? 1 + Math.sin(this.elapsed * 5.5 + m.uid) * 0.08 : 1;
+      const sqY = m.tplId.includes('slime') ? 1 - Math.sin(this.elapsed * 5.5 + m.uid) * 0.08 : 1;
+
+      ctx.save();
+      ctx.translate(m.x, m.y);
+      // Ground shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.38)';
+      ctx.beginPath(); ctx.ellipse(0, r * 0.78, r * 0.92, r * 0.42, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Boss / Rare / Elite Ground Aura
+      if (m.tier !== 'NORMAL') {
+        ctx.strokeStyle = m.tier === 'BOSS' ? '#facc15' : m.tier === 'RARE' ? '#e879f9' : '#fb923c';
+        ctx.lineWidth = m.tier === 'BOSS' ? 3.5 : 2;
+        ctx.globalAlpha = 0.65;
+        ctx.beginPath(); ctx.ellipse(0, r * 0.74, r * 1.25, r * 0.56, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.save();
+      ctx.translate(0, -bounce);
+      ctx.scale(sqX, sqY);
+
+      const bodyColor = m.hitFlash > 0 ? '#ffffff' : (m.freezeTimer > 0 ? '#7dd3fc' : m.color);
+      ctx.strokeStyle = '#1a1625';
+      ctx.lineWidth = m.tier === 'BOSS' ? 4 : 2.8;
+
+      if (m.tplId === 'slime' || m.tplId === 'golden_slime') {
+        // Glossy Maple Slime Dome
+        const g = ctx.createRadialGradient(-r * 0.25, -r * 0.35, 3, 0, 0, r * 1.1);
+        g.addColorStop(0, m.hitFlash > 0 ? '#fff' : (m.tplId === 'golden_slime' ? '#fef08a' : '#bbf7d0'));
+        g.addColorStop(1, bodyColor);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(0, 2, r, Math.PI, 0);
+        ctx.quadraticCurveTo(r, r * 0.85, 0, r * 0.78);
+        ctx.quadraticCurveTo(-r, r * 0.85, -r, 2);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Jelly specular shine
+        ctx.fillStyle = 'rgba(255,255,255,0.68)';
+        ctx.beginPath(); ctx.ellipse(-r * 0.36, -r * 0.35, r * 0.25, r * 0.14, -0.5, 0, Math.PI * 2); ctx.fill();
+        // Cute Maple Eyes & Blush
+        ctx.fillStyle = '#1e1b2e';
+        ctx.beginPath(); ctx.arc(-r * 0.3, 0, 2.8, 0, Math.PI * 2); ctx.arc(r * 0.3, 0, 2.8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(244,114,182,0.55)';
+        ctx.beginPath(); ctx.arc(-r * 0.52, 4, 3, 0, Math.PI * 2); ctx.arc(r * 0.52, 4, 3, 0, Math.PI * 2); ctx.fill();
+        if (m.tplId === 'golden_slime') {
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath(); ctx.moveTo(-10, -r + 2); ctx.lineTo(-7, -r - 10); ctx.lineTo(0, -r - 4); ctx.lineTo(7, -r - 10); ctx.lineTo(10, -r + 2); ctx.closePath();
+          ctx.fill(); ctx.stroke();
+        }
+      } else if (m.tplId === 'boar') {
+        // Wild Boar with Ivory Tusks
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath(); ctx.ellipse(0, 0, r * 1.1, r * 0.88, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Ears
+        ctx.beginPath(); ctx.moveTo(-12, -r * 0.6); ctx.lineTo(-16, -r * 1.15); ctx.lineTo(-4, -r * 0.78); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(12, -r * 0.6); ctx.lineTo(16, -r * 1.15); ctx.lineTo(4, -r * 0.78); ctx.fill(); ctx.stroke();
+        // Snout & Tusks
+        ctx.fillStyle = '#fca5a5';
+        ctx.beginPath(); ctx.ellipse(0, 6, 8, 5.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fffbeb';
+        ctx.beginPath(); ctx.moveTo(-9, 7); ctx.lineTo(-15, -1); ctx.lineTo(-6, 4); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(9, 7); ctx.lineTo(15, -1); ctx.lineTo(6, 4); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#1e1b2e';
+        ctx.beginPath(); ctx.arc(-6, -3, 2.5, 0, Math.PI * 2); ctx.arc(6, -3, 2.5, 0, Math.PI * 2); ctx.fill();
+      } else if (m.tplId.includes('wolf') || m.tplId === 'fenrir') {
+        // Fierce Wolf / Fenrir Boss with Pointed Ears & Mane
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Pointed Wolf Ears
+        ctx.beginPath(); ctx.moveTo(-r * 0.75, -r * 0.35); ctx.lineTo(-r * 0.85, -r * 1.25); ctx.lineTo(-r * 0.15, -r * 0.85); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(r * 0.75, -r * 0.35); ctx.lineTo(r * 0.85, -r * 1.25); ctx.lineTo(r * 0.15, -r * 0.85); ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Cheek fluff & glowing fierce eyes
+        ctx.fillStyle = m.tplId === 'fenrir' ? '#facc15' : m.tplId === 'glacier_wolf' ? '#0284c7' : '#ef4444';
+        ctx.beginPath(); ctx.arc(-r * 0.34, -r * 0.12, Math.max(3, r * 0.16), 0, Math.PI * 2); ctx.arc(r * 0.34, -r * 0.12, Math.max(3, r * 0.16), 0, Math.PI * 2); ctx.fill();
+        // Fangs
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.moveTo(-r * 0.25, r * 0.25); ctx.lineTo(-r * 0.18, r * 0.52); ctx.lineTo(-r * 0.08, r * 0.25); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(r * 0.25, r * 0.25); ctx.lineTo(r * 0.18, r * 0.52); ctx.lineTo(r * 0.08, r * 0.25); ctx.fill();
+      } else if (m.tplId === 'ignis' || m.tplId === 'lava_golem' || m.tplId === 'flame_imp') {
+        // Fiery Demon / Golem with Curved Magma Horns
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Curved Horns
+        ctx.fillStyle = m.tplId === 'ignis' ? '#facc15' : '#fdba74';
+        ctx.beginPath(); ctx.moveTo(-r * 0.5, -r * 0.7); ctx.quadraticCurveTo(-r * 1.2, -r * 1.35, -r * 0.4, -r * 1.45); ctx.lineTo(-r * 0.2, -r * 0.88); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(r * 0.5, -r * 0.7); ctx.quadraticCurveTo(r * 1.2, -r * 1.35, r * 0.4, -r * 1.45); ctx.lineTo(r * 0.2, -r * 0.88); ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Glowing Magma Eyes & Core Crack
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.12, Math.max(3.5, r * 0.17), 0, Math.PI * 2); ctx.arc(r * 0.32, -r * 0.12, Math.max(3.5, r * 0.17), 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#fde047'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(-r * 0.3, r * 0.3); ctx.lineTo(0, r * 0.12); ctx.lineTo(r * 0.3, r * 0.3); ctx.stroke();
+      } else if (m.tplId === 'treasure_goblin') {
+        // Purple Treasure Goblin with Golden Coin Sack
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath(); ctx.arc(10, -4, r * 0.78, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath(); ctx.arc(-4, 2, r * 0.85, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath(); ctx.arc(-9, -1, 3, 0, Math.PI * 2); ctx.arc(1, -1, 3, 0, Math.PI * 2); ctx.fill();
       } else {
-        const sh = Math.floor(s.maxHp * 0.45);
-        run.shield += sh; healHero(Math.floor(s.maxHp * 0.25));
-        const d = dealHeroHit(3.2, { forceCrit: true });
-        logs.push(`✨ [불멸의 심판] 방어막 +${fmt(sh)} + <strong>${fmt(d)}</strong> 강타!`);
-      }
-    }
-  } else if (act === 'parry') {
-    parried = true;
-    run.rage = Math.min(100, run.rage + 25);
-    const sh = Math.floor(s.maxHp * 0.18);
-    run.shield += sh;
-    logs.push(`🛡️ 방어 태세! (방어막 +${fmt(sh)})`);
-  }
-
-  // 동료 지원 공격 (또는 배신 체크!)
-  if (run.companion && enemy.hp > 0) {
-    if (run.companion.id === 'kain' && run.companion.trust < 30 && run.hp < s.maxHp * 0.38 && Math.random() < 0.35) {
-      // 카인의 배신!
-      const stealG = Math.floor(run.gold * 0.4);
-      run.gold -= stealG;
-      run.companion = null;
-      run.flags.kainBetrayed = true;
-      SFX.play('devil');
-      toast(`🗡️ 용병 카인이 약해진 틈을 타 ${fmt(stealG)}G를 훔쳐 달아났습니다!`, 'bad', 3200);
-      logs.push(`🩸 <strong>[배신!]</strong> 용병 카인이 등을 돌리고 금화를 훔쳐 도주했습니다!`);
-    } else {
-      const cDmg = Math.max(2, Math.floor(s.atk * 0.55));
-      enemy.hp -= cDmg;
-      FX.burst(true, `🤝-${fmt(cDmg)}`, '#82e0aa', false);
-    }
-  }
-
-  // 출혈/독 도트 피해 처리
-  if (enemy.hp > 0 && (enemy.bleed + enemy.poison) > 0) {
-    const dotMult = s.tags.bleed >= 2 ? 1.6 : 1.0;
-    const dot = Math.max(1, Math.floor((enemy.bleed + enemy.poison) * s.atk * 0.22 * dotMult));
-    enemy.hp -= dot;
-    FX.burst(true, `🩸-${fmt(dot)}`, '#ff6b6b', false);
-    logs.push(`🩸 출혈/독 지속 피해 -${fmt(dot)}`);
-  }
-
-  if (enemy.hp <= 0) {
-    finishCombatWin(logs.join('<br>'));
-    return;
-  }
-
-  // 적 턴 행동
-  if (enemy.stun) {
-    enemy.stun = false;
-    logs.push(`💫 적이 기절하여 행동하지 못했습니다!`);
-  } else {
-    let incoming = enemy.intentVal;
-    if (hasCard('c_thrn4')) incoming = Math.floor(incoming * 0.85);
-    if (hasContract('d_glass')) incoming = Math.floor(incoming * 1.45);
-
-    if (run.evadeNext) {
-      run.evadeNext = false; incoming = 0;
-      FX.burst(false, '💨 회피!', '#00f5d4', false);
-      logs.push(`💨 그림자 회피로 적의 공격을 흘렸습니다!`);
-    } else if (parried && enemy.intent === 'heavy') {
-      // ★ 퍼펙트 패링!! ★
-      incoming = Math.floor(incoming * 0.15);
-      enemy.stun = true;
-      run.rage = Math.min(100, run.rage + 40);
-      SFX.play('parry');
-      flashScreen('#00f5d4');
-      let counterMult = hasCard('c_thrn2') ? 4.4 : 2.2;
-      if (hasUnique('u_parry')) { counterMult = 5.0; run.freeSkillNext = true; }
-      const cDmg = dealHeroHit(counterMult, { forceCrit: true });
-      if (hasCard('c_thrn2')) healHero(Math.floor(s.maxHp * 0.15));
-      logs.push(`⚡ <strong>[퍼펙트 패링!!]</strong> 강타를 튕겨내고 적 기절 + <strong>${fmt(cDmg)}</strong> 치명 반격!`);
-    } else {
-      if (parried) incoming = Math.floor(incoming * 0.35);
-
-      // 엘레나/카인 호감도 높으면 치명상 대신 방어
-      if (run.companion && run.companion.trust >= 70 && incoming >= run.hp + run.shield) {
-        incoming = Math.floor(incoming * 0.2);
-        logs.push(`🛡️ <strong>[${run.companion.name}의 헌신!]</strong> 몸을 날려 치명상을 막아냈습니다!`);
+        // Frost Wraith / Glacier Giant / Magma Lizard
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = m.isIce ? '#e0f2fe' : '#fde047';
+        ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.15, Math.max(3, r * 0.15), 0, Math.PI * 2); ctx.arc(r * 0.32, -r * 0.15, Math.max(3, r * 0.15), 0, Math.PI * 2); ctx.fill();
       }
 
-      // 방어막 먼저 차감
-      const absorbed = Math.min(run.shield, incoming);
-      run.shield -= absorbed;
-      const hpDmg = incoming - absorbed;
-      run.hp -= hpDmg;
-
-      const enEl = document.getElementById('enemy-unit'), hEl = document.getElementById('hero-unit');
-      enEl.classList.add('lunge-l'); setTimeout(() => enEl.classList.remove('lunge-l'), 130);
-      hEl.classList.add('hit'); setTimeout(() => hEl.classList.remove('hit'), 220);
-      FX.burst(false, hpDmg > 0 ? `-${fmt(hpDmg)}` : '🛡️ BLOCK', hpDmg > 0 ? '#ff4d4d' : '#70d6ff', hpDmg > s.maxHp * 0.25);
-      logs.push(`🩸 ${enemy.name}의 공격! ${absorbed > 0 ? `방어막 -${fmt(absorbed)} ` : ''}HP -${fmt(hpDmg)}`);
-
-      // 가시 반사 (철벽 2세트 / 가시갑주 유니크)
-      let reflect = 0;
-      if (s.tags.thorns >= 2) { reflect += Math.floor(s.atk * 0.9); run.shield += Math.floor(s.maxHp * 0.08); }
-      if (hasUnique('u_thorns')) { reflect += Math.floor(s.atk * 1.3); run.shield += Math.floor(s.maxHp * 0.15); }
-      if (reflect > 0 && enemy.hp > 0) {
-        enemy.hp -= reflect;
-        FX.burst(true, `🛡️반사 -${fmt(reflect)}`, '#70d6ff', false);
-        logs.push(`🛡️ 가시 반사 피해 -${fmt(reflect)}`);
+      if (m.freezeTimer > 0) {
+        ctx.fillStyle = 'rgba(186, 230, 253, 0.45)';
+        ctx.strokeStyle = '#e0f2fe'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.roundRect(-r - 3, -r - 3, (r + 3) * 2, (r + 3) * 2, 8); ctx.fill(); ctx.stroke();
       }
+      ctx.restore();
+
+      // Monster Nameplate & Crisp Rounded HP Bar
+      const bw = m.tier === 'BOSS' ? 96 : 54;
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
+      ctx.beginPath(); ctx.roundRect(-bw / 2 - 1, -r - 22, bw + 2, 8, 4); ctx.fill();
+      ctx.fillStyle = m.tier === 'BOSS' ? '#f43f5e' : m.tier === 'ELITE' ? '#fb923c' : m.tier === 'RARE' ? '#e879f9' : '#ef4444';
+      ctx.beginPath(); ctx.roundRect(-bw / 2, -r - 21, bw * Math.max(0, m.hp / m.maxHp), 6, 3); ctx.fill();
+
+      const tag = m.tier === 'BOSS' ? '👑' : m.tier === 'RARE' ? '★' : m.tier === 'ELITE' ? '◆' : '';
+      ctx.font = m.tier === 'BOSS' ? 'bold 13px "Noto Sans KR"' : 'bold 10.5px "Noto Sans KR"';
+      ctx.textAlign = 'center';
+      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+      const label = `${tag}Lv.${m.lv} ${m.name}`;
+      ctx.strokeText(label, 0, -r - 27);
+      ctx.fillStyle = m.lv - this.player.lv > 5 ? '#fca5a5' : (m.tier === 'BOSS' ? '#fef08a' : '#f8fafc');
+      ctx.fillText(label, 0, -r - 27);
+      ctx.restore();
+    },
+
+    /* --- MapleStory-Style Chibi AI Adventurers --- */
+    drawMapleAiHero(ctx, ai) {
+      const bob = Math.abs(Math.sin(this.elapsed * 7 + ai.x * 0.05)) * 3;
+      ctx.save();
+      ctx.translate(ai.x, ai.y);
+      ctx.fillStyle = 'rgba(0,0,0,0.34)';
+      ctx.beginPath(); ctx.ellipse(0, 15, 14, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2.4;
+      // Armor body
+      ctx.fillStyle = ai.color;
+      ctx.beginPath(); ctx.roundRect(-10, -2 - bob, 20, 15, 6); ctx.fill(); ctx.stroke();
+      // Chibi head
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath(); ctx.arc(0, -10 - bob, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      // Hair cap
+      ctx.fillStyle = ai.color;
+      ctx.beginPath(); ctx.arc(0, -13 - bob, 11, Math.PI, 0); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#1e1b2e';
+      ctx.beginPath(); ctx.arc(-4, -9 - bob, 1.8, 0, Math.PI * 2); ctx.arc(4, -9 - bob, 1.8, 0, Math.PI * 2); ctx.fill();
+      // Nameplate
+      ctx.font = 'bold 10px "Noto Sans KR"'; ctx.textAlign = 'center';
+      ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+      ctx.strokeText(`[Lv.${ai.lv}] ${ai.name}`, 0, -28 - bob);
+      ctx.fillStyle = '#bae6fd'; ctx.fillText(`[Lv.${ai.lv}] ${ai.name}`, 0, -28 - bob);
+      ctx.restore();
+    },
+
+    /* --- MapleStory-Style Winged Magnet Pet --- */
+    drawMaplePet(ctx) {
+      const pet = this.pet;
+      const petTier = PET_TIERS[this.player.petTier];
+      for (const b of pet.beams) {
+        ctx.strokeStyle = b.color; ctx.lineWidth = 3.5;
+        ctx.shadowColor = b.color; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.moveTo(b.x1, b.y1); ctx.lineTo(b.x2, b.y2); ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+      ctx.save();
+      const petBob = Math.sin(this.elapsed * 6) * 4.5;
+      const wingFlap = Math.sin(this.elapsed * 18) * 4;
+      ctx.translate(pet.x, pet.y + petBob);
+      // Cute flapping wings
+      ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.ellipse(-11, -2 + wingFlap * 0.4, 7, 4, -0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(11, -2 + wingFlap * 0.4, 7, 4, 0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      // Pet round body & ears
+      ctx.fillStyle = petTier.color;
+      ctx.shadowColor = petTier.color; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.arc(0, 0, 10.5, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#1e1b2e'; ctx.lineWidth = 2; ctx.stroke();
+      // Cat/Fairy ears
+      ctx.fillStyle = petTier.color;
+      ctx.beginPath(); ctx.moveTo(-7, -7); ctx.lineTo(-10, -15); ctx.lineTo(-2, -10); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(7, -7); ctx.lineTo(10, -15); ctx.lineTo(2, -10); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // Sparkling eyes & rosy cheeks
+      ctx.fillStyle = '#1e1b2e';
+      ctx.beginPath(); ctx.arc(-3.5, 0, 2, 0, Math.PI * 2); ctx.arc(3.5, 0, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(-4.1, -0.7, 0.8, 0, Math.PI * 2); ctx.arc(2.9, -0.7, 0.8, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    },
+
+    /* --- MapleStory-Level 2.5D Chibi Player with Live Equipment Visuals & Awakening Wings --- */
+    renderPlayer(ctx) {
+      const p = this.player;
+      const stats = this.getPlayerStats();
+      const moving = Math.hypot(p.vx, p.vy) > 12;
+      const walkBob = moving ? Math.abs(Math.sin(this.elapsed * 14)) * 4.5 : Math.sin(this.elapsed * 3.5) * 1.5;
+      const isAwakened = p.awakeningTimer > 0;
+      const faceRight = Math.cos(p.facing) >= 0;
+
+      ctx.save();
+      if (p.invulnTimer > 0) ctx.globalAlpha = 0.6;
+      ctx.translate(p.x, p.y);
+
+      // Ground Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.42)';
+      ctx.beginPath(); ctx.ellipse(0, 18, 17, 7.5, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Auto-Hunt subtle radar ring underfoot
+      if (this.autoHunt.enabled) {
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.65)'; ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath(); ctx.arc(0, 8, 25, this.elapsed * 2, this.elapsed * 2 + Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Awakening Golden Wings & Radiant Aura
+      if (isAwakened) {
+        ctx.save();
+        ctx.shadowColor = '#facc15'; ctx.shadowBlur = 18;
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.85)';
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
+        const wFlap = Math.sin(this.elapsed * 12) * 5;
+        ctx.beginPath(); ctx.moveTo(-6, -4 - walkBob); ctx.quadraticCurveTo(-34, -22 + wFlap, -28, 4 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(6, -4 - walkBob); ctx.quadraticCurveTo(34, -22 + wFlap, 28, 4 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.restore();
+      }
+
+      // Berserker Helm low-HP crimson aura
+      if (stats.uniques.has('BERSERKER_HELM') && p.hp <= stats.maxHp * 0.5) {
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(0, 0, 27 + Math.sin(this.elapsed * 12) * 3, 0, Math.PI * 2); ctx.stroke();
+      }
+
+      // Fluttering Cloak behind hero (Gold if Greed Cloak!)
+      if (p.equip.CLOAK) {
+        const sway = Math.sin(this.elapsed * 8) * 3;
+        ctx.fillStyle = stats.uniques.has('GREED_CLOAK') ? '#eab308' : '#3b82f6';
+        ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(-10, -2 - walkBob); ctx.lineTo(10, -2 - walkBob);
+        ctx.lineTo(15 + sway, 15 - walkBob * 0.5); ctx.lineTo(-15 + sway, 15 - walkBob * 0.5);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
+
+      // Cute Animated Boots (Cyan if Swift Boots!)
+      const footSwing = moving ? Math.sin(this.elapsed * 14) * 5 : 0;
+      ctx.fillStyle = stats.uniques.has('SWIFT_BOOTS') ? '#2dd4bf' : '#78350f';
+      ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(-5 + footSwing, 14, 5.5, 3.8, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(5 - footSwing, 14, 5.5, 3.8, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      // Armor Torso
+      ctx.fillStyle = stats.uniques.has('GUARDIAN_ARMOR') ? '#38bdf8' : p.equip.ARMOR ? '#2563eb' : '#64748b';
+      ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.roundRect(-12, -3 - walkBob, 24, 16, 7); ctx.fill(); ctx.stroke();
+      // Armor Chest Emblem
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath(); ctx.arc(0, 5 - walkBob, 3.5, 0, Math.PI * 2); ctx.fill();
+
+      // Expressive Maple Chibi Head
+      ctx.fillStyle = '#ffedd5';
+      ctx.beginPath(); ctx.arc(0, -12 - walkBob, 13.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      // Stylish Spiky Hero Hair or Helmet
+      if (stats.uniques.has('BERSERKER_HELM')) {
+        ctx.fillStyle = '#991b1b';
+        ctx.beginPath(); ctx.arc(0, -15 - walkBob, 14, Math.PI, 0); ctx.fill(); ctx.stroke();
+        // Demon horns
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath(); ctx.moveTo(-10, -21 - walkBob); ctx.lineTo(-17, -32 - walkBob); ctx.lineTo(-5, -25 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(10, -21 - walkBob); ctx.lineTo(17, -32 - walkBob); ctx.lineTo(5, -25 - walkBob); ctx.closePath(); ctx.fill(); ctx.stroke();
+      } else {
+        ctx.fillStyle = isAwakened ? '#facc15' : '#1d4ed8';
+        ctx.beginPath(); ctx.arc(0, -15 - walkBob, 14, Math.PI * 0.95, Math.PI * 0.05);
+        ctx.lineTo(12, -16 - walkBob); ctx.lineTo(4, -22 - walkBob); ctx.lineTo(0, -16 - walkBob); ctx.lineTo(-6, -22 - walkBob);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
+
+      // Expressive Eyes + Shine + Rosy Cheeks
+      const eyeShift = faceRight ? 2 : -2;
+      ctx.fillStyle = '#1a1625';
+      ctx.beginPath();
+      ctx.ellipse(-4.5 + eyeShift, -11 - walkBob, 2.3, 3.1, 0, 0, Math.PI * 2);
+      ctx.ellipse(4.5 + eyeShift, -11 - walkBob, 2.3, 3.1, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-5.1 + eyeShift, -12.3 - walkBob, 1.1, 0, Math.PI * 2);
+      ctx.arc(3.9 + eyeShift, -12.3 - walkBob, 1.1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(244, 114, 182, 0.5)';
+      ctx.beginPath();
+      ctx.arc(-8 + eyeShift, -8 - walkBob, 2.4, 0, Math.PI * 2);
+      ctx.arc(8 + eyeShift, -8 - walkBob, 2.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Detailed Glowing Sword held along facing angle
+      ctx.save();
+      ctx.translate(0, 2 - walkBob);
+      ctx.rotate(p.facing);
+      const bladeColor = isAwakened ? '#fde047' : stats.uniques.has('RIFT_SWORD') ? '#c084fc' : stats.uniques.has('FROST_SWORD') ? '#38bdf8' : (stats.uniques.has('FLAME_SWORD') || stats.uniques.has('IGNIS_SWORD')) ? '#f97316' : '#e2e8f0';
+      if (isAwakened || stats.uniques.has('FLAME_SWORD') || stats.uniques.has('FROST_SWORD') || stats.uniques.has('RIFT_SWORD') || stats.uniques.has('IGNIS_SWORD')) {
+        ctx.shadowColor = bladeColor; ctx.shadowBlur = 12;
+      }
+      // Crossguard
+      ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#1a1625'; ctx.lineWidth = 2;
+      ctx.fillRect(11, -7, 4, 14); ctx.strokeRect(11, -7, 4, 14);
+      // Blade
+      ctx.fillStyle = bladeColor;
+      ctx.beginPath();
+      ctx.moveTo(15, -4); ctx.lineTo(35, -2.5); ctx.lineTo(41, 0); ctx.lineTo(35, 2.5); ctx.lineTo(15, 4);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.restore();
+
+      // Guardian Armor Hexagonal Shield Barrier VFX
+      if (p.shield > 0) {
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5;
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.16)';
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (Math.PI / 3) * i + this.elapsed * 0.9;
+          const hx = Math.cos(a) * 32, hy = Math.sin(a) * 32 - 4;
+          if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
+        }
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
+
+      // Rift Sword 3-stack indicator dots
+      if (stats.uniques.has('RIFT_SWORD') && p.riftSkillStack > 0) {
+        for (let s = 0; s < p.riftSkillStack; s++) {
+          ctx.fillStyle = '#e879f9';
+          ctx.beginPath(); ctx.arc(-10 + s * 10, -34 - walkBob, 3.5, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      // Auto-Hunt status tiny badge overhead
+      if (this.autoHunt.enabled && this.autoHunt.status) {
+        ctx.font = 'bold 10px "Noto Sans KR"'; ctx.textAlign = 'center';
+        ctx.lineWidth = 3; ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(`🤖 ${this.autoHunt.status}`, 0, -35 - walkBob);
+        ctx.fillStyle = '#6ee7b7'; ctx.fillText(`🤖 ${this.autoHunt.status}`, 0, -35 - walkBob);
+      }
+
+      ctx.restore();
+    },
+<!-- ... existing code ... -->
+      // Skill Cooldown Overlays
+      this.setCdOverlay('cdSkill1', p.skill1Cd);
+      this.setCdOverlay('cdSkill2', p.skill2Cd);
+      this.setCdOverlay('cdDodge', p.dodgeCd);
+      this.setCdOverlay('cdPotion', p.potionCd);
+
+      // Awakening Ultimate Button Charge Display
+      const ultBtn = document.getElementById('btnUlt');
+      const ultFill = document.getElementById('ultFillBar');
+      const ultLbl = document.getElementById('ultLabel');
+      if (p.awakeningTimer > 0) {
+        ultBtn.classList.add('ult-ready');
+        ultFill.style.height = `${(p.awakeningTimer / 10) * 100}%`;
+        ultLbl.textContent = `${p.awakeningTimer.toFixed(1)}s`;
+      } else {
+        const pct = Math.floor(p.ultGauge);
+        ultFill.style.height = `${pct}%`;
+        ultLbl.textContent = pct >= 100 ? '각성!' : `${pct}%`;
+        if (pct >= 100) ultBtn.classList.add('ult-ready');
+        else ultBtn.classList.remove('ult-ready');
+      }
+
+      // Active Rune Buff Badge
+      const runeBadge = document.getElementById('runeBuffBadge');
+      if (this.activeRune) {
+        const info = RUNE_TYPES[this.activeRune.type];
+        runeBadge.classList.remove('hidden');
+        runeBadge.style.borderColor = info.color;
+        document.getElementById('runeBuffIcon').textContent = info.icon;
+        document.getElementById('runeBuffText').textContent = `${info.name} ${Math.ceil(this.activeRune.timer)}s`;
+      } else {
+        runeBadge.classList.add('hidden');
+      }
+
+      // Multi-Kill Combo Fever Badge
+      const comboBadge = document.getElementById('comboBadge');
+      if (this.combo.count >= 2) {
+        comboBadge.classList.remove('hidden');
+        const bonusPct = Math.min(20, Math.floor(this.combo.count / 5));
+        document.getElementById('comboCountText').textContent = `${this.combo.count} COMBO`;
+        document.getElementById('comboBonusText').textContent = bonusPct > 0 ? `XP/드롭 +${bonusPct}%` : 'FEVER!';
+      } else {
+        comboBadge.classList.add('hidden');
+      }
+
+      // Nearby NPC Interact Button
+<!-- ... existing code ... -->
+        if (e.code === 'KeyF') this.interactNearbyNpc();
+        if (e.code === 'KeyZ') this.toggleAutoHunt();
+        if (e.code === 'KeyR') this.useAwakening();
+        if (e.code === 'KeyI') UI.toggleModal('inventory');
+        if (e.code === 'KeyM') UI.toggleModal('codex');
+        if (e.code === 'Escape') UI.closeModal();
+      });
+<!-- ... existing code ... -->
+      bindBtn('btnSkill2', () => this.useSkill2());
+      bindBtn('btnDodge', () => this.useDodge());
+      bindBtn('btnPotion', () => this.usePotion());
+      bindBtn('btnAuto', () => this.toggleAutoHunt());
+      bindBtn('btnUlt', () => this.useAwakening());
+
+      // Virtual Joystick (Touch + Mouse drag)
+<!-- ... existing code ... -->
+  window.onload = function() {
+    try {
+      Game.init();
+    } catch (err) {
+      console.error('Arcadia initialization error:', err);
     }
-  }
-
-  // [황금 요새 카드] 남은 방어막 150% 충격파
-  if (hasCard('c_thrn3') && run.shield > 0 && enemy.hp > 0) {
-    const wave = Math.floor(run.shield * 1.5);
-    enemy.hp -= wave;
-    FX.burst(true, `🏰충격파 -${fmt(wave)}`, '#ffd166', true);
-    logs.push(`🏰 [황금 요새] 방어막 충격파 -${fmt(wave)}!`);
-  }
-
-  // 불사 / 부활 체크 (철벽 4세트 또는 불사조 성갑)
-  if (run.hp <= 0 && !run.revivedThisFight && (s.tags.thorns >= 4 || hasUnique('u_phoenix'))) {
-    run.revivedThisFight = true;
-    run.hp = hasUnique('u_phoenix') ? Math.floor(s.maxHp * 0.4) : 1;
-    const revDmg = dealHeroHit(hasUnique('u_phoenix') ? 3.5 : 4.0, { forceCrit: true });
-    flashScreen('#ff9f1a'); SFX.play('boom');
-    logs.push(`🔥 <strong>[불멸의 각성!!]</strong> 죽음을 거부하고 <strong>${fmt(revDmg)}</strong> 필살 반격!`);
-  }
-
-  if (enemy.hp <= 0) {
-    finishCombatWin(logs.join('<br>'));
-    return;
-  }
-
-  // 진짜 사망 -> 로그라이트 런 결산!
-  if (run.hp <= 0) {
-    triggerRunDeath();
-    return;
-  }
-
-  const logEl = document.getElementById('combat-log');
-  logEl.innerHTML = logs.join('<br>');
-  logEl.classList.add('show');
-
-  rollEnemyIntent();
-  renderCombatButtons();
-  updateUI();
-  if (autoMob && enemy.tier === 'combat') scheduleAutoCombat();
-}
-
-function finishCombatWin(prevLog) {
-  if (phase !== 'combat' || !enemy) return;
-  phase = 'reward';
-  clearTimeout(autoTimer);
-
-  const isBoss = enemy.tier === 'boss';
-  const isElite = enemy.tier === 'elite';
-  const rMult = getRewardMult();
-  const goldMeta = 1 + (meta.upgrades.m_gold || 0) * 0.2;
-
-  const goldG = Math.floor((28 + run.floor * 16) * (isBoss ? 3.2 : isElite ? 1.8 : 1) * rMult * goldMeta);
-  const expG = Math.floor((22 + run.floor * 12) * (isBoss ? 3.0 : isElite ? 1.7 : 1));
-  run.gold += goldG;
-  run.kills++;
-  if (hasCard('c_mad3')) { run.killBonusAtkPct += 8; healHero(Math.floor(run.maxHp * 0.15)); }
-  if (hasUnique('u_exec')) run.rage = 100;
-
-  let soulG = 0;
-  if (isBoss) {
-    soulG = Math.floor((3 + run.floor * 2) * (hasContract('d_soul') ? 2.5 : 1));
-    run.soulsEarned += soulG;
-    meta.souls += soulG;
-  }
-
-  // 레벨업
-  run.exp += expG;
-  let lvTxt = '';
-  while (run.exp >= run.reqExp) {
-    run.exp -= run.reqExp;
-    run.lv++;
-    run.reqExp = Math.floor(45 * Math.pow(run.lv, 1.48));
-    const ns = calcStats();
-    run.maxHp = ns.maxHp;
-    run.hp = Math.min(run.maxHp, run.hp + Math.floor(run.maxHp * 0.35));
-    lvTxt = ` 🎉 Lv.${run.lv} 달성!`;
-  }
-
-  // 장비 드롭
-  let dropTxt = '';
-  if (isBoss || isElite || Math.random() < 0.55) {
-    const it = makeItem(run.floor, isBoss ? 3 : isElite ? 2 : 0);
-    gainItem(it, false);
-    dropTxt = `<br>🎁 전리품: <strong class="${it.gradeCls}">[${it.gradeName}] ${it.name}</strong>${it.uniqueDesc ? ` <span style="color:#ffd166">(${it.uniqueDesc})</span>` : ''}`;
-  }
-
-  const jpTxt = tryJackpot('전투 승리');
-  const defeatedName = enemy.name;
-  enemy = null;
-
-  const logEl = document.getElementById('combat-log');
-  logEl.innerHTML = `${prevLog}<br>🏆 <strong>${defeatedName} 처치!</strong> 🪙+${fmt(goldG)}G, EXP +${fmt(expG)}${soulG ? `, 💎+${soulG}` : ''}${lvTxt}${dropTxt}${jpTxt ? '<br>' + jpTxt : ''}`;
-  logEl.classList.add('show');
-
-  if (isBoss) {
-    run.floor++;
-    run.room = 1;
-    if (run.floor > meta.bestFloor) meta.bestFloor = run.floor;
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn ult-ready" style="justify-content:center;" onclick="openFateCardDraft()">
-        <span class="act-title">🃏 계층 돌파 보상 : 운명 카드 3택1 선택!</span>
-      </button>
-    `;
-  } else {
-    run.room++;
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn" style="justify-content:center; border-color:var(--gold);" onclick="showDoorChoices()">
-        <span class="act-title">➡️ 다음 갈림길로 이동 (${run.room}/5방)</span>
-      </button>
-    `;
-  }
-  updateUI();
-  saveAll();
-}
-
-// =========================================================================
-// 운명 카드 3택1 드래프트 (로그라이크 빌드 핵심)
-// =========================================================================
-function openFateCardDraft(onDone = null) {
-  const pool = FATE_CARDS.filter(c => !hasCard(c.id)).sort(() => Math.random() - 0.5);
-  const picks = pool.slice(0, 3);
-  if (picks.length === 0) { showDoorChoices(); return; }
-
-  const bg = document.getElementById('modal-bg'), body = document.getElementById('modal-body');
-  bg.classList.add('show');
-  body.innerHTML = `
-    <div style="text-align:center;">
-      <div style="font-size:16px; font-weight:900; color:var(--gold);">🃏 운명 카드 선택 (3택1)</div>
-      <div style="font-size:11px; color:var(--muted); margin-top:2px;">같은 태그를 2장·4장 모으면 사기급 시너지가 개방됩니다!</div>
-    </div>
-    ${picks.map(c => {
-      const tg = TAGS[c.tag];
-      return `
-        <div class="fate-card ${c.rarity}" onclick="pickFateCard('${c.id}')">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="font-size:13.5px; color:${c.rarity==='legend'?'#ff9f1a':c.rarity==='rare'?'#38a1ff':'#efe5d5'}">${tg.icon} ${c.name}</strong>
-            <span class="pill">${tg.name} 태그</span>
-          </div>
-          <div style="font-size:11.5px; color:var(--text); line-height:1.4;">${c.desc}</div>
-          <div style="font-size:10px; color:var(--muted);">시너지 2장: ${tg.b2}</div>
-        </div>
-      `;
-    }).join('')}
-  `;
-}
-
-function pickFateCard(id) {
-  const card = FATE_CARDS.find(c => c.id === id);
-  if (card) {
-    run.cards.push(card);
-    SFX.play('jackpot');
-    toast(`🃏 [${card.name}] 획득! (${TAGS[card.tag].icon}${TAGS[card.tag].name} 시너지)`, 'good', 2200);
-  }
-  closeModal();
-  showDoorChoices();
-}
-
-// =========================================================================
-// 악마 계약 + 연쇄 스토리(엘레나/카인/눈먼 대장장이) + 보물/화톳불
-// =========================================================================
-function startDevilEvent() {
-  phase = 'event';
-  SFX.play('devil');
-  document.getElementById('enemy-svg').innerHTML = `<svg viewBox="0 0 64 64" width="68" height="68"><path d="M16 14 Q8 2 22 10 M48 14 Q56 2 42 10" stroke="#ff3838" stroke-width="4" fill="none"/><circle cx="32" cy="28" r="14" fill="#2b0b12" stroke="#ff3838" stroke-width="2"/><circle cx="26" cy="26" r="2.5" fill="#ff3838"/><circle cx="38" cy="26" r="2.5" fill="#ff3838"/><path d="M24 35 Q32 41 40 35" stroke="#ff3838" stroke-width="2" fill="none"/></svg>`;
-  document.getElementById('enemy-name').textContent = '계약의 악마 메피스토';
-  document.getElementById('ev-title').textContent = '😈 심연 악마의 속삭임';
-  document.getElementById('ev-tag').textContent = '악마 계약';
-  document.getElementById('ev-desc').textContent = '"인간이여, 대가를 치르면 신조차 베는 권능을 주마. 계약을 맺을수록 심연의 보상 배율도 치솟지..."';
-
-  const avail = DEVIL_CONTRACTS.filter(d => !hasContract(d.id)).sort(() => Math.random() - 0.5).slice(0, 2);
-  document.getElementById('actions').innerHTML = avail.map(d => `
-    <button class="act-btn devil-btn" onclick="signContract('${d.id}')">
-      <div>
-        <span class="act-title">${d.name}</span>
-        <span class="act-sub" style="color:#ffd166;">얻음: ${d.gain} (보상 +${Math.round(d.mult*100)}%)</span>
-        <span class="act-sub" style="color:#ff8585;">대가: ${d.cost}</span>
-      </div>
-      <span class="act-badge">서명</span>
-    </button>
-  `).join('') + `
-    <button class="act-btn" onclick="run.light+=12; finishEvent('✨ 유혹을 뿌리쳤습니다. 신앙(빛)이 깊어져 체력을 15% 회복했습니다.', true);">
-      <div><span class="act-title">🙏 계약을 거부하고 신념을 지킨다</span><span class="act-sub">빛 성향 +12 · HP 15% 회복</span></div>
-      <span class="act-badge">거부</span>
-    </button>
-  `;
-  updateUI();
-}
-
-function signContract(id) {
-  const c = DEVIL_CONTRACTS.find(x => x.id === id);
-  if (!c) return;
-  run.contracts.push(c);
-  run.dark += 20;
-  if (id === 'd_soul') run.gold += 300;
-  const s = calcStats();
-  run.maxHp = s.maxHp;
-  run.hp = Math.min(run.maxHp, run.hp);
-  SFX.play('devil'); flashScreen('#ff3838');
-  finishEvent(`😈 <strong>[${c.name}]</strong> 영혼 계약을 체결했습니다! (현재 보상 배율 x${getRewardMult()})`);
-}
-
-// 묵직한 연쇄 스토리 이벤트 (선택이 몇 방 뒤에 복수/보답으로 돌아옴!)
-function startChainStoryEvent() {
-  phase = 'event';
-  document.getElementById('enemy-svg').innerHTML = getEnemySvg(null, false);
-  document.getElementById('enemy-name').textContent = '운명의 사건';
-
-  // 1) 엘레나 복수전 (이전에 식량을 빼앗았을 경우 난입!)
-  if (run.flags.elenaRobbed && !run.flags.elenaAvenged) {
-    run.flags.elenaAvenged = true;
-    toast('🩸 과거에 버렸던 기사 엘레나가 복수귀가 되어 나타났습니다!', 'bad', 3000);
-    startCombat('elite', '🩸 복수귀 엘레나');
-    return;
-  }
-
-  // 2) 눈먼 대장장이의 보답 (이전에 도와줬을 경우 무기 무료 신화 각성!)
-  if (run.flags.smithHelped && !run.flags.smithRewarded) {
-    run.flags.smithRewarded = true;
-    document.getElementById('ev-title').textContent = '⚒️ 눈먼 대장장이의 재회';
-    document.getElementById('ev-tag').textContent = '연쇄 보답';
-    document.getElementById('ev-desc').textContent = '"그때 날 구해준 은인이군! 이 심연의 모루에서 자네의 무기를 무료로 +3강화하고 영혼을 불어넣어 주겠네!"';
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn ult-ready" onclick="smithBlessWeapon()">
-        <div><span class="act-title">🔥 장착 무기 무료 +3강화 &amp; 영혼 각성</span><span class="act-sub">과거 선행의 묵직한 보답!</span></div>
-      </button>
-    `;
-    return;
-  }
-
-  // 3) 아직 보지 않은 핵심 연쇄 이벤트 제시
-  if (!run.flags.elenaMet) {
-    run.flags.elenaMet = true;
-    document.getElementById('ev-title').textContent = '🩸 쓰러진 소녀 기사 엘레나';
-    document.getElementById('ev-tag').textContent = '연쇄 사건';
-    document.getElementById('ev-desc').textContent = '치명상을 입은 기사 엘레나가 벽에 기대어 숨을 헐떡입니다.\n"제발... 내 피를 나눌 수 없다면, 그저 지나가 줘..."';
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn special-btn" onclick="run.hp=Math.max(1,run.hp-Math.floor(run.maxHp*0.25)); run.light+=15; run.flags.elenaSaved=true; finishEvent('✨ HP 25%를 나눠 엘레나를 살렸습니다. 그녀는 반드시 빚을 갚겠다며 떠났습니다... (보스전 지원 예고!)');">
-        <div><span class="act-title">💉 내 생명력(25%)을 나눠 그녀를 살린다</span><span class="act-sub">빛 +15 · 이후 보스전에 강력한 지원군으로 합류!</span></div>
-      </button>
-      <button class="act-btn devil-btn" onclick="run.gold+=180; run.dark+=20; run.flags.elenaRobbed=true; gainItem(makeItem(run.floor+1,3),false); finishEvent('😈 그녀의 장비와 180G를 빼앗았습니다. 엘레나가 증오 어린 눈으로 당신의 이름을 외웠습니다...');">
-        <div><span class="act-title">🗡️ 금화와 영웅 장비를 강탈하고 버려둔다</span><span class="act-sub">어둠 +20 · 즉석 180G + 영웅 장비 (훗날 복수전 발생!)</span></div>
-      </button>
-    `;
-  } else if (!run.flags.kainMet) {
-    run.flags.kainMet = true;
-    document.getElementById('ev-title').textContent = '🗡️ 악명 높은 용병 카인';
-    document.getElementById('ev-tag').textContent = '동료 영입';
-    document.getElementById('ev-desc').textContent = '피비린내 나는 용병 카인이 검을 닦으며 웃습니다.\n"계약금만 넉넉히 주면 함께 싸워주지. 단, 내가 손해 볼 짓은 안 해."';
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn special-btn" onclick="hireKain(120, 75)">
-        <div><span class="act-title">🪙 120G를 후하게 주고 신뢰로 고용한다</span><span class="act-sub">카인 합류(호감도 75: 치명상 대신 방어 + 매 턴 지원!)</span></div>
-      </button>
-      <button class="act-btn devil-btn" onclick="hireKain(0, 15)">
-        <div><span class="act-title">😈 약점을 잡아 공짜로 부려먹는다</span><span class="act-sub">카인 합류(호감도 15: HP 낮아지면 배신 위험!)</span></div>
-      </button>
-      <button class="act-btn" onclick="finishEvent('카인을 무시하고 갈 길을 떠났습니다.');">
-        <div><span class="act-title">🚶 거절하고 지나간다</span><span class="act-sub">안전하게 통과</span></div>
-      </button>
-    `;
-  } else if (!run.flags.smithMet) {
-    run.flags.smithMet = true;
-    document.getElementById('ev-title').textContent = '⚒️ 괴물에게 포위된 눈먼 대장장이';
-    document.getElementById('ev-tag').textContent = '연쇄 사건';
-    document.getElementById('ev-desc').textContent = '눈먼 노인 대장장이가 함정에 빠져 있습니다. 구하려면 상처를 입어야 합니다.';
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn special-btn" onclick="run.hp=Math.max(1,run.hp-Math.floor(run.maxHp*0.18)); run.light+=12; run.flags.smithHelped=true; finishEvent('✨ HP 18%를 희생해 대장장이를 구했습니다. 그는 다음 만남에 반드시 보답하겠다고 약속했습니다.');">
-        <div><span class="act-title">🛡️ 몸을 날려 대장장이를 구출한다</span><span class="act-sub">HP -18% · 이후 무기 무료 +3강화 각성 이벤트 개방</span></div>
-      </button>
-      <button class="act-btn" onclick="const it=makeItem(run.floor,2); gainItem(it,false); finishEvent('대장장이가 떨어뜨린 희귀 장비를 주워 조용히 떠났습니다.');">
-        <div><span class="act-title">🎒 떨어져 있는 장비만 챙겨 빠져나간다</span><span class="act-sub">즉석 희귀 이상 장비 획득</span></div>
-      </button>
-    `;
-  } else {
-    // 반복 시에도 긴장감 있는 운명 카드 교환/도박 이벤트
-    document.getElementById('ev-title').textContent = '🕯️ 심연의 예언자';
-    document.getElementById('ev-tag').textContent = '운명 도박';
-    document.getElementById('ev-desc').textContent = '검은 천을 두른 예언자가 두 개의 잔을 내밉니다. 하나는 신의 축복, 하나는 맹독입니다.';
-    document.getElementById('actions').innerHTML = `
-      <button class="act-btn ult-ready" onclick="drinkProphetCup()">
-        <div><span class="act-title">🍷 황금 잔을 마신다 (55% 운명 카드 / 45% 피 25% 손실)</span><span class="act-sub">실패해도 불운 게이지 +25% 상승!</span></div>
-      </button>
-      <button class="act-btn" onclick="openFateCardDraft()">
-        <div><span class="act-title">🪙 150G를 바치고 안전하게 운명 카드를 얻는다</span><span class="act-sub">골드 부족 시 불가 (보유: ${fmt(run.gold)}G)</span></div>
-      </button>
-    `;
-    if (run.gold < 150) document.querySelectorAll('#actions button')[1].disabled = true;
-    else document.querySelectorAll('#actions button')[1].onclick = () => { run.gold -= 150; openFateCardDraft(); };
-  }
-}
-
-function smithBlessWeapon() {
-  const w = run.equipped.weapon;
-  if (w) { w.enh = (w.enh || 0) + 3; w.atkPct = (w.atkPct || 0) + 15; }
-  SFX.play('jackpot'); flashScreen('#ff9f1a');
-  finishEvent(`⚒️ 눈먼 대장장이가 당신의 무기를 <strong>+${w ? w.enh : 3}강</strong>으로 벼려내고 공격력 +15%를 새겼습니다!`);
-}
-
-function hireKain(cost, trust) {
-  if (run.gold < cost) { toast('골드가 부족합니다!', 'bad'); return; }
-  run.gold -= cost;
-  run.companion = { id: 'kain', name: '용병 카인', trust, desc: trust >= 70 ? '신뢰 동행 (치명상 방어)' : '불안한 동행 (체력 낮을 시 배신 위험!)' };
-  SFX.play('click');
-  finishEvent(`🤝 용병 카인이 합류했습니다! (현재 호감도 ${trust})`);
-}
-
-function drinkProphetCup() {
-  if (Math.random() < 0.55) {
-    SFX.play('jackpot');
-    toast('✨ 축복의 잔이었습니다! 운명 카드를 선택하세요!', 'good');
-    openFateCardDraft();
-  } else {
-    run.hp = Math.max(1, run.hp - Math.floor(run.maxHp * 0.25));
-    run.unluck = Math.min(100, run.unluck + 25);
-    SFX.play('fail');
-    finishEvent(`💀 독이 든 잔이었습니다! HP -25% (대신 🎰 불운 게이지 +25% 축적!)`);
-  }
-}
-
-function startChestEvent() {
-  phase = 'event';
-  document.getElementById('enemy-svg').innerHTML = `<svg viewBox="0 0 64 64" width="64" height="64"><rect x="10" y="20" width="44" height="30" rx="4" fill="#6b3e1b" stroke="#f0c24b" stroke-width="2.5"/><rect x="10" y="30" width="44" height="6" fill="#d4a650"/><rect x="28" y="27" width="8" height="12" rx="2" fill="#ffe28a"/></svg>`;
-  document.getElementById('enemy-name').textContent = '피묻은 보물상자';
-  document.getElementById('ev-title').textContent = '🧰 심연의 보물상자';
-  document.getElementById('ev-tag').textContent = '보물';
-  document.getElementById('ev-desc').textContent = '고대 룬이 빛나는 상자입니다. 깊숙이 손을 넣으면 전설 장비가 나올 수도, 함정이 터질 수도 있습니다.';
-  document.getElementById('actions').innerHTML = `
-    <button class="act-btn ult-ready" onclick="openChestAction(true)">
-      <div><span class="act-title">🔥 깊숙이 파고들어 비밀 칸까지 연다</span><span class="act-sub">65% 영웅~창조 유니크 / 35% 함정 피해 + 불운 +20%</span></div>
-    </button>
-    <button class="act-btn" onclick="openChestAction(false)">
-      <div><span class="act-title">🔓 겉칸만 안전하게 챙긴다</span><span class="act-sub">100% 희귀 이상 장비 + 소량의 골드</span></div>
-    </button>
-  `;
-}
-
-function openChestAction(risky) {
-  if (risky) {
-    if (Math.random() < 0.65) {
-      const it = makeItem(run.floor + 1, 3);
-      gainItem(it, true);
-      const jp = tryJackpot('보물상자');
-      finishEvent(`🎉 비밀 칸 개방 성공! <strong class="${it.gradeCls}">[${it.gradeName}] ${it.name}</strong> 획득!${jp ? '<br>' + jp : ''}`);
-    } else {
-      const dmg = Math.floor(run.maxHp * 0.22);
-      run.hp = Math.max(1, run.hp - dmg);
-      run.unluck = Math.min(100, run.unluck + 20);
-      SFX.play('fail');
-      finishEvent(`💥 저주 함정 폭발! HP -${fmt(dmg)} (🎰 불운 게이지 +20% 증가!)`);
-    }
-  } else {
-    const it = makeItem(run.floor, 2);
-    const g = 50 + run.floor * 20;
-    run.gold += g;
-    gainItem(it, false);
-    finishEvent(`🧰 안전하게 <strong class="${it.gradeCls}">[${it.gradeName}] ${it.name}</strong> 및 🪙+${fmt(g)}G를 챙겼습니다.`);
-  }
-}
-
-function startCampEvent() {
-  phase = 'event';
-  document.getElementById('enemy-svg').innerHTML = `<svg viewBox="0 0 64 64" width="64" height="64"><path d="M16 50 L48 50 L42 56 L22 56 Z" fill="#5c3a21"/><path d="M20 50 Q32 8 44 50 Z" fill="#ff6b1a"/><path d="M26 50 Q32 22 38 50 Z" fill="#ffe066"/></svg>`;
-  document.getElementById('enemy-name').textContent = '안식의 화톳불';
-  document.getElementById('ev-title').textContent = '🏕️ 꺼져가는 화톳불';
-  document.getElementById('ev-tag').textContent = '휴식/강화';
-  document.getElementById('ev-desc').textContent = '잠시 숨을 돌릴 수 있는 성역입니다. 체력을 회복하거나, 화톳불의 불꽃으로 무기를 벼려낼 수 있습니다.';
-  document.getElementById('actions').innerHTML = `
-    <button class="act-btn special-btn" onclick="healHero(Math.floor(run.maxHp*0.55)); finishEvent('🔥 화톳불 곁에서 체력을 55% 회복했습니다.');">
-      <div><span class="act-title">🔥 깊은 휴식 (HP 55% 회복)</span><span class="act-sub">안전하게 체력 회복</span></div>
-    </button>
-    <button class="act-btn ult-ready" onclick="campForgeFree()">
-      <div><span class="act-title">🔨 화톳불 제련 (장착 무기 무료 +1강 100%)</span><span class="act-sub">실패 위험 없이 무기 강화!</span></div>
-    </button>
-  `;
-}
-
-function campForgeFree() {
-  const w = run.equipped.weapon;
-  if (w) { w.enh = (w.enh || 0) + 1; SFX.play('jackpot'); }
-  finishEvent(`🔨 화톳불의 힘으로 <strong>[${w ? w.name : '무기'}]</strong>이(가) <strong>+${w ? w.enh : 1}강</strong>이 되었습니다!`);
-}
-
-function finishEvent(msg, heal15 = false) {
-  if (heal15) healHero(Math.floor(run.maxHp * 0.15));
-  phase = 'reward';
-  run.room++;
-  const logEl = document.getElementById('combat-log');
-  logEl.innerHTML = msg;
-  logEl.classList.add('show');
-  document.getElementById('actions').innerHTML = `
-    <button class="act-btn" style="justify-content:center; border-color:var(--gold);" onclick="showDoorChoices()">
-      <span class="act-title">➡️ 다음 갈림길로 이동 (${run.room}/5방)</span>
-    </button>
-  `;
-  updateUI();
-  saveAll();
-}
-
-// =========================================================================
-// 장비 상세 · 하이리스크 대장간 (+1~+15) · 유산 지정
-// =========================================================================
-function openLootModal(it) {
-  openGearModal(it.uid, false);
-}
-
-function openGearModal(uid, isEq) {
-  const it = isEq ? Object.values(run.equipped).find(x => x && x.uid === uid) : run.bag.find(x => x.uid === uid);
-  if (!it) return;
-  const g = GRADES[it.gradeIdx];
-  const enh = it.enh || 0;
-  const cost = Math.floor((40 + run.floor * 15) * Math.pow(1.42, enh));
-  const prob = enh < 5 ? 95 - enh * 6 : enh < 10 ? 60 - (enh - 5) * 6 : Math.max(15, 32 - (enh - 10) * 3);
-  const riskTxt = enh < 5 ? '안전 구간(하락 없음)' : enh < 10 ? '실패 시 35% 확률 하락' : '🔥 오버차지 구간 (성공 시 폭발 상승 / 실패 시 20% 파괴!)';
-
-  const bg = document.getElementById('modal-bg'), body = document.getElementById('modal-body');
-  bg.classList.add('show');
-  body.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-      <div>
-        <div class="${it.gradeCls}" style="font-size:16px; font-weight:900;">${it.icon} [${it.gradeName}] ${it.name} ${enh ? '+' + enh : ''}</div>
-        <div style="font-size:11px; color:var(--muted);">${it.slotName} ${it.isLegacy ? '· 🌟 유산 장비' : ''}</div>
-      </div>
-      <button class="btn-sm" onclick="closeModal()">✕</button>
-    </div>
-    <div class="card" style="font-size:12px; line-height:1.6;">
-      <div>• 기본 ${it.stat.toUpperCase()} +<strong>${Math.floor(it.baseVal * (1 + enh * (enh >= 10 ? 0.24 : 0.14)))}</strong></div>
-      ${it.atkPct ? `<div>• 공격력 증가 +${it.atkPct}%</div>` : ''}
-      ${it.critDmg ? `<div>• 치명타 피해 +${it.critDmg}%</div>` : ''}
-      ${it.uniqueDesc ? `<div style="margin-top:5px; padding:6px; background:#251830; border:1px solid ${g.col}; border-radius:5px; color:#ffe699; font-weight:800;">⚡ 고유 발동: ${it.uniqueDesc}</div>` : ''}
-    </div>
-    <div class="card" style="border-color:var(--gold-dim);">
-      <div style="font-size:11.5px; font-weight:800; color:var(--gold);">🔨 하이리스크 대장간 (+${enh} ➔ +${enh + 1})</div>
-      <div style="font-size:10.5px; color:${enh >= 10 ? '#ff8585' : 'var(--muted)'}; margin:3px 0;">성공률 ${prob}% · 비용 🪙${fmt(cost)}G · ${riskTxt}</div>
-      <button class="act-btn ult-ready" style="width:100%; justify-content:center; padding:8px;" onclick="enhanceGear('${it.uid}', ${isEq}, ${cost}, ${prob})">
-        <span class="act-title">🔨 강화 도전 (${fmt(cost)}G)</span>
-      </button>
-    </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-      <button class="act-btn special-btn" style="justify-content:center;" onclick="equipOrUnequip('${it.uid}', ${isEq})">
-        <span class="act-title">${isEq ? '📥 해제' : '⚔️ 장착'}</span>
-      </button>
-      <button class="act-btn" style="justify-content:center; border-color:#00f5d4;" onclick="setLegacyGear('${it.uid}', ${isEq})">
-        <span class="act-title">🌟 유산 지정</span>
-      </button>
-    </div>
-  `;
-}
-
-function enhanceGear(uid, isEq, cost, prob) {
-  if (run.gold < cost) { SFX.play('fail'); toast('골드가 부족합니다!', 'bad'); return; }
-  const it = isEq ? Object.values(run.equipped).find(x => x && x.uid === uid) : run.bag.find(x => x.uid === uid);
-  if (!it) return;
-  run.gold -= cost;
-
-  if (Math.random() * 100 < prob) {
-    it.enh = (it.enh || 0) + 1;
-    SFX.play(it.enh >= 10 ? 'jackpot' : 'parry');
-    if (it.enh >= 10) flashScreen('#ff9f1a');
-    toast(`🔨 [${it.name}] +${it.enh} 강화 대성공!!`, 'good');
-  } else {
-    run.unluck = Math.min(100, run.unluck + 12); // 실패할수록 잭팟 천장 상승!
-    SFX.play('fail');
-    const enh = it.enh || 0;
-    if (enh >= 10 && Math.random() < 0.20) {
-      // 파괴! 대신 영혼석 환원
-      meta.souls += 3;
-      if (isEq) run.equipped[it.slotId] = null;
-      else run.bag = run.bag.filter(x => x.uid !== uid);
-      toast(`💥 오버차지 파괴!! 대신 영혼석 +3개 & 불운 +12% 축적`, 'bad', 3000);
-      closeModal(); updateUI(); renderGearTab(); saveAll(); return;
-    } else if ((enh >= 5 && Math.random() < 0.35) || (hasContract('d_chaos') && Math.random() < 0.2)) {
-      it.enh = Math.max(0, enh - 1);
-      toast(`📉 강화 실패! +${it.enh}로 하락 (불운 +12%)`, 'bad');
-    } else {
-      toast(`💦 강화 실패 (수치 유지 · 불운 +12%)`, 'bad');
-    }
-  }
-  updateUI(); renderGearTab(); saveAll(); openGearModal(uid, isEq);
-}
-
-function equipOrUnequip(uid, isEq) {
-  SFX.play('click');
-  if (isEq) {
-    const k = Object.keys(run.equipped).find(s => run.equipped[s]?.uid === uid);
-    if (k && run.bag.length < 20) { run.bag.unshift(run.equipped[k]); run.equipped[k] = null; }
-  } else {
-    const idx = run.bag.findIndex(x => x.uid === uid);
-    if (idx !== -1) {
-      const it = run.bag[idx], prev = run.equipped[it.slotId];
-      run.equipped[it.slotId] = it;
-      run.bag.splice(idx, 1);
-      if (prev) run.bag.unshift(prev);
-    }
-  }
-  closeModal(); updateUI(); renderGearTab(); saveAll();
-}
-
-function setLegacyGear(uid, isEq) {
-  const it = isEq ? Object.values(run.equipped).find(x => x && x.uid === uid) : run.bag.find(x => x.uid === uid);
-  if (!it) return;
-  meta.legacyItem = JSON.parse(JSON.stringify(it));
-  SFX.play('jackpot');
-  toast(`🌟 [${it.name}] 유산 지정 완료! 죽어도 다음 런에 계승됩니다!`, 'jackpot', 2600);
-  saveAll(); openGearModal(uid, isEq);
-}
-
-function salvageTrash() {
-  let cnt = 0, gain = 0;
-  run.bag = run.bag.filter(it => {
-    if (it.gradeIdx <= 2 && !it.uniqueId) { cnt++; gain += 20 + it.gradeIdx * 25; return false; }
-    return true;
-  });
-  if (cnt === 0) { toast('판매할 일반~희귀 비유니크 장비가 없습니다.'); return; }
-  run.gold += gain;
-  SFX.play('click');
-  toast(`🪙 장비 ${cnt}개 일괄 판매 (+${fmt(gain)}G)`, 'good');
-  updateUI(); renderGearTab(); saveAll();
-}
-
-// =========================================================================
-// 진짜 죽음 & 로그라이트 런 결산 + 영혼 제단
-// =========================================================================
-function triggerRunDeath() {
-  clearTimeout(autoTimer);
-  autoMob = false;
-  SFX.play('devil');
-  flashScreen('#ff2a2a');
-
-  const floorBonus = Math.max(2, run.floor * 2 + Math.floor(run.kills / 3));
-  meta.souls += floorBonus;
-  meta.runs++;
-  if (run.floor > meta.bestFloor) meta.bestFloor = run.floor;
-
-  const summary = {
-    floor: run.floor, kills: run.kills, maxHit: run.maxHit,
-    soulsTotal: run.soulsEarned + floorBonus,
-    cards: run.cards.length, contracts: run.contracts.length
   };
-
-  run = null; enemy = null;
-  saveAll();
-
-  const bg = document.getElementById('modal-bg'), body = document.getElementById('modal-body');
-  bg.classList.add('show');
-  body.innerHTML = `
-    <div style="text-align:center;">
-      <div style="font-size:44px;">💀</div>
-      <div style="font-size:18px; font-weight:900; color:#ff6b6b;">심연에 잠들다 — 원정 결산</div>
-      <div style="font-size:11.5px; color:var(--muted); margin-top:3px;">획득한 영혼석과 유산 장비로 더 강해져 다시 도전하십시오.</div>
-    </div>
-    <div class="card" style="font-size:12.5px; line-height:1.8;">
-      <div>🏰 최종 도달 층수: <strong>심연 ${summary.floor}층</strong></div>
-      <div>⚔️ 처치한 적: <strong>${summary.kills}마리</strong></div>
-      <div>💥 이번 런 최고 한방 딜: <strong style="color:#ffd166;">${fmt(summary.maxHit)}</strong></div>
-      <div>🃏 완성한 빌드: 운명 카드 ${summary.cards}장 · 악마 계약 ${summary.contracts}건</div>
-      <div style="color:var(--cyan); font-weight:800;">💎 정산 영혼석: +${fmt(summary.soulsTotal)} (총 보유 💎${fmt(meta.souls)})</div>
-      ${meta.legacyItem ? `<div style="color:#4cd964;">🌟 계승될 유산: [${meta.legacyItem.gradeName}] ${meta.legacyItem.name} +${meta.legacyItem.enh||0}</div>` : ''}
-    </div>
-    <button class="act-btn ult-ready" style="justify-content:center;" onclick="closeModal(); showClassSelect();">
-      <span class="act-title">🔥 영혼 제단 강화 후 새 원정 시작</span>
-    </button>
-  `;
-}
-
-function showClassSelect() {
-  const bg = document.getElementById('modal-bg'), body = document.getElementById('modal-body');
-  bg.classList.add('show');
-  body.innerHTML = `
-    <div style="text-align:center;">
-      <div style="font-size:17px; font-weight:900; color:var(--gold);">⚔️ 심연의 서약 : 직업 선택</div>
-      <div style="font-size:11px; color:var(--muted); margin-top:2px;">보유 영혼석 💎${fmt(meta.souls)} ${meta.legacyItem ? `| 유산: ${meta.legacyItem.name}` : ''}</div>
-    </div>
-    ${Object.entries(CLASSES).map(([k, c]) => `
-      <button class="act-btn" onclick="startFreshRun('${k}')">
-        <div>
-          <span class="act-title">${c.icon} ${c.name}</span>
-          <span class="act-sub">스킬: ${c.skill.name} — ${c.skill.desc}</span>
-          <span class="act-sub" style="color:#ffd166;">필살: ${c.ult.name}</span>
-        </div>
-        <span class="act-badge">출정</span>
-      </button>
-    `).join('')}
-    ${meta.souls >= 4 ? `<button class="btn-sm" style="padding:8px; border-color:var(--cyan); color:var(--cyan);" onclick="closeModal(); switchTab('altar');">🌌 영혼 제단 먼저 강화하기 (💎${fmt(meta.souls)})</button>` : ''}
-  `;
-}
-
-function startFreshRun(classKey) {
-  SFX.play('jackpot');
-  run = createRun(classKey);
-  const s = calcStats();
-  run.maxHp = s.maxHp; run.hp = s.maxHp;
-  closeModal();
-  switchTab('run');
-  if ((meta.upgrades.m_card || 0) >= 1) {
-    openFateCardDraft();
-  } else {
-    showDoorChoices();
-  }
-  updateUI();
-  saveAll();
-}
-
-function buyMetaUpgrade(id) {
-  const u = META_UPGRADES.find(x => x.id === id);
-  const lv = meta.upgrades[id] || 0;
-  if (u.max && lv >= u.max) return;
-  const cost = u.cost + lv * 3;
-  if (meta.souls < cost) { SFX.play('fail'); toast('영혼석이 부족합니다!', 'bad'); return; }
-  meta.souls -= cost;
-  meta.upgrades[id] = lv + 1;
-  SFX.play('jackpot');
-  toast(`${u.name} Lv.${lv + 1} 영구 각성!`, 'good');
-  saveAll(); renderAltarTab(); updateUI();
-}
-
-// =========================================================================
-// 자동 잡몹 전투(선택형 편의), UI 렌더링 및 탭 전환
-// =========================================================================
-function toggleAutoMob() {
-  autoMob = !autoMob;
-  const b = document.getElementById('btn-auto-mob');
-  b.textContent = `잡몹자동:${autoMob ? 'ON' : 'OFF'}`;
-  b.classList.toggle('on', autoMob);
-  if (autoMob && phase === 'combat' && enemy?.tier === 'combat') scheduleAutoCombat();
-  else clearTimeout(autoTimer);
-}
-
-function scheduleAutoCombat() {
-  clearTimeout(autoTimer);
-  autoTimer = setTimeout(() => {
-    if (!autoMob || phase !== 'combat' || !enemy || enemy.tier !== 'combat') return;
-    if (enemy.intent === 'heavy' && !enemy.stun && !hasContract('d_nopar')) doCombatTurn('parry');
-    else if (run.rage >= 100) doCombatTurn('ult');
-    else if (run.rage >= CLASSES[run.classKey].skill.rage) doCombatTurn('skill');
-    else doCombatTurn('atk');
-  }, 420);
-}
-
-function updateUI() {
-  if (!run) return;
-  const s = calcStats();
-  run.maxHp = s.maxHp;
-  run.hp = Math.min(run.maxHp, run.hp);
-  const c = CLASSES[run.classKey];
-
-  document.getElementById('hud-cls-ico').textContent = c.icon;
-  document.getElementById('hud-lv').textContent = `Lv.${run.lv}`;
-  document.getElementById('hud-cls-name').textContent = c.name;
-  document.getElementById('hud-floor').textContent = `심연 ${run.floor}층 (${run.room}/5)`;
-  document.getElementById('hud-gold').textContent = fmt(run.gold);
-  document.getElementById('hud-soul').textContent = fmt(meta.souls);
-
-  const dp = document.getElementById('hud-devil-pill');
-  dp.style.display = run.contracts.length ? 'inline-block' : 'none';
-  dp.textContent = `😈 계약 ${run.contracts.length}`;
-
-  const hpPct = Math.max(0, Math.min(100, (run.hp / run.maxHp) * 100));
-  const shPct = Math.min(100, (run.shield / run.maxHp) * 100);
-  document.getElementById('bar-hp').style.width = hpPct + '%';
-  document.getElementById('bar-shield').style.width = shPct + '%';
-  document.getElementById('txt-hp').textContent = `HP ${fmt(run.hp)}/${fmt(run.maxHp)}${run.shield ? ` (+${fmt(run.shield)})` : ''}`;
-  document.getElementById('bar-rage').style.width = Math.min(100, run.rage) + '%';
-  document.getElementById('txt-rage').textContent = `분노 ${run.rage}/100`;
-
-  const al = run.light - run.dark;
-  document.getElementById('hud-align').textContent = al >= 15 ? `✨ 성자(${run.light})` : al <= -15 ? `😈 타락(${run.dark})` : `⚖️ 중립`;
-
-  // 태그 시너지 칩
-  document.getElementById('hud-syns').innerHTML = Object.entries(s.tags)
-    .filter(([,v]) => v > 0)
-    .map(([k,v]) => `<span class="st-badge" style="${v>=2?'border-color:#ff9f1a;color:#ffe28a;':''}">${TAGS[k].icon}${v}</span>`).join('');
-
-  // 아레나 HUD 갱신
-  document.getElementById('unluck-txt').textContent = `🎰 잭팟 ${getJackpotChance()}%`;
-  document.getElementById('reward-mult-txt').textContent = `🔥 보상 x${getRewardMult()}`;
-  document.getElementById('hero-svg').innerHTML = getHeroSvg(run.classKey);
-  document.getElementById('arena-hero-hp').style.width = hpPct + '%';
-  document.getElementById('hero-name').textContent = `${c.name} (공 ${fmt(s.atk)})`;
-  document.getElementById('hero-companion-tag').style.display = run.companion ? 'block' : 'none';
-  if (run.companion) document.getElementById('hero-companion-tag').textContent = `🤝 ${run.companion.name}`;
-
-  document.getElementById('hero-status').innerHTML = run.shield > 0 ? `<span class="st-badge st-shield">🛡️${fmt(run.shield)}</span>` : '';
-
-  if (enemy) {
-    document.getElementById('enemy-name').textContent = `${enemy.name} (${fmt(Math.max(0,enemy.hp))})`;
-    document.getElementById('arena-enemy-hp').style.width = Math.max(0, (enemy.hp / enemy.maxHp) * 100) + '%';
-    const itTag = document.getElementById('enemy-intent');
-    itTag.style.display = 'block';
-    itTag.className = 'intent-tag' + (enemy.intent === 'heavy' && !enemy.stun ? ' danger' : '');
-    itTag.textContent = enemy.stun ? '💫 기절함!' : enemy.intent === 'heavy' ? `🔥 치명 강타 ${fmt(enemy.intentVal)}!` : enemy.intent === 'curse' ? `🩸 저주 공격 ${fmt(enemy.intentVal)}` : `⚔️ 공격 ${fmt(enemy.intentVal)}`;
-
-    let est = '';
-    if (enemy.bleed > 0) est += `<span class="st-badge st-bleed">🩸출혈 ${enemy.bleed}</span>`;
-    if (enemy.poison > 0) est += `<span class="st-badge st-poison">☠️독 ${enemy.poison}</span>`;
-    if (enemy.stun) est += `<span class="st-badge st-stun">💫기절</span>`;
-    document.getElementById('enemy-status').innerHTML = est;
-  }
-
-  document.getElementById('dot-altar').classList.toggle('show', meta.souls >= 4);
-}
-
-function switchTab(id) {
-  SFX.play('click');
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  document.getElementById('nav-' + id).classList.add('active');
-  if (id === 'build') renderBuildTab();
-  if (id === 'gear') { document.getElementById('dot-gear').classList.remove('show'); renderGearTab(); }
-  if (id === 'altar') renderAltarTab();
-  if (id === 'lore') renderLoreTab();
-}
-
-function renderBuildTab() {
-  if (!run) return;
-  const tags = getTagCounts();
-  document.getElementById('synergy-list').innerHTML = Object.entries(TAGS).map(([k, t]) => `
-    <div class="row">
-      <div><strong>${t.icon} ${t.name} (${tags[k]}장)</strong><br><span style="font-size:10.5px; color:${tags[k]>=2?'#4cd964':'var(--muted)'};">2장: ${t.b2}</span><br><span style="font-size:10.5px; color:${tags[k]>=4?'#00f5d4':'var(--muted)'};">4장: ${t.b4}</span></div>
-    </div>
-  `).join('');
-
-  document.getElementById('card-cnt').textContent = run.cards.length + '장';
-  document.getElementById('card-list').innerHTML = run.cards.length
-    ? run.cards.map(c => `<div class="row"><div><strong>${TAGS[c.tag].icon} ${c.name}</strong><div style="font-size:10.5px; color:var(--muted);">${c.desc}</div></div></div>`).join('')
-    : '<div style="font-size:11.5px; color:var(--muted);">보스를 처치하거나 사건을 통해 운명 카드를 획득하세요!</div>';
-
-  document.getElementById('contract-mult').textContent = `보상 x${getRewardMult()}`;
-  document.getElementById('contract-list').innerHTML = run.contracts.length
-    ? run.contracts.map(c => `<div class="row" style="border-color:#7a222b;"><div><strong style="color:#ff9999;">${c.name}</strong><div style="font-size:10.5px; color:#ffd166;">${c.gain}</div><div style="font-size:10px; color:#ff7b7b;">대가: ${c.cost}</div></div></div>`).join('')
-    : '<div style="font-size:11.5px; color:var(--muted);">아직 악마와 맺은 계약이 없습니다.</div>';
-
-  document.getElementById('companion-box').innerHTML = run.companion
-    ? `<div class="row"><div><strong>🤝 ${run.companion.name}</strong> (호감도 ${run.companion.trust})<div style="font-size:10.5px; color:var(--muted);">${run.companion.desc}</div></div></div>`
-    : '<div style="font-size:11.5px; color:var(--muted);">동행 중인 동료가 없습니다. [❓ 핏빛 사건]에서 인연을 만나세요.</div>';
-}
-
-function renderGearTab() {
-  if (!run) return;
-  document.getElementById('equip-list').innerHTML = SLOTS.map(sl => {
-    const it = run.equipped[sl.id];
-    if (!it) return `<div class="row" style="opacity:0.45;"><span>${sl.icon} ${sl.name}: 비어 있음</span></div>`;
-    return `
-      <div class="row click" style="border-color:${GRADES[it.gradeIdx].col}66;" onclick="openGearModal('${it.uid}', true)">
-        <div>
-          <strong class="${it.gradeCls}">${it.icon} [${it.gradeName}] ${it.name} ${it.enh ? '+' + it.enh : ''}</strong> ${meta.legacyItem?.uid===it.uid ? '🌟' : ''}
-          <div style="font-size:10.5px; color:#ffe699;">${it.uniqueDesc || `기본 ${it.stat.toUpperCase()} +${it.baseVal}`}</div>
-        </div>
-        <span class="btn-sm">강화/관리</span>
-      </div>
-    `;
-  }).join('');
-
-  document.getElementById('bag-cnt').textContent = run.bag.length;
-  document.getElementById('bag-list').innerHTML = run.bag.length
-    ? run.bag.map(it => `
-      <div class="row click" onclick="openGearModal('${it.uid}', false)">
-        <div>
-          <strong class="${it.gradeCls}">${it.icon} [${it.gradeName}] ${it.name} ${it.enh ? '+' + it.enh : ''}</strong>
-          <div style="font-size:10.5px; color:${it.uniqueDesc ? '#ffe699' : 'var(--muted)'};">${it.uniqueDesc || `기본 ${it.stat.toUpperCase()} +${it.baseVal}`}</div>
-        </div>
-        <span class="btn-sm">상세</span>
-      </div>
-    `).join('')
-    : '<div style="font-size:11.5px; color:var(--muted); text-align:center;">가방이 비어 있습니다.</div>';
-}
-
-function renderAltarTab() {
-  document.getElementById('altar-soul').textContent = fmt(meta.souls);
-  document.getElementById('meta-list').innerHTML = META_UPGRADES.map(u => {
-    const lv = meta.upgrades[u.id] || 0;
-    const isMax = u.max && lv >= u.max;
-    const cost = u.cost + lv * 3;
-    return `
-      <div class="row">
-        <div><strong>${u.name} (Lv.${lv}${u.max ? '/' + u.max : ''})</strong><div style="font-size:10.5px; color:var(--muted);">${u.desc}</div></div>
-        <button class="btn-sm" ${isMax ? 'disabled' : ''} onclick="buyMetaUpgrade('${u.id}')">${isMax ? 'MAX' : '💎 ' + cost}</button>
-      </div>
-    `;
-  }).join('');
-
-  document.getElementById('record-box').innerHTML = `
-    <div>🏰 최고 도달 층수: <strong>심연 ${meta.bestFloor}층</strong></div>
-    <div>💥 역대 최고 한방 딜: <strong style="color:#ffd166;">${fmt(meta.bestDmg)}</strong></div>
-    <div>💀 누적 도전 횟수: <strong>${meta.runs}회</strong></div>
-    <div>🌟 지정된 유산 장비: <strong>${meta.legacyItem ? `[${meta.legacyItem.gradeName}] ${meta.legacyItem.name} +${meta.legacyItem.enh||0}` : '없음 (장비 탭에서 지정)'}</strong></div>
-  `;
-}
-
-function renderLoreTab() {
-  if (run) {
-    const fl = [];
-    if (run.flags.elenaSaved) fl.push('✨ 엘레나를 구출함 (보스전 지원군 예정)');
-    if (run.flags.elenaRobbed) fl.push('🩸 엘레나를 배신함 (복수귀 추격 위험!)');
-    if (run.flags.smithHelped) fl.push('⚒️ 눈먼 대장장이 구출 (무료 각성 예고)');
-    if (run.flags.kainBetrayed) fl.push('🗡️ 용병 카인에게 배신당함');
-    document.getElementById('flags-box').innerHTML = fl.length ? fl.join('<br>') : '아직 기록된 굵직한 운명 분기가 없습니다.';
-  }
-  document.getElementById('codex-cnt').textContent = `${meta.codex.length}/${UNIQUE_EFFECTS.length}종`;
-  document.getElementById('codex-box').innerHTML = UNIQUE_EFFECTS.map(u => {
-    const found = meta.codex.includes(u.id);
-    return `<div class="row" style="opacity:${found ? 1 : 0.4};"><div><strong style="color:${found ? '#ff9f1a' : 'var(--muted)'}">${found ? '👑 ' + u.name : '❓ 미발견 유니크'}</strong><div style="font-size:10.5px; color:var(--muted);">${found ? u.desc : '심연의 정예·보스·상자에서 발견'}</div></div></div>`;
-  }).join('');
-}
-
-function closeModal() { document.getElementById('modal-bg').classList.remove('show'); }
-function toggleSfx() { SFX.on = !SFX.on; meta.sfx = SFX.on; document.getElementById('btn-sfx').textContent = `🔊 효과음: ${SFX.on ? 'ON' : 'OFF'}`; saveAll(); }
-function giveUpRun() { if (!run) return; if (!confirmTap('giveup', document.getElementById('btn-giveup'), '💀 진짜 포기(재탭)')) return; triggerRunDeath(); }
-function wipeAllData() { if (!confirmTap('wipe', document.getElementById('btn-wipe'), '⚠️ 전체 삭제(재탭)')) return; localStorage.removeItem('ABYSS_V5_META'); localStorage.removeItem('ABYSS_V5_RUN'); location.reload(); }
-
-window.addEventListener('DOMContentLoaded', () => {
-  FX.init();
-  const hasRun = loadAll();
-  document.getElementById('btn-sfx').textContent = `🔊 효과음: ${SFX.on ? 'ON' : 'OFF'}`;
-  if (hasRun && run) {
-    showDoorChoices();
-  } else {
-    showClassSelect();
-  }
-});
+})();
 </script>
 </body>
 </html>
